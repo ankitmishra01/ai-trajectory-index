@@ -1,0 +1,912 @@
+[
+  {
+    "id": "mexico", "slug": "mexico", "name": "Mexico", "flag": "🇲🇽", "region": "Americas",
+    "scores": {
+      "infrastructure": { "score": 11, "reasons": ["Mexico City and Guadalajara are growing data centre hubs; AT&T and Telmex rolling out 5G in major cities", "Significant infrastructure inequality — tier-1 cities have good connectivity while rural areas remain underserved", "Nearshore position to US driving investment in cross-border connectivity and data infrastructure"] },
+      "talent": { "score": 12, "reasons": ["UNAM and IPN produce large volumes of engineering and CS graduates, the largest pipeline in Latin America", "Growing nearshore tech sector employing 700,000+ IT professionals serving US companies", "Brain drain to the US is significant but returning diaspora and remote work is building reverse flow"] },
+      "governance": { "score": 10, "reasons": ["Mexico's Federal Law on Personal Data Protection provides a data governance foundation", "National AI strategy in development; INAI data protection authority active but under-resourced", "Political instability and regulatory unpredictability create uncertainty for long-term AI investment"] },
+      "investment": { "score": 10, "reasons": ["Rappi, Kavak, and Clip demonstrate Mexican founders can build billion-dollar AI-driven companies", "Major US tech companies (IBM, Intel, Oracle) operating significant engineering centres in Guadalajara", "Nearshore tech investment growing rapidly as US companies seek cost-effective AI development"] },
+      "economic_readiness": { "score": 8, "reasons": ["215M population and Latin America's second largest economy provides meaningful domestic AI market scale", "Manufacturing sector (near-shoring boom) rapidly adopting AI for supply chain and quality control", "Fintech sector growing fast — Mercado Pago, Clip deploying AI in payments and credit"] }
+    },
+    "total_score": 51, "trajectory_score": 4, "trajectory_label": "Positive", "projected_score_2028": 55,
+    "top_accelerator": "Nearshoring boom attracting US manufacturers and tech investment at unprecedented pace",
+    "top_risk": "Political instability, regulatory unpredictability, and security concerns deterring international AI investment",
+    "comparable_countries": ["brazil", "colombia"]
+  },
+  {
+    "id": "argentina", "slug": "argentina", "name": "Argentina", "flag": "🇦🇷", "region": "Americas",
+    "scores": {
+      "infrastructure": { "score": 10, "reasons": ["Buenos Aires has a solid data centre ecosystem; Claro and Telefónica Argentina deploying 5G", "Infrastructure investment constrained by macroeconomic instability and currency controls", "Undersea cable connectivity good for South America; Arsat national satellite provides rural connectivity"] },
+      "talent": { "score": 12, "reasons": ["UBA (Universidad de Buenos Aires) ranked among Latin America's top CS research institutions", "CONICET public research agency produces strong AI research output despite funding constraints", "Globant and MercadoLibre demonstrate Argentina's capacity to build globally competitive AI product companies"] },
+      "governance": { "score": 9, "reasons": ["Argentina passed a comprehensive Personal Data Protection law (Law 25.326) with updates in progress", "National AI strategy published but macroeconomic crises repeatedly disrupt government programme continuity", "AAIP (data protection authority) active but under-resourced given economic constraints"] },
+      "investment": { "score": 8, "reasons": ["Globant ($8B market cap) and MercadoLibre are world-class AI-driven companies founded in Argentina", "VC investment hampered by currency restrictions and economic instability; peso devaluation creates $ conversion risk", "Government Milei administration pursuing deregulation that could unlock more private AI investment"] },
+      "economic_readiness": { "score": 7, "reasons": ["Large domestic market (46M) and well-educated population provide good AI adoption foundation", "Agricultural technology AI is a natural fit for Argentina's dominant farming sector", "Chronic macroeconomic instability (hyperinflation cycles, debt crises) undermines long-term AI planning"] }
+    },
+    "total_score": 46, "trajectory_score": 2, "trajectory_label": "Positive", "projected_score_2028": 48,
+    "top_accelerator": "World-class tech companies (Globant, MercadoLibre) proving Argentine AI talent can reach global scale",
+    "top_risk": "Chronic macroeconomic instability — currency crises, inflation, and capital controls creating perpetual investment uncertainty",
+    "comparable_countries": ["brazil", "chile"]
+  },
+  {
+    "id": "chile", "slug": "chile", "name": "Chile", "flag": "🇨🇱", "region": "Americas",
+    "scores": {
+      "infrastructure": { "score": 11, "reasons": ["Santiago data centre market growing rapidly; Google and AWS established South American regions here", "Entel and Movistar deploying 5G; Chile has Latin America's best fibre penetration rates", "Subsea cable landing point for trans-Pacific cables connecting South America to Asia"] },
+      "talent": { "score": 11, "reasons": ["Pontificia Universidad Católica and Universidad de Chile producing strong engineering and CS graduates", "National Centre for Artificial Intelligence (CENIA) established with government backing for research coordination", "Brain drain to the US and Europe significant but Start-Up Chile government programme attracting global founders"] },
+      "governance": { "score": 11, "reasons": ["Chile's Personal Data Protection Law being updated to align with international standards", "National AI Policy published 2021 with clear principles and government adoption commitments", "Most stable regulatory environment in Latin America — Chile has highest rule-of-law scores in region"] },
+      "investment": { "score": 10, "reasons": ["Start-Up Chile has funded 3,000+ startups since 2010 — Latin America's first and most impactful accelerator", "Google and AWS cloud regions driving significant local investment ecosystem formation", "Mining sector AI investment (BHP, Codelco automation) creates industrial AI R&D demand"] },
+      "economic_readiness": { "score": 7, "reasons": ["Latin America's most stable macroeconomic environment with strong rule of law and low corruption", "Mining sector AI for copper extraction and ESG monitoring is a unique global opportunity", "Financial services and retail sectors deploying AI with increasing sophistication"] }
+    },
+    "total_score": 50, "trajectory_score": 3, "trajectory_label": "Positive", "projected_score_2028": 53,
+    "top_accelerator": "Start-Up Chile programme and Google/AWS cloud regions creating Latin America's most sophisticated startup ecosystem",
+    "top_risk": "Small population (19M) and remote geography limit domestic market scale; political polarisation creating policy uncertainty",
+    "comparable_countries": ["argentina", "colombia"]
+  },
+  {
+    "id": "colombia", "slug": "colombia", "name": "Colombia", "flag": "🇨🇴", "region": "Americas",
+    "scores": {
+      "infrastructure": { "score": 10, "reasons": ["Bogotá and Medellín have growing data centre markets; Claro and Movistar deploying 5G", "MinTIC national digital strategy investing in broadband expansion for rural areas", "LACNIC regional internet exchange improving Latin American connectivity infrastructure"] },
+      "talent": { "score": 10, "reasons": ["Universidad de Los Andes and UNAL producing quality AI and engineering graduates", "Medellín's transformation into a tech hub has created a growing AI engineering community", "Rappi (super-app) demonstrates Colombian founders building AI-driven Latin American scale companies"] },
+      "governance": { "score": 9, "reasons": ["Colombia's personal data protection law (Ley 1581) provides a regulatory foundation", "Ministry of Science, Technology and Innovation publishing national AI policy framework", "Colombia held OECD accession talks — driving alignment with international AI governance standards"] },
+      "investment": { "score": 7, "reasons": ["Rappi, Addi, Habi, and Frubana show Colombia's growing AI startup ecosystem", "ProColombia FDI agency attracting tech investment; Ruta N Medellín as innovation hub", "VC market developing but smaller than Mexico and Brazil; peso volatility creates investment friction"] },
+      "economic_readiness": { "score": 6, "reasons": ["52M population and growing middle class creating substantial domestic AI market", "Fintech and logistics AI sectors growing rapidly, powered by improving urban infrastructure", "Security challenges in some regions and inequality create uneven AI adoption patterns"] }
+    },
+    "total_score": 42, "trajectory_score": 4, "trajectory_label": "Positive", "projected_score_2028": 46,
+    "top_accelerator": "Medellín's urban transformation creating Latin America's most dynamic mid-tier tech ecosystem",
+    "top_risk": "Security challenges and inequality creating uneven regional AI adoption and deterring some international investment",
+    "comparable_countries": ["mexico", "peru"]
+  },
+  {
+    "id": "peru", "slug": "peru", "name": "Peru", "flag": "🇵🇪", "region": "Americas",
+    "scores": {
+      "infrastructure": { "score": 8, "reasons": ["Lima data centre market growing; Claro and Movistar Peru deploying 5G in major cities", "Significant infrastructure gap between Lima and rural/Andean regions", "Dorsal Nacional de Fibra Óptica project extending connectivity to underserved areas"] },
+      "talent": { "score": 9, "reasons": ["Pontificia Universidad Católica del Perú and UTEC producing engineering graduates with improving AI focus", "Growing Lima tech community with Platzi and Crehana driving digital skills development", "Brain drain to Chile, Spain, and the US significant among top technical talent"] },
+      "governance": { "score": 8, "reasons": ["Personal data protection law (Ley 29733) providing baseline governance framework", "Digital Government Secretariat coordinating AI adoption in public services", "Political instability (multiple presidents in recent years) disrupts policy continuity"] },
+      "investment": { "score": 6, "reasons": ["Smaller VC ecosystem than Colombia or Chile; Kushki and Culqi as notable fintech AI examples", "Mining sector AI investment growing as international companies seek efficiency in copper and gold operations", "Start-Up Peru government programme funding early-stage tech companies"] },
+      "economic_readiness": { "score": 6, "reasons": ["33M population with growing urban middle class; Lima represents a concentrated AI adoption market", "Mining and agriculture sectors creating AI demand for extraction optimisation and precision farming", "Significant informal economy (70%+ of employment) limiting structured AI deployment in many sectors"] }
+    },
+    "total_score": 37, "trajectory_score": 3, "trajectory_label": "Positive", "projected_score_2028": 40,
+    "top_accelerator": "Mining sector AI investment and growing Lima fintech ecosystem",
+    "top_risk": "Political instability and large informal economy limiting structured AI market development",
+    "comparable_countries": ["colombia", "ecuador"]
+  },
+  {
+    "id": "venezuela", "slug": "venezuela", "name": "Venezuela", "flag": "🇻🇪", "region": "Americas",
+    "scores": {
+      "infrastructure": { "score": 5, "reasons": ["Decades of underinvestment and economic collapse have severely degraded telecommunications infrastructure", "CANTV national telco severely under-resourced; internet reliability poor nationwide", "Power grid collapses frequently limiting data centre operation viability"] },
+      "talent": { "score": 7, "reasons": ["Universities (UCV, USB) historically produced strong CS graduates; quality has declined severely", "Massive emigration (7M+ Venezuelans abroad) has exported most top tech talent to Colombia, Chile, and Spain", "Diaspora networks maintain some connection but domestic talent base critically depleted"] },
+      "governance": { "score": 3, "reasons": ["Authoritarian government severely restricts internet freedom and international tech company operations", "No meaningful AI strategy; government technology focus is on surveillance and control", "US and EU sanctions restrict access to cloud services, software, and AI hardware"] },
+      "investment": { "score": 3, "reasons": ["International investment effectively blocked by sanctions and political risk", "No functioning VC ecosystem; informal crypto use as work-around demonstrates underlying demand", "State-owned enterprises unable to invest in AI due to liquidity crisis"] },
+      "economic_readiness": { "score": 4, "reasons": ["Large population (32M) represents potential but purchasing power severely eroded by hyperinflation", "Oil sector using aging technology with minimal AI adoption", "Dollarisation of portions of economy creating informal digital commerce growth"] }
+    },
+    "total_score": 22, "trajectory_score": -2, "trajectory_label": "Negative", "projected_score_2028": 20,
+    "top_accelerator": "Large diaspora of skilled tech workers who could return if political situation normalises",
+    "top_risk": "Authoritarian governance, sanctions, and economic collapse creating a multi-decade AI development setback",
+    "comparable_countries": ["cuba", "nicaragua"]
+  },
+  {
+    "id": "ecuador", "slug": "ecuador", "name": "Ecuador", "flag": "🇪🇨", "region": "Americas",
+    "scores": {
+      "infrastructure": { "score": 8, "reasons": ["Quito and Guayaquil have improving data centre infrastructure; CNT deploying 5G", "Undersea cable access through Pacific cables improving international connectivity", "Infrastructure investment constrained by fiscal challenges and political instability"] },
+      "talent": { "score": 8, "reasons": ["ESPOL and PUCE engineering schools producing growing tech graduate cohorts", "Growing Quito tech community; Kushki (Colombian-Ecuadorian fintech) demonstrating regional talent", "Brain drain to Spain and Chile significant among top engineering graduates"] },
+      "governance": { "score": 7, "reasons": ["Ecuador's Organic Law on Personal Data Protection (LOPDP) enacted 2021", "Ministry of Telecommunications developing digital Ecuador plan with AI components", "Political instability has disrupted digital governance continuity"] },
+      "investment": { "score": 5, "reasons": ["Small but developing Quito startup ecosystem with Kruger Corp as major local tech anchor", "FDI in tech limited by political risk and security concerns in recent years", "Small domestic VC market; most investment through regional Latin American funds"] },
+      "economic_readiness": { "score": 6, "reasons": ["18M population; dollarised economy providing monetary stability as competitive advantage", "Agricultural export economy (bananas, shrimp) creating precision farming AI demand", "Security challenges in 2023-2024 created significant investment deterrence"] }
+    },
+    "total_score": 34, "trajectory_score": 2, "trajectory_label": "Positive", "projected_score_2028": 36,
+    "top_accelerator": "Dollarised economy providing investment stability advantage relative to neighbours",
+    "top_risk": "Security deterioration and political instability deterring the international AI investment needed to accelerate",
+    "comparable_countries": ["peru", "bolivia"]
+  },
+  {
+    "id": "bolivia", "slug": "bolivia", "name": "Bolivia", "flag": "🇧🇴", "region": "Americas",
+    "scores": {
+      "infrastructure": { "score": 6, "reasons": ["Entel Bolivia deploying 4G/LTE nationally; 5G planning underway but limited", "Landlocked geography and challenging terrain create significant connectivity infrastructure challenges", "Tupac Katari satellite providing some rural broadband coverage"] },
+      "talent": { "score": 7, "reasons": ["Universidad Mayor de San Andrés and UMSS producing engineering graduates", "Bolivia Tech Hub in Cochabamba and Santa Cruz emerging as tech communities", "Brain drain to Argentina, Chile, and Spain reducing domestic AI talent density"] },
+      "governance": { "score": 6, "reasons": ["Personal Data Protection Law enacted 2023", "Bolivia's digital transformation strategy with AI components in early development", "State-heavy economic model constraining private sector AI development"] },
+      "investment": { "score": 4, "reasons": ["Limited VC ecosystem; Emprende Bolivia government entrepreneurship support available", "Mining and natural gas sectors have minimal AI adoption", "Small market and political risk deter international tech investment"] },
+      "economic_readiness": { "score": 4, "reasons": ["12M population with growing mobile internet adoption providing digital foundation", "Natural resource economy (lithium, gas, tin) creating potential AI applications in extraction", "Significant informal economy limiting structured digital commerce adoption"] }
+    },
+    "total_score": 27, "trajectory_score": 2, "trajectory_label": "Positive", "projected_score_2028": 29,
+    "top_accelerator": "Lithium reserves creating strategic importance for battery AI and electric vehicle supply chains",
+    "top_risk": "State-heavy economic model and limited private sector creating structural constraints on AI market formation",
+    "comparable_countries": ["ecuador", "paraguay"]
+  },
+  {
+    "id": "paraguay", "slug": "paraguay", "name": "Paraguay", "flag": "🇵🇾", "region": "Americas",
+    "scores": {
+      "infrastructure": { "score": 6, "reasons": ["Tigo and Personal Paraguay deploying 4G/LTE nationally; 5G investment beginning", "Itaipú Dam provides abundant cheap electricity — emerging bitcoin/crypto mining interest", "Landlocked geography; connectivity through Brazil and Argentina fibre routes"] },
+      "talent": { "score": 6, "reasons": ["Universidad Nacional de Asunción producing modest tech graduate cohorts", "Small but growing Asunción tech community; StartupPY driving ecosystem formation", "Brain drain to Argentina and Brazil significant"] },
+      "governance": { "score": 6, "reasons": ["Personal data protection law in early implementation; SENATICS digital agency active", "National digital transformation strategy with basic AI components", "Political stability relatively high by regional standards"] },
+      "investment": { "score": 4, "reasons": ["Crypto and digital asset sector growing given low electricity costs", "Limited formal VC; some Brazilian and Argentinian fund activity", "Free zones attracting some tech companies for cost advantages"] },
+      "economic_readiness": { "score": 3, "reasons": ["7M population with growing informal economy adopting mobile payments", "Agricultural sector (soy, beef) creating precision farming AI demand", "Strong informal economy means formal AI market is smaller than GDP suggests"] }
+    },
+    "total_score": 25, "trajectory_score": 2, "trajectory_label": "Positive", "projected_score_2028": 27,
+    "top_accelerator": "Cheap hydroelectric electricity creating competitive advantage for AI compute infrastructure",
+    "top_risk": "Small, largely informal economy with limited human capital for AI sector development",
+    "comparable_countries": ["bolivia", "uruguay"]
+  },
+  {
+    "id": "uruguay", "slug": "uruguay", "name": "Uruguay", "flag": "🇺🇾", "region": "Americas",
+    "scores": {
+      "infrastructure": { "score": 10, "reasons": ["Uruguay has Latin America's highest internet penetration rate at 80%+ households", "Antel (state telecom) has deployed fibre to 80% of homes — among the highest in Latin America", "ANTEL Arena data centre and growing hyperscaler interest in Montevideo"] },
+      "talent": { "score": 10, "reasons": ["Universidad de la República and ORT Uruguay producing strong CS and AI graduates relative to population", "Pedidos Ya, dLocal, and Tryolabs demonstrate Uruguayan capacity for AI product companies", "High quality of life retaining graduates; digital nomad policies attracting international talent"] },
+      "governance": { "score": 9, "reasons": ["Uruguay has Latin America's most advanced personal data protection framework (Law 18.331) with URCDP", "National AI Strategy published with clear implementation milestones", "Transparent, low-corruption governance creating predictable regulatory environment"] },
+      "investment": { "score": 7, "reasons": ["dLocal (payments AI, $1B+ valuation) is Uruguay's most prominent tech success story", "ANDE (national entrepreneurship agency) providing structured startup support", "Small but sophisticated VC ecosystem; Uruguay's stability attracts regional fund managers"] },
+      "economic_readiness": { "score": 5, "reasons": ["3.5M population limits domestic market but high GDP per capita means strong purchasing power", "Financial services and agritech sectors integrating AI at regional benchmark levels", "Strong social trust and human development creates high-quality consumer AI adoption environment"] }
+    },
+    "total_score": 41, "trajectory_score": 3, "trajectory_label": "Positive", "projected_score_2028": 44,
+    "top_accelerator": "Latin America's highest internet penetration and most robust data protection framework",
+    "top_risk": "Very small population (3.5M) creates fundamental ceiling on domestic AI market scale",
+    "comparable_countries": ["chile", "argentina"]
+  },
+  {
+    "id": "guatemala", "slug": "guatemala", "name": "Guatemala", "flag": "🇬🇹", "region": "Americas",
+    "scores": {
+      "infrastructure": { "score": 6, "reasons": ["Guatemala City data centre market growing; Claro and Tigo deploying 4G/LTE widely", "5G rollout beginning in major cities; rural connectivity remains very limited", "Pacific and Atlantic cable landing points providing international connectivity"] },
+      "talent": { "score": 5, "reasons": ["Universidad del Valle and USAC producing limited CS graduate cohorts", "Small tech community in Guatemala City; Guatevision and local digital media AI adoption", "Brain drain to the US (large Guatemalan diaspora) limiting domestic talent retention"] },
+      "governance": { "score": 5, "reasons": ["Personal data protection law in development; INACIF digital governance limited", "Digital Guatemala strategy published with basic AI components", "Governance capacity significantly constrained by corruption and weak institutions"] },
+      "investment": { "score": 4, "reasons": ["Limited startup ecosystem; LabsUVG providing innovation support at small scale", "Remittances ($20B/year) drive fintech interest but not AI R&D investment", "Most tech investment comes through US-based Guatemalan diaspora"] },
+      "economic_readiness": { "score": 4, "reasons": ["17M population with growing mobile internet adoption; remittance economy creating fintech demand", "Agricultural sector (coffee, bananas) AI applications emerging", "High inequality and poverty levels limiting broad consumer AI market development"] }
+    },
+    "total_score": 24, "trajectory_score": 2, "trajectory_label": "Positive", "projected_score_2028": 26,
+    "top_accelerator": "Remittance economy creating strong fintech AI demand and growing US diaspora investment",
+    "top_risk": "Weak institutions, corruption, and high inequality creating poor environment for AI investment",
+    "comparable_countries": ["honduras", "el-salvador"]
+  },
+  {
+    "id": "honduras", "slug": "honduras", "name": "Honduras", "flag": "🇭🇳", "region": "Americas",
+    "scores": {
+      "infrastructure": { "score": 5, "reasons": ["Hondutel and Claro Honduras providing 4G/LTE; 5G in very early stages", "Significant connectivity gaps outside Tegucigalpa and San Pedro Sula", "Hurricane vulnerability creates ongoing infrastructure resilience challenges"] },
+      "talent": { "score": 4, "reasons": ["UNAH and UNITEC producing modest IT graduate cohorts", "Small tech community in San Pedro Sula (maquila/manufacturing hub)", "Brain drain to the US is very high; 1M+ Hondurans in the US including significant tech talent"] },
+      "governance": { "score": 4, "reasons": ["Personal data protection law under development", "Digital Honduras strategy with basic digital government components", "Governance severely constrained by corruption and insecurity issues"] },
+      "investment": { "score": 3, "reasons": ["Very limited startup ecosystem; CIETEC technology park in Tegucigalpa", "ZEDE (special economic zones) intended to attract tech investment — controversial", "Remittance flow creating some fintech interest but limited AI investment"] },
+      "economic_readiness": { "score": 4, "reasons": ["10M population with high mobile phone penetration; remittance economy digitising", "Maquila manufacturing sector creating industrial IoT/AI demand from US companies", "High poverty and inequality fundamentally limit domestic AI market size"] }
+    },
+    "total_score": 20, "trajectory_score": 2, "trajectory_label": "Positive", "projected_score_2028": 22,
+    "top_accelerator": "Manufacturing sector AI for US supply chain integration and remittance fintech digitalisation",
+    "top_risk": "Extreme insecurity and corruption severely constraining investment and talent retention",
+    "comparable_countries": ["guatemala", "el-salvador"]
+  },
+  {
+    "id": "el-salvador", "slug": "el-salvador", "name": "El Salvador", "flag": "🇸🇻", "region": "Americas",
+    "scores": {
+      "infrastructure": { "score": 6, "reasons": ["Claro El Salvador and Tigo deploying 4G/LTE; 5G emerging in San Salvador", "Bitcoin legal tender status driving fintech infrastructure investment", "Small geography (smallest Central American country) aids connectivity deployment"] },
+      "talent": { "score": 5, "reasons": ["UES and UTEC producing modest tech graduate cohorts", "Growing tech community interested in blockchain and fintech AI", "Significant diaspora in the US maintaining tech knowledge linkages"] },
+      "governance": { "score": 6, "reasons": ["Bitcoin legal tender law demonstrates willingness for bold digital innovation policy", "PDPC data protection commission operational", "Government tech-forward stance under President Bukele attracting international attention"] },
+      "investment": { "score": 4, "reasons": ["Bitcoin/blockchain ecosystem attracting some crypto-adjacent AI investment", "PROESA investment agency targeting tech FDI", "Limited traditional VC; mostly regional Central American fund activity"] },
+      "economic_readiness": { "score": 3, "reasons": ["6.5M population, largely dollarised; bitcoin adoption creating digital payment infrastructure", "Remittance economy (24% of GDP) driving mobile financial services AI", "Gang violence and insecurity historically deterred investment — improving under current government"] }
+    },
+    "total_score": 24, "trajectory_score": 3, "trajectory_label": "Positive", "projected_score_2028": 27,
+    "top_accelerator": "Bitcoin legal tender policy and crypto-first digital infrastructure creating unique fintech AI environment",
+    "top_risk": "Concentration of power and governance risks limiting sustainable long-term AI ecosystem development",
+    "comparable_countries": ["guatemala", "honduras"]
+  },
+  {
+    "id": "nicaragua", "slug": "nicaragua", "name": "Nicaragua", "flag": "🇳🇮", "region": "Americas",
+    "scores": {
+      "infrastructure": { "score": 5, "reasons": ["Claro Nicaragua and Tigo providing 4G/LTE in urban areas; 5G very limited", "Limited data centre infrastructure; significant connectivity gaps in rural areas", "Underinvestment due to political risk and economic constraints"] },
+      "talent": { "score": 4, "reasons": ["UNI (Universidad Nacional de Ingeniería) producing modest CS cohorts", "Brain drain accelerating — thousands of professionals emigrating due to political repression", "Very limited tech community formation under current political environment"] },
+      "governance": { "score": 3, "reasons": ["Authoritarian government limiting internet freedom and civil society", "No meaningful AI strategy; surveillance-oriented technology policy", "Opposition to US and international institutions constraining access to digital development programmes"] },
+      "investment": { "score": 3, "reasons": ["Political risk rating among Latin America's highest — severely deterring FDI", "Limited domestic private sector under state-controlled economy", "Remittances partially sustaining basic digital commerce"] },
+      "economic_readiness": { "score": 4, "reasons": ["6.6M population; agricultural economy with growing mobile adoption", "Free trade zones with US companies provide some manufacturing AI exposure", "Political crisis since 2018 has reversed economic development trajectory"] }
+    },
+    "total_score": 19, "trajectory_score": -1, "trajectory_label": "Neutral", "projected_score_2028": 18,
+    "top_accelerator": "Free trade zone manufacturing creating some industrial AI exposure through US company supply chains",
+    "top_risk": "Authoritarian governance and international isolation creating sustained AI development stagnation",
+    "comparable_countries": ["venezuela", "cuba"]
+  },
+  {
+    "id": "costa-rica", "slug": "costa-rica", "name": "Costa Rica", "flag": "🇨🇷", "region": "Americas",
+    "scores": {
+      "infrastructure": { "score": 9, "reasons": ["ICE (national telecom) and Claro deploying 5G; solid urban fibre connectivity", "Growing data centre market in San José; US tech companies establishing Central American operations", "100% renewable electricity (hydro, geothermal) attracting sustainable data centre investment"] },
+      "talent": { "score": 9, "reasons": ["UCR, TEC, and UNA producing strong engineering graduates; Intel Costa Rica created a generation of chip engineers", "Strong English language skills and US alignment creating nearshore tech talent in Central America", "Medical device and pharmaceutical manufacturing creating specialised AI engineering community"] },
+      "governance": { "score": 9, "reasons": ["OECD member (2023) — regulatory alignment with international standards including AI governance", "PRODHAB data protection agency among Central America's most sophisticated", "Costa Rica's peace tradition and strong institutions provide stable policy environment"] },
+      "investment": { "score": 7, "reasons": ["Intel, HP, and Amazon have significant Costa Rican engineering operations", "Government PROCOMER and CINDE attracting tech FDI with renewable energy proposition", "Growing startup ecosystem in San José; Costa Rica is Central America's VC hub"] },
+      "economic_readiness": { "score": 5, "reasons": ["5M population, high human development, and strong US economic ties create good AI adoption environment", "Medical device and tech services sectors deploying AI with sophistication exceeding country's size", "OECD membership driving economic and regulatory modernisation at accelerated pace"] }
+    },
+    "total_score": 39, "trajectory_score": 4, "trajectory_label": "Positive", "projected_score_2028": 43,
+    "top_accelerator": "OECD membership and 100% renewable energy positioning Costa Rica as Central America's AI hub",
+    "top_risk": "Small population (5M) and geographic constraints limiting scale beyond nearshore/services AI",
+    "comparable_countries": ["panama", "uruguay"]
+  },
+  {
+    "id": "panama", "slug": "panama", "name": "Panama", "flag": "🇵🇦", "region": "Americas",
+    "scores": {
+      "infrastructure": { "score": 8, "reasons": ["Panama City is a regional internet hub; multiple subsea cables land here connecting Americas", "Cable & Wireless Panama and Claro deploying 5G; solid urban connectivity in Panama City", "Data centre market growing as regional hub for international companies serving Latin America"] },
+      "talent": { "score": 7, "reasons": ["Universidad Tecnológica de Panamá and UTP producing engineering graduates", "Financial services sector AI community growing in Panama City", "Brain drain to the US and Colombia moderate but significant"] },
+      "governance": { "score": 7, "reasons": ["Personal data protection law enacted; ANTAI data governance authority operational", "Digital government transformation programme with AI components", "International finance hub status driving sophisticated financial AI regulation"] },
+      "investment": { "score": 6, "reasons": ["Panama Canal AI for shipping optimisation is flagship AI deployment", "Regional HQ hub for multinationals creating AI enterprise adoption", "Colón Free Zone attracting tech company regional operations"] },
+      "economic_readiness": { "score": 5, "reasons": ["4.5M population but outsized economic role as hemispheric logistics hub", "Financial services (offshore banking, insurance) deploying AI for compliance and risk", "Dollarised economy and US legal system alignment create stable investment environment"] }
+    },
+    "total_score": 33, "trajectory_score": 3, "trajectory_label": "Positive", "projected_score_2028": 36,
+    "top_accelerator": "Panama Canal AI optimisation and regional HQ hub role creating unique deployment opportunities",
+    "top_risk": "Small domestic population and dependence on logistics and finance creating narrow AI sector development",
+    "comparable_countries": ["costa-rica", "dominican-republic"]
+  },
+  {
+    "id": "cuba", "slug": "cuba", "name": "Cuba", "flag": "🇨🇺", "region": "Americas",
+    "scores": {
+      "infrastructure": { "score": 5, "reasons": ["ETECSA state monopoly provides limited mobile internet (4G since 2018) with significant restrictions", "Internet penetration growing but access is heavily controlled and internationally constrained", "US embargo restricts access to cloud services, software, and AI hardware"] },
+      "talent": { "score": 7, "reasons": ["University of Havana and CUJAE produce strong mathematics and CS graduates", "Cuban AI research in bio-informatics and natural language processing has international recognition", "Brain drain very severe — thousands of Cuban tech professionals emigrating to Spain, Mexico, and the US"] },
+      "governance": { "score": 3, "reasons": ["Government AI focus is on controlled applications; internet censorship limits AI research freedom", "No AI strategy in conventional sense; technology is state-controlled", "US sanctions restrict access to mainstream cloud and AI platforms"] },
+      "investment": { "score": 2, "reasons": ["US embargo and state economy effectively block conventional tech investment", "No meaningful startup ecosystem; state enterprises dominate", "Some ALBA-aligned country technical cooperation but minimal AI investment"] },
+      "economic_readiness": { "score": 4, "reasons": ["11M population with high education levels but severely constrained by the state economy and embargo", "Medical biotechnology is Cuba's standout AI-adjacent sector with genuine global capability", "Economic reforms remain limited — most commercial AI deployment blocked structurally"] }
+    },
+    "total_score": 21, "trajectory_score": 0, "trajectory_label": "Neutral", "projected_score_2028": 21,
+    "top_accelerator": "World-class medical and biotechnology research tradition with genuine AI application potential",
+    "top_risk": "US embargo, authoritarian governance, and state-controlled economy creating near-total structural blockage on AI development",
+    "comparable_countries": ["venezuela", "nicaragua"]
+  },
+  {
+    "id": "jamaica", "slug": "jamaica", "name": "Jamaica", "flag": "🇯🇲", "region": "Americas",
+    "scores": {
+      "infrastructure": { "score": 7, "reasons": ["Flow and Digicel Jamaica deploying 5G in Kingston and major cities", "Jamaica is a key Caribbean subsea cable hub connecting the region", "National broadband plan expanding connectivity but rural gaps persist"] },
+      "talent": { "score": 6, "reasons": ["University of the West Indies (Mona) has a growing technology faculty", "Strong diaspora network in UK and US with tech knowledge linkages to Jamaica", "Small population (3M) with brain drain to developed English-speaking markets"] },
+      "governance": { "score": 7, "reasons": ["Data Protection Act 2020 providing a modern privacy framework", "National digital transformation strategy with AI sector components", "MSET (Ministry of Science, Energy and Technology) coordinating digital government AI"] },
+      "investment": { "score": 4, "reasons": ["jm|SPARK investment agency supporting tech startups", "Tourism sector AI for visitor management and personalisation", "Limited domestic VC; primarily Caribbean Basin-focused funds"] },
+      "economic_readiness": { "score": 3, "reasons": ["3M population with high mobile penetration; tourism and remittance economy digitising", "BPO sector (business process outsourcing) increasingly AI-enhanced", "Small domestic market requires Caribbean regional thinking for any AI company scale"] }
+    },
+    "total_score": 27, "trajectory_score": 2, "trajectory_label": "Positive", "projected_score_2028": 29,
+    "top_accelerator": "BPO sector AI integration and English language advantage for Caribbean AI services hub",
+    "top_risk": "Very small domestic market and severe brain drain to UK, US, and Canada",
+    "comparable_countries": ["trinidad-tobago", "barbados"]
+  },
+  {
+    "id": "haiti", "slug": "haiti", "name": "Haiti", "flag": "🇭🇹", "region": "Americas",
+    "scores": {
+      "infrastructure": { "score": 3, "reasons": ["Digicel and Natcom providing basic mobile connectivity; broadband extremely limited", "Repeated natural disasters (earthquakes, hurricanes) have repeatedly destroyed infrastructure", "Power grid largely non-functional; most connectivity dependent on mobile networks and generators"] },
+      "talent": { "score": 3, "reasons": ["State University of Haiti producing very limited tech graduate numbers under difficult conditions", "Significant diaspora in US and Canada maintains connection to global tech trends", "Political instability and gang control of Port-au-Prince severely disrupts education"] },
+      "governance": { "score": 2, "reasons": ["State collapse conditions with gangs controlling significant territory limit any coherent digital policy", "No functional AI strategy; basic government services barely operational", "International community filling governance gaps but AI policy is not a priority"] },
+      "investment": { "score": 2, "reasons": ["Security conditions make meaningful tech investment nearly impossible", "Diaspora remittances ($3.5B/year) sustain basic digital services", "International NGO-funded digital projects the primary tech investment vehicle"] },
+      "economic_readiness": { "score": 3, "reasons": ["11M population; mobile money (MonCash) has achieved significant adoption as survival tool", "Despite chaos, mobile-first fintech has shown remarkable resilience", "Extreme poverty and insecurity create very limited commercial AI market"] }
+    },
+    "total_score": 13, "trajectory_score": 0, "trajectory_label": "Neutral", "projected_score_2028": 13,
+    "top_accelerator": "Mobile money resilience showing demand for digital financial services despite state collapse",
+    "top_risk": "Complete state failure and gang control of territory making any sustained AI development impossible",
+    "comparable_countries": ["venezuela", "nicaragua"]
+  },
+  {
+    "id": "dominican-republic", "slug": "dominican-republic", "name": "Dominican Republic", "flag": "🇩🇴", "region": "Americas",
+    "scores": {
+      "infrastructure": { "score": 7, "reasons": ["Claro and Altice Dominican Republic deploying 5G; relatively solid urban connectivity", "CODOPTEL digital strategy improving rural broadband coverage", "Caribbean submarine cable hub improving international bandwidth"] },
+      "talent": { "score": 6, "reasons": ["INTEC and PUCMM producing engineering and CS graduates", "BPO sector employing thousands of tech workers creating AI skills base", "Growing Santo Domingo tech community with INDOTEL digital innovation support"] },
+      "governance": { "score": 6, "reasons": ["Personal data protection law enacted 2013; INDOTEL regulatory authority active", "National digital transformation strategy with emerging AI components", "Relatively stable political environment compared to Caribbean neighbours"] },
+      "investment": { "score": 5, "reasons": ["Tourism and free zone manufacturing tech investment growing", "InvestDR attracting tech FDI with competitive free zone benefits", "Growing Santo Domingo startup community; relatively advanced for Caribbean region"] },
+      "economic_readiness": { "score": 5, "reasons": ["11M population, Caribbean's largest economy; tourism and free zones driving digital adoption", "Remittance fintech and tourism AI growing as primary sectors", "US trade alignment and CAFTA-DR creating regulatory familiarity for US tech companies"] }
+    },
+    "total_score": 29, "trajectory_score": 3, "trajectory_label": "Positive", "projected_score_2028": 32,
+    "top_accelerator": "Caribbean's largest economy with tourism AI and free zone manufacturing creating dual AI demand",
+    "top_risk": "Small domestic market and economic dependence on tourism creating concentrated risk",
+    "comparable_countries": ["jamaica", "panama"]
+  },
+  {
+    "id": "trinidad-tobago", "slug": "trinidad-tobago", "name": "Trinidad and Tobago", "flag": "🇹🇹", "region": "Americas",
+    "scores": {
+      "infrastructure": { "score": 8, "reasons": ["bmobile and Digicel TT deploying 5G; Caribbean's most advanced connectivity infrastructure", "Data centre hub for English-speaking Caribbean; solid submarine cable connectivity", "Oil and gas sector driving industrial AI infrastructure investment"] },
+      "talent": { "score": 7, "reasons": ["University of the West Indies (St. Augustine) is the Caribbean's leading research university", "Energy sector engineers creating industrial AI capability; diaspora networks active", "Small population (1.4M) limits talent pool scale"] },
+      "governance": { "score": 7, "reasons": ["Data Protection Act in force; ICT Commissioner operational", "National ICT strategy with AI components published by MoEYT", "Common Law tradition and English language create alignment with international AI governance"] },
+      "investment": { "score": 5, "reasons": ["Energy sector AI investment (bpTT, Shell) is the primary AI R&D activity", "Caribbean AI startup investments emerging; iGovTT government digital investment", "National Investment Promotion Agency targeting tech diversification from energy"] },
+      "economic_readiness": { "score": 5, "reasons": ["High GDP per capita for the Caribbean; energy wealth enabling technology investment", "Financial services sector and energy are primary AI deployment sectors", "Energy transition creating urgent AI need for resource optimisation and diversification"] }
+    },
+    "total_score": 32, "trajectory_score": 2, "trajectory_label": "Positive", "projected_score_2028": 34,
+    "top_accelerator": "Energy sector AI and UWI research creating Caribbean AI hub ambitions",
+    "top_risk": "Oil dependence and small market limiting AI diversification beyond the energy sector",
+    "comparable_countries": ["jamaica", "barbados"]
+  },
+  {
+    "id": "barbados", "slug": "barbados", "name": "Barbados", "flag": "🇧🇧", "region": "Americas",
+    "scores": {
+      "infrastructure": { "score": 7, "reasons": ["Flow and Digicel Barbados providing solid 4G/LTE; 5G deployment beginning", "Good submarine cable connectivity for a small island state", "Government digital services portal among most advanced in Caribbean"] },
+      "talent": { "score": 7, "reasons": ["UWI Cave Hill campus producing growing tech graduate cohorts", "Small but quality workforce; English proficiency and diaspora connections aid international AI work", "Population of 285,000 severely limits absolute talent numbers"] },
+      "governance": { "score": 7, "reasons": ["Data Protection Act enacted; Barbados digital government strategy advanced by Caribbean standards", "Barbados has emerged as a digital nomad and fintech regulation innovator", "Common Law system and English language align with UK and US AI governance standards"] },
+      "investment": { "score": 4, "reasons": ["Barbados positioning as fintech regulatory hub attracting crypto and digital asset companies", "Bajan diaspora in the UK and US maintaining investment connections", "Small market limits absolute VC activity"] },
+      "economic_readiness": { "score": 3, "reasons": ["285,000 population; tourism and financial services economy", "International business and fintech AI growing as economic diversification strategy", "Small domestic market requires immediate Caribbean regional or international orientation"] }
+    },
+    "total_score": 28, "trajectory_score": 2, "trajectory_label": "Positive", "projected_score_2028": 30,
+    "top_accelerator": "Progressive fintech regulation and digital nomad policies attracting global AI workers",
+    "top_risk": "Tiny domestic market — 285,000 population creates no viable standalone AI industry",
+    "comparable_countries": ["jamaica", "trinidad-tobago"]
+  },
+  {
+    "id": "guyana", "slug": "guyana", "name": "Guyana", "flag": "🇬🇾", "region": "Americas",
+    "scores": {
+      "infrastructure": { "score": 6, "reasons": ["GTT and Digicel Guyana deploying 4G/LTE; oil revenue beginning to fund connectivity expansion", "Offshore oil discovery (Exxon/Hess/CNOOC) generating government investment capacity", "Georgetown infrastructure improving but rural and interior regions severely underserved"] },
+      "talent": { "score": 5, "reasons": ["University of Guyana producing modest tech graduates; Caribbean diaspora connections", "Oil sector attracting international technical talent to Georgetown", "Significant brain drain to Canada and UK among educated Guyanese"] },
+      "governance": { "score": 6, "reasons": ["Data protection law in development; ICT Authority operational", "Government oil wealth funding accelerated digital transformation plans", "Strong English Common Law tradition supporting business AI governance"] },
+      "investment": { "score": 5, "reasons": ["Oil sector (Exxon, Hess, CNOOC) investing heavily in industrial AI for offshore operations", "Government sovereign wealth fund from oil revenues being established", "Oil-funded infrastructure investment creating first meaningful IT spend"] },
+      "economic_readiness": { "score": 2, "reasons": ["800,000 population; newly oil-rich but infrastructure and human capital lag", "Fastest growing economy in the world (2023-2024) creating rapid investment capacity", "Oil revenues transforming a previously underdeveloped economy with AI potential in energy management"] }
+    },
+    "total_score": 24, "trajectory_score": 4, "trajectory_label": "Positive", "projected_score_2028": 28,
+    "top_accelerator": "Massive offshore oil discovery generating unprecedented investment capital for digital infrastructure",
+    "top_risk": "Small population and very recent development mean AI ecosystem building is decades behind the oil revenue growth",
+    "comparable_countries": ["suriname", "trinidad-tobago"]
+  },
+  {
+    "id": "suriname", "slug": "suriname", "name": "Suriname", "flag": "🇸🇷", "region": "Americas",
+    "scores": {
+      "infrastructure": { "score": 6, "reasons": ["Telesur and Digicel Suriname providing 4G/LTE; limited 5G development", "Small coastal population concentrated in Paramaribo area aids connectivity deployment", "Offshore oil and mining sectors beginning to drive industrial IoT investment"] },
+      "talent": { "score": 5, "reasons": ["Anton de Kom University of Suriname producing modest tech cohorts", "Dutch language connection provides access to Netherlands tech ecosystem and education", "Very small population (600,000) limits talent pool size"] },
+      "governance": { "score": 5, "reasons": ["Personal data protection in development; National Authority for Personal Data (ABP) establishing", "Digital Suriname strategy with basic AI components", "Dutch legal tradition providing relatively clear business governance environment"] },
+      "investment": { "score": 3, "reasons": ["Oil and mining sector (Staatsolie, Newmont) limited AI investment", "Small VC activity; some Dutch and Caribbean fund interest", "Economy recovering from 2020 debt crisis constraining investment capacity"] },
+      "economic_readiness": { "score": 3, "reasons": ["600,000 population; multilingual (Dutch, English, Sranan Tongo) country", "Oil and mining dominance with modest fintech development", "Economic crisis recovery limiting near-term AI market formation"] }
+    },
+    "total_score": 22, "trajectory_score": 1, "trajectory_label": "Neutral", "projected_score_2028": 23,
+    "top_accelerator": "Dutch language connection to Netherlands tech ecosystem and offshore oil digital transformation",
+    "top_risk": "Very small population and economic recovery constraints limiting AI ecosystem formation",
+    "comparable_countries": ["guyana", "trinidad-tobago"]
+  },
+  {
+    "id": "bahamas", "slug": "bahamas", "name": "Bahamas", "flag": "🇧🇸", "region": "Americas",
+    "scores": {
+      "infrastructure": { "score": 7, "reasons": ["BTC (Bahamas Telecommunications Company) and Aliv deploying 5G in Nassau and Freeport", "Excellent submarine cable connectivity as regional hub between US and Caribbean", "Digital Bahamas programme investing in national broadband and digital services"] },
+      "talent": { "score": 6, "reasons": ["University of the Bahamas expanding CS and IT programmes", "Strong financial services workforce with growing AI skills in offshore banking", "Small population (400,000) limits talent pool; significant US diaspora connections"] },
+      "governance": { "score": 7, "reasons": ["Data Protection (Privacy of Personal Information) Act enacted 2003, updated 2018", "Financial services digital regulation sophisticated given offshore banking scale", "URCA (telecoms regulator) developing AI-relevant digital services framework"] },
+      "investment": { "score": 4, "reasons": ["Offshore financial services sector driving fintech AI investment", "FTX crypto exchange chose Bahamas for headquarters — now infamous but showed fintech appetite", "Small economy; tourism and finance dominate limited VC activity"] },
+      "economic_readiness": { "score": 2, "reasons": ["400,000 population; tourism (50% of GDP) and offshore finance economy", "High GDP per capita for the region creating premium digital services demand", "Small domestic market requires immediate regional orientation for AI company scaling"] }
+    },
+    "total_score": 26, "trajectory_score": 2, "trajectory_label": "Positive", "projected_score_2028": 28,
+    "top_accelerator": "Offshore finance AI and sophisticated fintech regulation creating Caribbean AI finance hub potential",
+    "top_risk": "Tiny domestic market and tourism concentration creating limited AI diversification opportunity",
+    "comparable_countries": ["barbados", "jamaica"]
+  },
+  {
+    "id": "belize", "slug": "belize", "name": "Belize", "flag": "🇧🇿", "region": "Americas",
+    "scores": {
+      "infrastructure": { "score": 5, "reasons": ["Belize Telemedia Limited (BTL) and Digi providing 4G/LTE; 5G in early planning", "Good submarine cable connectivity given position between Mexico and Central America", "Small population concentrated in Belize City and Belmopan aids deployment but funding limited"] },
+      "talent": { "score": 5, "reasons": ["University of Belize producing modest IT graduate cohorts", "English-speaking Caribbean connection with tech community connections to Jamaica and Trinidad", "Very small population (400,000) with significant brain drain to the US and UK"] },
+      "governance": { "score": 5, "reasons": ["Data Protection Act in development; personal data privacy law being drafted", "Digital Belize strategy with basic e-government components", "Common Law and English language provide business environment clarity"] },
+      "investment": { "score": 3, "reasons": ["Tourism sector AI for eco-tourism management emerging", "Offshore gaming (iGaming licensed) contributing to digital services investment", "Very limited domestic VC; primarily regional fund interest"] },
+      "economic_readiness": { "score": 2, "reasons": ["400,000 population; tourism and agriculture economy", "English language advantage and proximity to Mexican and Caribbean markets", "Very small market requiring Caribbean or Central American regional approach"] }
+    },
+    "total_score": 20, "trajectory_score": 1, "trajectory_label": "Neutral", "projected_score_2028": 21,
+    "top_accelerator": "English language advantage and eco-tourism creating niche AI applications",
+    "top_risk": "Tiny population and economy with very limited capacity for domestic AI industry formation",
+    "comparable_countries": ["honduras", "guatemala"]
+  },
+  {
+    "id": "taiwan", "slug": "taiwan", "name": "Taiwan", "flag": "🇹🇼", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 17, "reasons": ["Chunghwa Telecom and Taiwan Mobile deployed 5G across the island rapidly; internet speeds among world's highest", "TSMC's semiconductor fabs in Hsinchu, Taichung, and Tainan are the world's most critical AI chip manufacturing infrastructure", "Robust data centre market in Taipei; TWAREN national research network providing exceptional academic AI compute"] },
+      "talent": { "score": 16, "reasons": ["NTHU, NTU, and NCKU produce world-class AI and semiconductor engineering graduates", "TSMC talent ecosystem — 65,000+ engineers trained in the world's most advanced chip manufacturing processes", "Taiwanese diaspora in Silicon Valley is one of the most influential in global AI (Jensen Huang/Nvidia, numerous founders)"] },
+      "governance": { "score": 14, "reasons": ["Taiwan AI Action Plan with government investment commitments across research and industrial AI", "PDPA (Personal Data Protection Act) providing data governance framework", "Democratic governance enabling open AI research and international collaboration with US, Japan, and EU"] },
+      "investment": { "score": 17, "reasons": ["TSMC alone invests $30B+ annually in capex — much AI-chip-focused; creating immense R&D spillovers", "MediaTek and Realtek investing heavily in edge AI chip design for consumer electronics", "ASUS, Acer, and Quanta Computing running significant AI R&D programmes"] },
+      "economic_readiness": { "score": 14, "reasons": ["Semiconductor industry creates uniquely AI-ready manufacturing and supply chain ecosystem", "Electronics manufacturing AI for quality control and supply chain optimisation at global scale", "High-tech export economy deeply integrated with global AI hardware supply chains"] }
+    },
+    "total_score": 78, "trajectory_score": 5, "trajectory_label": "Strong Positive", "projected_score_2028": 83,
+    "top_accelerator": "TSMC semiconductor manufacturing monopoly — Taiwan makes the chips that run every major AI system globally",
+    "top_risk": "Geopolitical risk — China's claim over Taiwan creates existential threat to the world's most critical AI hardware infrastructure",
+    "comparable_countries": ["south-korea", "singapore"]
+  },
+  {
+    "id": "indonesia", "slug": "indonesia", "name": "Indonesia", "flag": "🇮🇩", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 10, "reasons": ["Telkom Indonesia and Indosat deploying 5G in Java; growing data centre market in Jakarta", "Archipelago geography (17,000 islands) creates significant rural connectivity challenges", "Palapa Ring undersea cable project connecting all Indonesian provinces"] },
+      "talent": { "score": 11, "reasons": ["ITB and UI producing growing AI engineering cohorts; Gojek and Tokopedia built world-class ML teams", "World's fourth largest population (277M) providing large absolute talent supply", "Brain drain to Singapore significant — many Indonesian AI engineers prefer Singapore's ecosystem"] },
+      "governance": { "score": 10, "reasons": ["Personal Data Protection Law enacted 2022 — major milestone after decade of delays", "National AI Strategy 2020-2045 published; BSSN cybersecurity agency developing AI security framework", "Government AI for public services (MyGov app) demonstrating commitment despite implementation challenges"] },
+      "investment": { "score": 10, "reasons": ["GoTo Group, Grab (Singapore-HQ), and Traveloka run major AI R&D programmes in Indonesia", "Southeast Asia's largest startup ecosystem by number of funded companies", "SoftBank Vision Fund and East Ventures among major regional investors with Indonesian portfolio"] },
+      "economic_readiness": { "score": 9, "reasons": ["Fourth largest population globally provides enormous domestic AI market scale potential", "Gojek super-app ecosystem demonstrates AI-powered digital services at massive scale", "Large informal economy and significant inter-island inequality create complex AI adoption environment"] }
+    },
+    "total_score": 50, "trajectory_score": 5, "trajectory_label": "Strong Positive", "projected_score_2028": 55,
+    "top_accelerator": "World's fourth largest population and Gojek-built AI talent ecosystem creating unrivalled Southeast Asian scale",
+    "top_risk": "Archipelago geography, infrastructure inequality, and brain drain to Singapore constraining AI distribution",
+    "comparable_countries": ["vietnam", "malaysia"]
+  },
+  {
+    "id": "malaysia", "slug": "malaysia", "name": "Malaysia", "flag": "🇲🇾", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 13, "reasons": ["Malaysia's MSC (Multimedia Super Corridor) Cyberjaya is Southeast Asia's leading dedicated tech infrastructure zone", "Celcom, Maxis, and Digi deploying 5G; Penang Silicon Valley of the East has world-class semiconductor infrastructure", "Major data centre investment from Microsoft ($2.2B), Google, and AWS announced for Malaysia 2024-2025"] },
+      "talent": { "score": 12, "reasons": ["UTM, UM, and Universiti Putra Malaysia producing strong AI engineering graduates", "Penang semiconductor ecosystem (Intel, AMD, Infineon) has built deep hardware AI engineering talent", "English proficiency and multicultural workforce aid international AI collaboration"] },
+      "governance": { "score": 12, "reasons": ["National AI Roadmap published 2021; PDPA (Personal Data Protection Act) providing framework", "MDEC (Malaysia Digital Economy Corp) actively driving AI adoption and governance", "Malaysia positioning as Southeast Asian AI governance hub through ASEAN AI governance cooperation"] },
+      "investment": { "score": 11, "reasons": ["Microsoft, Google, and AWS combined $10B+ investment announcements for Malaysian AI infrastructure 2024-2025", "Khazanah national sovereign fund investing in domestic AI companies", "Penang semiconductor sector attracting continued FDI in AI chip assembly and testing"] },
+      "economic_readiness": { "score": 9, "reasons": ["Upper-middle income country with strong manufacturing AI in electronics and semiconductor sectors", "Financial services (CIMB, Maybank) deploying sophisticated AI for credit and risk", "ASEAN's most complete combination of manufacturing and services AI readiness"] }
+    },
+    "total_score": 57, "trajectory_score": 4, "trajectory_label": "Positive", "projected_score_2028": 61,
+    "top_accelerator": "$10B+ hyperscaler investment wave and Penang semiconductor ecosystem creating AI infrastructure momentum",
+    "top_risk": "Political fragility and talent competition from Singapore limiting sustained AI ecosystem development",
+    "comparable_countries": ["thailand", "vietnam"]
+  },
+  {
+    "id": "thailand", "slug": "thailand", "name": "Thailand", "flag": "🇹🇭", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 12, "reasons": ["AIS, True Move, and DTAC deploying 5G; Bangkok among Southeast Asia's best-connected cities", "Growing data centre market in Bangkok; AWS and Microsoft establishing Thai cloud regions", "EEC (Eastern Economic Corridor) developing tech infrastructure zone for AI manufacturing"] },
+      "talent": { "score": 11, "reasons": ["Chulalongkorn and KMITL universities have strong engineering and AI research programmes", "Thailand has the largest tech workforce in mainland Southeast Asia after Vietnam", "Language barrier limits international AI talent attraction and research collaboration"] },
+      "governance": { "score": 10, "reasons": ["PDPA (Personal Data Protection Act) enacted 2019 — one of Southeast Asia's earliest comprehensive laws", "National AI Strategy 2022-2027 published with government and private sector implementation tracks", "Military influence in government creates periodic policy discontinuity"] },
+      "investment": { "score": 9, "reasons": ["BOI (Board of Investment) AI incentive packages attracting EV and semiconductor manufacturing", "True Digital Group and SCG running significant domestic AI R&D programmes", "SET-listed companies adopting AI; Thailand VC market third-largest in Southeast Asia"] },
+      "economic_readiness": { "score": 8, "reasons": ["71M population; strong manufacturing, tourism, and financial services sectors deploying AI", "Automotive sector AI (Toyota, Honda, BMW production) integrating AI quality systems", "Tourism sector AI for visitor management and personalisation at global-scale deployment"] }
+    },
+    "total_score": 50, "trajectory_score": 3, "trajectory_label": "Positive", "projected_score_2028": 53,
+    "top_accelerator": "EV manufacturing hub emergence and BOI incentives attracting AI-integrated industrial investment",
+    "top_risk": "Language barrier limiting AI research collaboration and political instability creating policy discontinuity",
+    "comparable_countries": ["malaysia", "indonesia"]
+  },
+  {
+    "id": "philippines", "slug": "philippines", "name": "Philippines", "flag": "🇵🇭", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 9, "reasons": ["PLDT and Globe Telecom deploying 5G in Metro Manila and key cities", "Internet speeds improving significantly since 2021 Open Access legislation broke duopoly", "Archipelago geography (7,600 islands) creates major rural connectivity infrastructure challenges"] },
+      "talent": { "score": 11, "reasons": ["UP Diliman, Ateneo, and De La Salle producing growing AI research cohorts", "BPO sector (1.5M employees) is transforming with AI skills integration — AI-ready workforce", "Filipino diaspora in the US and UK providing strong knowledge transfer and investment linkages"] },
+      "governance": { "score": 9, "reasons": ["Data Privacy Act 2012 (NPC) is one of Southeast Asia's oldest data protection frameworks", "National AI Strategy and Artificial Intelligence Roadmap published 2021", "ICT-friendly governance with NTC and DICT coordinating digital policy"] },
+      "investment": { "score": 9, "reasons": ["BPO sector AI investment driving demand for AI tools and platforms", "Ayala Group, JG Summit investing in domestic AI startups through Kickstart Ventures", "Remittance fintech (GCash, PayMaya) are world-leading mobile money AI platforms"] },
+      "economic_readiness": { "score": 8, "reasons": ["115M population with very high English language proficiency creating unique AI services advantage", "GCash's 80M+ users demonstrates mobile-first AI financial services at scale", "BPO sector AI transformation creating massive workforce reskilling demand and market opportunity"] }
+    },
+    "total_score": 46, "trajectory_score": 4, "trajectory_label": "Positive", "projected_score_2028": 50,
+    "top_accelerator": "1.5M BPO workforce AI transformation and GCash mobile money platform at 80M users",
+    "top_risk": "Archipelago infrastructure gaps and political dynasty system limiting equitable AI distribution",
+    "comparable_countries": ["indonesia", "vietnam"]
+  },
+  {
+    "id": "new-zealand", "slug": "new-zealand", "name": "New Zealand", "flag": "🇳🇿", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 13, "reasons": ["Chorus nationwide fibre rollout completed — one of the world's highest fibre penetration rates", "Spark and One NZ deploying 5G nationally; AWS and Azure New Zealand regions operational", "Strong submarine cable connectivity; Southern Cross and Hawaiki cables providing high-speed Pacific links"] },
+      "talent": { "score": 13, "reasons": ["University of Auckland and Victoria University of Wellington maintaining strong CS research programmes", "Rocket Lab, Xero, and Trade Me demonstrate New Zealand capacity for global tech products", "Small population (5M) creates talent ceiling; Australia and US attract many NZ AI graduates"] },
+      "governance": { "score": 14, "reasons": ["Privacy Act 2020 modernising data governance in line with international standards", "Algorithm Assessment — government commitment to responsible AI use in public sector", "Five Eyes intelligence alignment and strong rule of law creating trusted AI governance environment"] },
+      "investment": { "score": 10, "reasons": ["Xero (accounting AI), Rocket Lab, and Vista Group showing NZ capability to build global tech companies", "NZVC and Icehouse Ventures providing structured early-stage investment", "Government R&D tax credit regime supporting AI innovation investment"] },
+      "economic_readiness": { "score": 10, "reasons": ["Highly digitised, stable economy; agriculture (precision farming AI) and tourism are primary sectors", "Financial services and government services well advanced in AI adoption by Pacific standards", "Geographic isolation from major tech hubs creates time-zone and talent competition disadvantages"] }
+    },
+    "total_score": 60, "trajectory_score": 3, "trajectory_label": "Positive", "projected_score_2028": 63,
+    "top_accelerator": "Completed nationwide fibre rollout and Five Eyes AI security cooperation creating robust foundation",
+    "top_risk": "Geographic isolation and small market (5M) requiring all AI companies to internationalise immediately",
+    "comparable_countries": ["australia", "canada"]
+  },
+  {
+    "id": "pakistan", "slug": "pakistan", "name": "Pakistan", "flag": "🇵🇰", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 8, "reasons": ["Jazz, Telenor Pakistan, and Zong deploying 4G widely; 5G spectrum auctions beginning", "PTCL national fibre backbone; major cities (Karachi, Lahore, Islamabad) have improving connectivity", "Frequent power outages and internet shutdowns by government create operational unreliability"] },
+      "talent": { "score": 11, "reasons": ["LUMS, IBA, and NUST producing growing AI and CS research cohorts of improving quality", "Pakistan is among the top-5 countries by number of registered Upwork/Fiverr freelancers — massive latent AI skill", "Large diaspora in the US and UK maintaining knowledge transfer; many Stanford/MIT-trained Pakistani AI researchers"] },
+      "governance": { "score": 7, "reasons": ["National AI Policy 2023 published — Pakistan moving to formalise AI governance", "Personal Data Protection Bill being passed through parliament", "Political instability and frequent government changes creating policy discontinuity"] },
+      "investment": { "score": 6, "reasons": ["Careem (acquired by Uber) and Bykea show Pakistani AI product-building capability", "Pakistan tech VC growing — $350M invested in 2021 — but macro instability disrupted subsequent years", "IMF programme and dollar shortage creating severe constraints on tech investment in 2022-2024"] },
+      "economic_readiness": { "score": 5, "reasons": ["230M population provides massive domestic market potential if economic stability returns", "Freelance economy and remittances maintaining digital services demand despite macro crisis", "Economic instability (IMF bailouts, currency depreciation) creating near-term constraint on formal AI market"] }
+    },
+    "total_score": 37, "trajectory_score": 3, "trajectory_label": "Positive", "projected_score_2028": 40,
+    "top_accelerator": "World's largest per-capita freelance digital workforce demonstrating massive latent AI skills and entrepreneurial energy",
+    "top_risk": "Chronic macroeconomic instability, political crises, and internet shutdowns deterring sustained AI investment",
+    "comparable_countries": ["bangladesh", "india"]
+  },
+  {
+    "id": "bangladesh", "slug": "bangladesh", "name": "Bangladesh", "flag": "🇧🇩", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 8, "reasons": ["Grameenphone and Robi deploying 4G/LTE widely; 5G spectrum assigned", "SEA-ME-WE-4 and SEA-ME-WE-5 subsea cables providing international bandwidth", "National Data Centre being constructed; Digital Bangladesh infrastructure programme ongoing"] },
+      "talent": { "score": 9, "reasons": ["BUET producing strong engineering graduates; BASIS (software association) counts 4,500+ member companies", "Bangladesh ranks among top-5 countries globally for software freelancers by volume", "Growing IT services export sector employing 1M+ engineers developing AI-adjacent skills"] },
+      "governance": { "score": 7, "reasons": ["Digital Security Act and forthcoming Data Protection Act providing framework", "Bangladesh National Digital Architecture includes AI components", "Government 'Smart Bangladesh 2041' vision placing AI centrally in development strategy"] },
+      "investment": { "score": 5, "reasons": ["bKash mobile money platform (BRAC Bank) is world-leading mobile financial AI at 60M+ users", "Pathao, Shajgoj, and Shohoz demonstrate emerging Dhaka startup ecosystem", "VC activity limited but growing; mostly Singapore and US-based regional funds investing"] },
+      "economic_readiness": { "score": 5, "reasons": ["170M population — one of world's most densely populated countries; growing middle class", "RMG (garment) sector AI for quality and supply chain is a massive potential vertical", "bKash's 60M users demonstrates mobile-first financial AI adoption at Bangladesh scale"] }
+    },
+    "total_score": 34, "trajectory_score": 4, "trajectory_label": "Positive", "projected_score_2028": 38,
+    "top_accelerator": "World-leading mobile financial AI (bKash) and massive software freelance workforce",
+    "top_risk": "Political instability post-2024 and climate vulnerability creating medium-term AI investment uncertainty",
+    "comparable_countries": ["pakistan", "vietnam"]
+  },
+  {
+    "id": "sri-lanka", "slug": "sri-lanka", "name": "Sri Lanka", "flag": "🇱🇰", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 9, "reasons": ["Dialog Axiata and SLT deploying 4G/LTE widely; 5G beginning post-economic recovery", "SEA-ME-WE subsea cable landing point providing good international bandwidth", "Data centre market in Colombo beginning to attract regional interest"] },
+      "talent": { "score": 10, "reasons": ["University of Moratuwa is Southeast Asia's well-regarded engineering university with strong AI research", "Strong IT services tradition — 300,000+ IT professionals in a country of 22M", "Brain drain accelerated by 2022 economic crisis; many engineers emigrating to Australia and UAE"] },
+      "governance": { "score": 9, "reasons": ["Personal Data Protection Act 2022 — enacted during economic crisis showing policy prioritisation", "ICTA (ICT Agency) coordinating digital transformation with AI components", "IMF programme supporting governance reforms that improve business environment"] },
+      "investment": { "score": 7, "reasons": ["99x Technology, IronOne, and WSO2 demonstrate Sri Lankan AI product company capability", "Economic crisis 2022 severely disrupted investment; recovery beginning post-IMF agreement", "SLASSCOM (ICT chamber) working to retain and attract tech investment"] },
+      "economic_readiness": { "score": 5, "reasons": ["IT services exports grew even during economic crisis — testament to sector resilience", "22M population; tourism and tea economy recovering with digital transformation accelerating", "IMF recovery programme creating more stable environment for AI investment"] }
+    },
+    "total_score": 40, "trajectory_score": 2, "trajectory_label": "Positive", "projected_score_2028": 42,
+    "top_accelerator": "Strong IT services tradition and University of Moratuwa engineering pipeline despite economic setback",
+    "top_risk": "Economic crisis legacy and accelerated brain drain depleting the talent pool that powers the IT sector",
+    "comparable_countries": ["bangladesh", "vietnam"]
+  },
+  {
+    "id": "myanmar", "slug": "myanmar", "name": "Myanmar", "flag": "🇲🇲", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 6, "reasons": ["MPT and Telenor Myanmar (now Ooredoo) providing 4G/LTE; military coup disrupted infrastructure investment", "Internet shutdowns frequent since 2021 coup; connectivity unreliable in conflict areas", "Data centre development effectively halted by political and economic instability"] },
+      "talent": { "score": 6, "reasons": ["Yangon University of Technology and Myanmar Institute of IT producing CS graduates", "Growing diaspora tech community maintaining connection to global AI developments", "Brain drain accelerating post-coup; many tech workers in Thailand and Singapore"] },
+      "governance": { "score": 3, "reasons": ["Military junta governance incompatible with open AI development; surveillance technology deployed", "Cyber Security Law restricting legitimate tech activity", "No AI strategy; technology used primarily for control and propaganda"] },
+      "investment": { "score": 4, "reasons": ["International tech investment effectively withdrawn post-coup sanctions", "Some Chinese tech investment continuing despite Western withdrawal", "Limited domestic private sector AI investment under military-controlled economy"] },
+      "economic_readiness": { "score": 3, "reasons": ["54M population but economy severely disrupted by civil war and sanctions", "Manufacturing sector (garments) reduced due to Western sanctions and instability", "Mobile money (Wave Money) deployment disrupted; pre-coup digital momentum lost"] }
+    },
+    "total_score": 22, "trajectory_score": -2, "trajectory_label": "Negative", "projected_score_2028": 20,
+    "top_accelerator": "Young, mobile-savvy population that could rapidly adopt AI when political situation normalises",
+    "top_risk": "Military junta governance and civil war creating sustained infrastructure and investment collapse",
+    "comparable_countries": ["cambodia", "laos"]
+  },
+  {
+    "id": "cambodia", "slug": "cambodia", "name": "Cambodia", "flag": "🇰🇭", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 6, "reasons": ["Smart Axiata and Metfone deploying 4G/LTE; 5G beginning in Phnom Penh", "Chinese BRI investment in fibre backbone improving connectivity", "Growing Phnom Penh data centre market for regional hosting"] },
+      "talent": { "score": 6, "reasons": ["Royal University of Phnom Penh and RUPP producing modest CS cohorts", "Young population (median age 27) with growing digital skills adoption", "Brain drain to Thailand and Malaysia; limited domestic AI talent concentration"] },
+      "governance": { "score": 6, "reasons": ["Personal Data Protection Law enacted 2023", "Digital Economy and Digital Society Policy framework published", "Governance constrained by one-party dominance but tech policy reasonably pragmatic"] },
+      "investment": { "score": 4, "reasons": ["WING mobile money demonstrating AI-powered fintech at scale in developing economy", "Special economic zones attracting light manufacturing with some AI-integrated production", "Limited VC; mostly Singapore and Thailand-based regional investment"] },
+      "economic_readiness": { "score": 3, "reasons": ["17M population; garment manufacturing and tourism primary economic sectors", "Mobile money (WING) penetration creating digital financial infrastructure", "Very low income levels limiting formal AI market; informal economy dominant"] }
+    },
+    "total_score": 25, "trajectory_score": 2, "trajectory_label": "Positive", "projected_score_2028": 27,
+    "top_accelerator": "Young mobile-first population and BRI connectivity investment creating foundation for AI adoption",
+    "top_risk": "Very low income levels and limited digital infrastructure outside Phnom Penh constraining AI market development",
+    "comparable_countries": ["laos", "myanmar"]
+  },
+  {
+    "id": "laos", "slug": "laos", "name": "Laos", "flag": "🇱🇦", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 5, "reasons": ["LTC and Unitel providing 4G/LTE in major cities; rural coverage very limited", "Landlocked geography with Chinese BRI rail and fibre investment improving connectivity", "Limited data centre infrastructure; mostly dependent on Thai and Vietnamese facilities"] },
+      "talent": { "score": 4, "reasons": ["National University of Laos producing very limited CS graduates", "Brain drain to Thailand significant; small educated workforce", "Very small population (7.5M) limits talent supply"] },
+      "governance": { "score": 5, "reasons": ["Laos Digital Economy Policy with basic AI components in development", "Personal data protection regulations early-stage", "One-party governance providing stability but limiting open innovation"] },
+      "investment": { "score": 3, "reasons": ["Chinese and Thai investment dominating tech infrastructure", "Very limited startup ecosystem; mostly subsistence and agricultural economy", "Hydro power export economy beginning digital transformation with limited AI investment"] },
+      "economic_readiness": { "score": 2, "reasons": ["7.5M population; among Southeast Asia's poorest countries per capita", "Debt distress from Chinese BRI loans constraining government investment capacity", "Mobile money growing but formal digital economy very early stage"] }
+    },
+    "total_score": 19, "trajectory_score": 1, "trajectory_label": "Neutral", "projected_score_2028": 20,
+    "top_accelerator": "BRI infrastructure investment and regional connectivity improving physical AI deployment foundation",
+    "top_risk": "Debt distress, poverty, and one-party constraints limiting autonomous AI ecosystem formation",
+    "comparable_countries": ["cambodia", "myanmar"]
+  },
+  {
+    "id": "mongolia", "slug": "mongolia", "name": "Mongolia", "flag": "🇲🇳", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 7, "reasons": ["Mobicom and Unitel providing 4G/LTE widely in urban areas; 5G beginning in Ulaanbaatar", "Improving fibre backbone connecting Ulaanbaatar to Russia and China", "Significant connectivity gap between capital and sparse rural steppe regions"] },
+      "talent": { "score": 6, "reasons": ["National University of Mongolia and MUST producing growing CS graduates", "Small population (3.4M) with surprisingly high mobile literacy given nomadic context", "Brain drain to South Korea (large Mongolian community) and Russia limiting domestic talent"] },
+      "governance": { "score": 6, "reasons": ["Personal Data Protection Law enacted 2021; NDPSA authority operational", "National digital transformation strategy with AI components", "Democratic governance with fair rule of law creating predictable business environment"] },
+      "investment": { "score": 4, "reasons": ["Mining sector AI for coal and copper extraction beginning with international company support", "Government digital transformation investment modest", "Small domestic VC; regional fund access limited"] },
+      "economic_readiness": { "score": 4, "reasons": ["3.4M population; mining and nomadic herding economy with growing urban digital sector", "Mobile phone penetration very high (120%+) for population; leapfrogged to mobile-first", "Mining AI for resource extraction and ESG compliance growing with international company involvement"] }
+    },
+    "total_score": 27, "trajectory_score": 2, "trajectory_label": "Positive", "projected_score_2028": 29,
+    "top_accelerator": "Mining sector AI investment and high mobile penetration enabling leapfrog digital adoption",
+    "top_risk": "Extreme geographic dispersal, small population, and resource dependence limiting AI ecosystem diversity",
+    "comparable_countries": ["kyrgyzstan", "kazakhstan"]
+  },
+  {
+    "id": "nepal", "slug": "nepal", "name": "Nepal", "flag": "🇳🇵", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 6, "reasons": ["Nepal Telecom and Ncell deploying 4G/LTE; 5G in early planning", "Challenging Himalayan terrain creating significant rural connectivity challenges", "Growing Kathmandu Valley data centre market; FBCDN and NTC fibre improving backbone"] },
+      "talent": { "score": 6, "reasons": ["IOE (Institute of Engineering) Pulchowk producing strong engineering graduates", "Growing Kathmandu IT community; Leapfrog Technology and Yomari demonstrating product capability", "Brain drain to the US, Australia, and Gulf states very high — $500M+ annual IT services export despite drain"] },
+      "governance": { "score": 5, "reasons": ["Electronic Transactions Act and forthcoming Personal Data Protection Bill", "National IT Policy with AI components; NITC coordinating digital transformation", "Political instability (multiple governments per year historically) creates policy discontinuity"] },
+      "investment": { "score": 4, "reasons": ["Remittance economy ($8B/year) driving mobile money AI demand", "F1Soft and Leapfrog Technology representing domestic AI product companies", "Very limited domestic VC; mostly diaspora angels and regional funds"] },
+      "economic_readiness": { "score": 3, "reasons": ["30M population; remittance and tourism economy with high digital aspirations", "eSewa and IME Pay mobile wallets showing AI-powered fintech adoption at scale", "Geographic landlocked position and poverty constraining formal AI market formation"] }
+    },
+    "total_score": 24, "trajectory_score": 2, "trajectory_label": "Positive", "projected_score_2028": 26,
+    "top_accelerator": "Remittance-driven mobile money AI and growing IT services export despite challenging geography",
+    "top_risk": "Extreme brain drain depleting IT talent faster than universities can produce graduates",
+    "comparable_countries": ["bangladesh", "sri-lanka"]
+  },
+  {
+    "id": "bhutan", "slug": "bhutan", "name": "Bhutan", "flag": "🇧🇹", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 5, "reasons": ["Bhutan Telecom and TashiCell providing 4G/LTE nationally; rural coverage limited", "Improving fibre backbone; Internet Exchange of Bhutan (IXBhutan) established", "Hydroelectric-powered electricity providing stable, affordable energy for digital infrastructure"] },
+      "talent": { "score": 5, "reasons": ["Royal University of Bhutan producing limited but growing CS graduate cohorts", "Small population (800,000) creates inherent talent supply constraint", "Government digital literacy programme building foundational skills nationally"] },
+      "governance": { "score": 6, "reasons": ["Bhutan National Digital Identity project deploying AI for government services", "Data Privacy and Protection Act in development", "Constitutional Monarchy with good governance indicators; Gross National Happiness framework guiding ethical AI approach"] },
+      "investment": { "score": 3, "reasons": ["Royal Government of Bhutan National Digital Drukyul programme investing in digital transformation", "Crypto mining briefly boomed using cheap hydro power before government restriction", "Very limited private sector investment; state-guided economy"] },
+      "economic_readiness": { "score": 2, "reasons": ["800,000 population; hydroelectric exports and tourism economy", "Geraluminium hydro wealth provides energy for AI infrastructure but limits commercial AI market", "Unique Gross National Happiness governance philosophy creating distinct ethical AI framework opportunity"] }
+    },
+    "total_score": 21, "trajectory_score": 2, "trajectory_label": "Positive", "projected_score_2028": 23,
+    "top_accelerator": "Cheap hydroelectric energy and unique GNH ethical AI governance framework creating distinct positioning",
+    "top_risk": "Tiny population and geography-constrained economy creating no viable standalone AI market",
+    "comparable_countries": ["nepal", "maldives"]
+  },
+  {
+    "id": "maldives", "slug": "maldives", "name": "Maldives", "flag": "🇲🇻", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 6, "reasons": ["Dhiraagu and Ooredoo Maldives providing 4G/LTE across inhabited islands; 5G beginning", "Challenging geography (1,190 islands) makes connectivity investment difficult and expensive", "Tourism sector AI requirements driving investment in Male data infrastructure"] },
+      "talent": { "score": 4, "reasons": ["Maldives National University expanding CS programmes; very small cohorts", "Very small population (500,000); most higher education pursued abroad", "Tourism sector employing many foreign workers with imported digital skills"] },
+      "governance": { "score": 5, "reasons": ["Data Protection Act enacted 2021; Data Protection Authority operational", "Digital Maldives programme with e-government AI components", "Climate vulnerability creating urgency for AI in disaster response and infrastructure management"] },
+      "investment": { "score": 3, "reasons": ["Tourism sector (90% of GDP) driving AI investment for visitor personalisation", "Government renewable energy AI investment for solar transition", "Very limited domestic VC; mostly international tourism and hospitality investment"] },
+      "economic_readiness": { "score": 2, "reasons": ["500,000 population; luxury tourism economy with very limited domestic AI market", "Climate crisis (existential flooding risk) creating AI urgency in environmental monitoring", "High GDP per capita from tourism but concentration limits industrial AI diversification"] }
+    },
+    "total_score": 20, "trajectory_score": 1, "trajectory_label": "Neutral", "projected_score_2028": 21,
+    "top_accelerator": "Tourism sector AI for premium visitor personalisation and climate monitoring AI demand",
+    "top_risk": "Existential climate risk and micro-island geography creating unique AI challenges with no domestic scale",
+    "comparable_countries": ["bhutan", "nepal"]
+  },
+  {
+    "id": "afghanistan", "slug": "afghanistan", "name": "Afghanistan", "flag": "🇦🇫", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 3, "reasons": ["MTN Afghanistan and Roshan providing mobile connectivity; infrastructure severely damaged by conflict", "Internet access heavily restricted by Taliban government; many sites blocked", "Power grid largely non-functional; solar and generators the primary energy source"] },
+      "talent": { "score": 3, "reasons": ["Kabul University and polytechnics produced CS graduates pre-Taliban; many have fled", "Significant Afghan diaspora tech community in US, Germany, and Iran maintaining connections", "Taliban ban on women's education eliminates half the potential talent pipeline"] },
+      "governance": { "score": 2, "reasons": ["Taliban governance incompatible with open AI development; internet restrictions severe", "No AI strategy; surveillance and propaganda primary technology use", "International sanctions and non-recognition constraining any governance development"] },
+      "investment": { "score": 2, "reasons": ["International investment effectively withdrawn; economy in severe crisis", "Informal cryptocurrency use maintaining some digital economy function", "Humanitarian aid digitising but not as AI investment"] },
+      "economic_readiness": { "score": 4, "reasons": ["40M population with very high mobile penetration — mobile money the primary digital access point", "Women excluded from workforce and education limiting economic AI potential dramatically", "Mineral wealth (lithium, rare earths) could theoretically support AI hardware supply chain involvement"] }
+    },
+    "total_score": 14, "trajectory_score": -2, "trajectory_label": "Negative", "projected_score_2028": 12,
+    "top_accelerator": "Large diaspora maintaining AI knowledge connections and mineral wealth creating potential future leverage",
+    "top_risk": "Taliban governance, women's education ban, and conflict creating multi-decade AI development setback",
+    "comparable_countries": ["myanmar", "venezuela"]
+  },
+  {
+    "id": "kazakhstan", "slug": "kazakhstan", "name": "Kazakhstan", "flag": "🇰🇿", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 11, "reasons": ["Kazakhtelecom and Kcell deploying 5G in Almaty and Astana; Trans-Caspian cable route", "Major data centre investment — Kazakhstan positioning as Central Asian data hub", "Digital Kazakhstan programme investing billions in national digital infrastructure"] },
+      "talent": { "score": 10, "reasons": ["Nazarbayev University and KazNU producing growing AI engineering cohorts", "Bolashak scholarship programme sent 13,000 students to study abroad — significant AI talent returned", "Russia-linked diaspora maintaining knowledge connections to strong STEM tradition"] },
+      "governance": { "score": 10, "reasons": ["National Digital Transformation Concept 2025 with clear AI priorities", "Personal Data Protection Act aligned with international standards; MDIT coordinating AI policy", "Kazakhstan positioning as Central Asia AI governance leader through SCO and CIS frameworks"] },
+      "investment": { "score": 9, "reasons": ["Samruk-Kazyna sovereign wealth fund investing in domestic AI companies and infrastructure", "Astana International Financial Centre (AIFC) attracting fintech AI investment with common law courts", "National Fund of Kazakhstan deploying capital into digital economy initiatives"] },
+      "economic_readiness": { "score": 6, "reasons": ["19M population; oil and commodity wealth funding ambitious AI transformation", "Financial technology (Kaspi.kz) at 13M users is Central Asia's most successful AI-powered super-app", "Manufacturing and mining sectors beginning AI adoption with international company support"] }
+    },
+    "total_score": 46, "trajectory_score": 4, "trajectory_label": "Positive", "projected_score_2028": 50,
+    "top_accelerator": "Kaspi.kz super-app proving Central Asian AI product capability and oil wealth funding digital transformation",
+    "top_risk": "Governance constraints and over-dependence on Russian/Chinese technology ecosystems limiting AI sovereignty",
+    "comparable_countries": ["azerbaijan", "uzbekistan"]
+  },
+  {
+    "id": "uzbekistan", "slug": "uzbekistan", "name": "Uzbekistan", "flag": "🇺🇿", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 8, "reasons": ["Ucell and Beeline Uzbekistan deploying 4G/LTE; 5G in Tashkent under development", "Improving fibre backbone; Tashkent growing as Central Asian connectivity hub", "Government Digital Uzbekistan 2030 programme investing in national ICT infrastructure"] },
+      "talent": { "score": 9, "reasons": ["Westminster International University Tashkent and TUIT producing growing CS cohorts", "IT Park Uzbekistan housing 500+ tech companies and training programme creating new talent", "Strong STEM tradition from Soviet era; President Mirziyoyev prioritising tech education"] },
+      "governance": { "score": 8, "reasons": ["National AI Strategy published 2021 under Presidential decree", "Personal Data Protection Law enacted 2019; Agency for Personalised Data Protection operational", "Government AI adoption active — AI used in customs, tax, education across ministries"] },
+      "investment": { "score": 6, "reasons": ["IT Park special economic zone attracting tech FDI with tax incentives", "Government Uzbekistan Fund for Reconstruction and Development investing in digital economy", "Growing regional VC activity; Uzum (AI e-commerce) valued at $500M+"] },
+      "economic_readiness": { "score": 5, "reasons": ["36M population — Central Asia's largest; growing middle class creating AI product market", "Textile, agriculture, and mining sectors beginning AI transformation", "Ongoing economic reforms attracting international attention from UAE, South Korea, and EU investors"] }
+    },
+    "total_score": 36, "trajectory_score": 5, "trajectory_label": "Strong Positive", "projected_score_2028": 41,
+    "top_accelerator": "Presidential AI mandate, IT Park investment zone, and rapid economic reform attracting regional AI investment",
+    "top_risk": "Authoritarian legacy and governance constraints limiting civil society innovation and international AI partnerships",
+    "comparable_countries": ["kazakhstan", "georgia"]
+  },
+  {
+    "id": "turkmenistan", "slug": "turkmenistan", "name": "Turkmenistan", "flag": "🇹🇲", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 5, "reasons": ["TurkmenTelekom providing basic mobile connectivity; internet heavily restricted", "One of the world's least connected countries — less than 20% internet penetration", "State monopoly on telecommunications preventing competitive infrastructure development"] },
+      "talent": { "score": 4, "reasons": ["Magtymguly Turkmen State University producing very limited CS cohorts", "Extreme isolation limiting exposure to global AI trends and research", "Brain drain severe among educated population; many seek opportunities in Russia and Turkey"] },
+      "governance": { "score": 3, "reasons": ["Among the world's most closed societies — 5th most repressive internet environment globally", "No AI strategy in any meaningful sense; technology for state control", "No international AI governance participation"] },
+      "investment": { "score": 3, "reasons": ["State-owned economy with no private tech investment infrastructure", "Natural gas revenues not directed toward AI development", "Isolated from international investment flows by governance conditions"] },
+      "economic_readiness": { "score": 3, "reasons": ["6M population; natural gas economy with very limited digital economy development", "Currency manipulation and state control limiting market function", "Free trade zones existing but minimal tech activity"] }
+    },
+    "total_score": 18, "trajectory_score": 0, "trajectory_label": "Neutral", "projected_score_2028": 18,
+    "top_accelerator": "Natural gas wealth that could theoretically fund digital transformation if governance opens",
+    "top_risk": "Extreme authoritarianism and internet isolation creating complete AI development stagnation",
+    "comparable_countries": ["north-korea", "venezuela"]
+  },
+  {
+    "id": "kyrgyzstan", "slug": "kyrgyzstan", "name": "Kyrgyzstan", "flag": "🇰🇬", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 6, "reasons": ["MegaCom and Beeline Kyrgyzstan providing 4G/LTE; 5G planning beginning", "Bishkek data centre market growing; Trans-Caspian connectivity through Kazakhstan", "Hydroelectric power providing cheap, stable energy for digital infrastructure"] },
+      "talent": { "score": 6, "reasons": ["AUCA (American University of Central Asia) producing quality CS graduates", "Small population (6.8M) with significant brain drain to Russia and Kazakhstan", "Growing tech community in Bishkek with Geeks.kg and other initiatives"] },
+      "governance": { "score": 5, "reasons": ["Personal Data Protection Law enacted 2021", "Digital government programme with AI components", "Democratic governance (by Central Asian standards) providing more open innovation environment than neighbours"] },
+      "investment": { "score": 4, "reasons": ["Very limited domestic VC; mostly diaspora remittances and microfinance", "Hydroelectric bitcoin mining briefly attracted crypto investment", "Government UDHF digital development fund providing modest support"] },
+      "economic_readiness": { "score": 3, "reasons": ["6.8M population; remittance economy (35% of GDP) with growing mobile money adoption", "Hydroelectric cheap electricity potential for AI compute not yet exploited commercially", "Small market requiring immediate regional approach for any AI company"] }
+    },
+    "total_score": 24, "trajectory_score": 2, "trajectory_label": "Positive", "projected_score_2028": 26,
+    "top_accelerator": "AUCA university quality and cheap hydroelectric energy creating modest AI development foundation",
+    "top_risk": "Small population, brain drain to Russia, and limited investment infrastructure",
+    "comparable_countries": ["tajikistan", "mongolia"]
+  },
+  {
+    "id": "tajikistan", "slug": "tajikistan", "name": "Tajikistan", "flag": "🇹🇯", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 5, "reasons": ["Babilon-T and Megafon Tajikistan providing mobile connectivity; 5G limited to Dushanbe", "Limited international bandwidth; landlocked with poor regional connectivity", "Hydroelectric power potential for digital infrastructure not yet materialising"] },
+      "talent": { "score": 5, "reasons": ["Tajik Technical University producing modest CS cohorts", "Brain drain to Russia very significant — 1M+ Tajiks working in Russia", "Very limited domestic AI research activity"] },
+      "governance": { "score": 4, "reasons": ["Authoritarian governance limiting open internet and digital innovation", "Data protection law in development; АНСЗПД authority early-stage", "No substantive AI strategy; government technology focus is surveillance"] },
+      "investment": { "score": 3, "reasons": ["Extremely limited tech investment; mostly remittance-supported informal economy", "Chinese BRI investment in infrastructure not extending to AI", "Central Bank fintech modernisation is the primary digital investment track"] },
+      "economic_readiness": { "score": 2, "reasons": ["10M population; poorest Central Asian country by GDP per capita", "Remittance economy (50%+ of GDP) driving mobile money demand", "Nurek Dam hydroelectric project creating energy surplus that could support digital infrastructure"] }
+    },
+    "total_score": 19, "trajectory_score": 1, "trajectory_label": "Neutral", "projected_score_2028": 20,
+    "top_accelerator": "Mobile money adoption driven by large diaspora remittance flows",
+    "top_risk": "Extreme poverty, authoritarian governance, and near-total dependence on Russia creating severe AI development constraints",
+    "comparable_countries": ["kyrgyzstan", "turkmenistan"]
+  },
+  {
+    "id": "azerbaijan", "slug": "azerbaijan", "name": "Azerbaijan", "flag": "🇦🇿", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 10, "reasons": ["Azercell and Bakcell deploying 5G in Baku; Trans-Caspian fibre cable route to Central Asia", "Baku data centre market growing with government investment in ICT park", "ASAN Service government digital platform demonstrates AI-ready public infrastructure"] },
+      "talent": { "score": 9, "reasons": ["ADA University and Azerbaijan State Oil Academy producing growing AI engineering cohorts", "SOCAR (oil company) AI talent community; government digital transformation hiring", "Diaspora connections to Russia and Turkey providing knowledge linkages"] },
+      "governance": { "score": 9, "reasons": ["Personal Data Protection Law enacted; AZDATA authority operational", "Digital Azerbaijan State Programme 2021-2025 with AI components", "ASAN Service digital government is CIS reference model for e-government AI adoption"] },
+      "investment": { "score": 9, "reasons": ["SOCAR (state oil company) investing in industrial AI for operations optimisation", "SOFAZ sovereign wealth fund providing co-investment for tech projects", "COP29 (2024 Baku) hosting driving smart city and sustainability AI investment"] },
+      "economic_readiness": { "score": 5, "reasons": ["10M population; oil wealth funding digital transformation ambitions", "ASAN Service creates most efficient government digital services in CIS region", "Economic diversification from oil to digital is core government strategy with AI central"] }
+    },
+    "total_score": 42, "trajectory_score": 4, "trajectory_label": "Positive", "projected_score_2028": 46,
+    "top_accelerator": "ASAN Service digital government model and COP29 hosting driving smart city AI investment",
+    "top_risk": "Oil dependence and governance constraints limiting private sector AI innovation beyond state-directed projects",
+    "comparable_countries": ["georgia", "armenia"]
+  },
+  {
+    "id": "armenia", "slug": "armenia", "name": "Armenia", "flag": "🇦🇲", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 10, "reasons": ["ArmenTel (Beeline) and Team Telecom deploying 5G in Yerevan; solid urban connectivity", "VivaCell-MTS and Ucom providing competitive connectivity landscape; DataPro data centre growing", "Russian IT company relocation post-2022 sanctions boosting data infrastructure demand"] },
+      "talent": { "score": 12, "reasons": ["American University of Armenia, YSU, and SEUA producing strong CS graduates", "NVIDIA, Synopsis, ServiceNow have significant engineering centres in Yerevan", "Large influx of Russian IT workers post-2022 dramatically boosting local AI talent density"] },
+      "governance": { "score": 9, "reasons": ["Personal Data Protection Law aligned with GDPR; PDPD authority operational", "AI Armenia national programme and tech city development ambitions", "Democratic governance post-2018 Velvet Revolution supporting innovation culture"] },
+      "investment": { "score": 8, "reasons": ["50,000+ Russian IT workers relocated to Armenia creating major talent and investment surge", "NVIDIA, Synopsis, Mentor Graphics Armenia driving significant private sector AI R&D", "FAST Foundation and governmental tech park creating structured investment support"] },
+      "economic_readiness": { "score": 4, "reasons": ["3M population; but GDP per capita growing rapidly from tech migration and FDI", "IT services exports grew 60% in 2022 alone on Russian company relocation wave", "Armenia positioned as bridge between EU and CIS markets for AI companies"] }
+    },
+    "total_score": 43, "trajectory_score": 4, "trajectory_label": "Positive", "projected_score_2028": 47,
+    "top_accelerator": "Massive influx of Russian tech workers post-2022 and NVIDIA/Synopsys engineering hub presence",
+    "top_risk": "Geopolitical vulnerability (Nagorno-Karabakh conflict) and dependence on Russian IT migration wave that could reverse",
+    "comparable_countries": ["georgia", "azerbaijan"]
+  },
+  {
+    "id": "georgia", "slug": "georgia", "name": "Georgia", "flag": "🇬🇪", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 10, "reasons": ["Magti and Silknet deploying 5G in Tbilisi; fast, affordable broadband by regional standards", "Tbilisi positioned as Caucasus connectivity hub; multiple fibre routes to Black Sea cables", "Growing data centre market in Tbilisi; low electricity costs from hydro power"] },
+      "talent": { "score": 10, "reasons": ["Georgian Technical University and Tbilisi State University producing CS graduates", "Startup Tbilisi community growing rapidly; Gita and BAG programs developing ecosystem", "Russian tech worker influx 2022 boosting talent density significantly"] },
+      "governance": { "score": 10, "reasons": ["Personal Data Protection Law aligned with GDPR; PDI commissioner operational", "Georgia Innovation and Technology Agency (GITA) coordinating AI strategy", "EU candidate status application (though complex) driving regulatory modernisation"] },
+      "investment": { "score": 6, "reasons": ["Bank of Georgia and TBC Bank running fintech AI programmes at regional scale", "Russian tech company relocation bringing investment; EU interest growing", "Tbilisi coworking and startup ecosystem growing rapidly with GITA support"] },
+      "economic_readiness": { "score": 4, "reasons": ["4M population; banking, tourism, and transit economy with growing IT services sector", "TBC Bank and Bank of Georgia deploying sophisticated AI in financial services", "Strategic Silk Road position connecting EU and Central Asian markets for tech companies"] }
+    },
+    "total_score": 40, "trajectory_score": 4, "trajectory_label": "Positive", "projected_score_2028": 44,
+    "top_accelerator": "Russian tech worker influx and EU orientation creating unique talent and governance momentum simultaneously",
+    "top_risk": "Political tension between EU aspiration and Russian influence creating governance and investment uncertainty",
+    "comparable_countries": ["armenia", "azerbaijan"]
+  },
+  {
+    "id": "papua-new-guinea", "slug": "papua-new-guinea", "name": "Papua New Guinea", "flag": "🇵🇬", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 4, "reasons": ["Digicel PNG providing basic mobile connectivity; Coral Sea Cable System improving international bandwidth", "PNG DataCo national network company; urban centres (Port Moresby, Lae) have improving connectivity", "Vast geography (460,000 km²) with 800+ languages creates major infrastructure deployment challenges"] },
+      "talent": { "score": 3, "reasons": ["University of PNG and PNG University of Technology producing very limited CS cohorts", "Very small urban educated workforce; most population subsistence agricultural", "Brain drain to Australia significant among educated Papua New Guineans"] },
+      "governance": { "score": 3, "reasons": ["ICT Act and developing data protection framework", "National ICT policy with basic digital government components", "Governance constrained by significant corruption and weak institutional capacity"] },
+      "investment": { "score": 3, "reasons": ["Resource sector (ExxonMobil LNG, Barrick Gold) driving some industrial IoT investment", "Very limited domestic tech investment; mostly development aid-funded digital projects", "PNG Sustainable Development Program providing limited tech co-investment"] },
+      "economic_readiness": { "score": 3, "reasons": ["9.5M population; resource-dependent economy with very limited digital market formation", "Mobile money (MiBank, BSP) growing as primary digital financial access point", "Extreme geographic and linguistic fragmentation creating unique challenges for any AI deployment"] }
+    },
+    "total_score": 16, "trajectory_score": 1, "trajectory_label": "Neutral", "projected_score_2028": 17,
+    "top_accelerator": "Coral Sea Cable System improving international bandwidth and resource sector AI investment potential",
+    "top_risk": "Extreme geographic, linguistic, and governance fragmentation making AI deployment uniquely difficult",
+    "comparable_countries": ["cambodia", "laos"]
+  },
+  {
+    "id": "fiji", "slug": "fiji", "name": "Fiji", "flag": "🇫🇯", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 6, "reasons": ["Vodafone Fiji and Digicel deploying 4G/LTE; Southern Cross Cable providing international connectivity", "Developing data centre infrastructure in Suva; government e-Fiji programme investing", "Island geography challenges connectivity across 330+ islands"] },
+      "talent": { "score": 5, "reasons": ["University of the South Pacific (USP) and FNU producing IT graduates", "Pacific Islands' leading university hub; English proficiency aiding international collaboration", "Small population (930,000) limits absolute talent supply"] },
+      "governance": { "score": 5, "reasons": ["Online Safety Act 2018; data protection law under development", "Government e-Fiji national digital strategy", "Democratic governance improving after 2022 elections; more stable policy environment"] },
+      "investment": { "score": 3, "reasons": ["Tourism AI for visitor management growing as primary sector application", "Pacific regional development finance (ADB, World Bank) funding digital infrastructure", "Very limited domestic private tech investment"] },
+      "economic_readiness": { "score": 2, "reasons": ["930,000 population; tourism-dependent economy with high climate vulnerability", "Mobile money (M-PAiSA) providing financial inclusion for Pacific islands", "Pacific regional AI hub potential through USP but domestic market very small"] }
+    },
+    "total_score": 21, "trajectory_score": 2, "trajectory_label": "Positive", "projected_score_2028": 23,
+    "top_accelerator": "USP university Pacific hub status and improving democratic governance attracting regional AI investment",
+    "top_risk": "Climate change existential risk and small island micro-market constraining AI investment scale",
+    "comparable_countries": ["samoa", "papua-new-guinea"]
+  },
+  {
+    "id": "brunei", "slug": "brunei", "name": "Brunei", "flag": "🇧🇳", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 11, "reasons": ["DST and Progresif deploying 5G; Brunei has among Southeast Asia's highest internet speeds", "High GDP per capita from oil revenues enabling infrastructure investment above regional peers", "Regional submarine cable connectivity through FASTER and other Pacific cable systems"] },
+      "talent": { "score": 8, "reasons": ["Universiti Brunei Darussalam (UBD) and UTB producing limited but quality CS graduates", "Small population (450,000) with high English proficiency; many study in UK and Australia", "Oil sector creating some industrial AI engineering community"] },
+      "governance": { "score": 9, "reasons": ["Personal Data Protection Order 2021 — modern data governance framework", "Brunei National AI Agenda published 2021 with government adoption plans", "Stable governance under Sultan; Brunei Vision 2035 placing AI in economic diversification strategy"] },
+      "investment": { "score": 8, "reasons": ["Brunei Investment Agency (BIA) sovereign fund investments in global tech", "Oil revenues funding government digital transformation initiative", "BEDB (economic development board) attracting tech FDI with incentives"] },
+      "economic_readiness": { "score": 2, "reasons": ["450,000 population; oil-wealthy micro-state with very limited domestic AI market", "Financial services and oil sector AI primary deployment areas", "Vision 2035 economic diversification strategy creating AI urgency beyond oil sector"] }
+    },
+    "total_score": 38, "trajectory_score": 2, "trajectory_label": "Positive", "projected_score_2028": 40,
+    "top_accelerator": "Oil wealth funding ambitious digital transformation and Singapore proximity enabling ecosystem access",
+    "top_risk": "Tiny population (450,000) and oil dependence creating limited domestic AI market and innovation incentive",
+    "comparable_countries": ["malaysia", "singapore"]
+  },
+  {
+    "id": "north-korea", "slug": "north-korea", "name": "North Korea", "flag": "🇰🇵", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 4, "reasons": ["Koryolink mobile network provides internal communications; civilian internet almost non-existent", "Kwangmyong intranet serves limited domestic content; external internet for elite only", "Power grid unreliable; energy constraints severely limit any data centre operation"] },
+      "talent": { "score": 6, "reasons": ["Kim Chaek University of Technology produces state-directed CS graduates with military applications", "Lazarus Group and Bureau 121 demonstrate world-class offensive cyber AI capabilities", "Talent entirely directed toward military, surveillance, and hard currency generation via cybercrime"] },
+      "governance": { "score": 2, "reasons": ["Totalitarian governance with complete internet censorship and isolation from global AI", "Technology policy focused on weapons programme and foreign currency generation", "No civilian AI strategy; isolated from all international AI governance frameworks"] },
+      "investment": { "score": 2, "reasons": ["No foreign investment accessible under international sanctions", "State-directed investment goes entirely to military AI applications", "Cryptocurrency theft ($3B+ attributed to Lazarus Group) funds the state but not civilian AI"] },
+      "economic_readiness": { "score": 2, "reasons": ["25M population in extreme isolation; civilian digital economy essentially non-existent", "Command economy with minimal market function limiting any commercial AI deployment", "Military-industrial complex maintains advanced AI for weapons but civilian sector receives nothing"] }
+    },
+    "total_score": 16, "trajectory_score": -1, "trajectory_label": "Neutral", "projected_score_2028": 15,
+    "top_accelerator": "World-class offensive cyber capabilities demonstrating underlying technical talent — if ever redirected",
+    "top_risk": "Total isolation, sanctions, and militarised technology policy making civilian AI development effectively impossible",
+    "comparable_countries": ["turkmenistan", "myanmar"]
+  },
+  {
+    "id": "solomon-islands", "slug": "solomon-islands", "name": "Solomon Islands", "flag": "🇸🇧", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 3, "reasons": ["Bmobile and Our Telekom providing basic mobile connectivity", "Coral Sea Cable (2020) significantly improved international bandwidth", "Very limited fixed broadband; most access via mobile"] },
+      "talent": { "score": 2, "reasons": ["Solomon Islands National University with very limited IT programmes", "Tiny educated workforce; most talent emigrating to Australia and New Zealand", "Population of 700,000 across 1,000 islands"] },
+      "governance": { "score": 3, "reasons": ["ICT Act; data protection in development", "National Development Strategy with digital components", "Governance capacity limited; Chinese security deal complicating international relations"] },
+      "investment": { "score": 2, "reasons": ["Development finance (ADB, World Bank, Australia) primary investment source", "Very limited private sector digital investment", "Chinese Belt and Road infrastructure interest"] },
+      "economic_readiness": { "score": 1, "reasons": ["700,000 population; subsistence agriculture and resource extraction economy", "Mobile money slowly developing with limited smartphone penetration", "Extreme geographic fragmentation creating very high per-capita AI deployment costs"] }
+    },
+    "total_score": 11, "trajectory_score": 1, "trajectory_label": "Neutral", "projected_score_2028": 12,
+    "top_accelerator": "Coral Sea Cable improving bandwidth enabling basic digital services development",
+    "top_risk": "Extreme geographic fragmentation and very small economy creating no viable AI deployment scale",
+    "comparable_countries": ["vanuatu", "fiji"]
+  },
+  {
+    "id": "vanuatu", "slug": "vanuatu", "name": "Vanuatu", "flag": "🇻🇺", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 3, "reasons": ["Digicel Vanuatu and WanTok providing mobile connectivity; VCAP cable improving bandwidth", "Very limited fixed broadband; mostly mobile-based connectivity", "80 islands across 1,300km creating challenging infrastructure economics"] },
+      "talent": { "score": 2, "reasons": ["University of the South Pacific (Emalus campus) with very limited IT programme", "Very small educated workforce; most emigrating to Australia and New Zealand", "Population of 320,000 across diverse islands"] },
+      "governance": { "score": 3, "reasons": ["ICT policies developing; data protection in planning stage", "Vanuatu 2030 development plan with digital components", "Commonwealth and Francophone dual legal tradition"] },
+      "investment": { "score": 2, "reasons": ["Development bank and donor-funded digital projects", "Very limited private sector; tourism and agriculture dominate", "Passport by investment programme funding some government digital spending"] },
+      "economic_readiness": { "score": 1, "reasons": ["320,000 population; tourism, agriculture, and offshore finance economy", "Mobile money emerging; Digicel Cash and other services", "Climate vulnerability creates AI demand for disaster response systems"] }
+    },
+    "total_score": 11, "trajectory_score": 1, "trajectory_label": "Neutral", "projected_score_2028": 12,
+    "top_accelerator": "Passport by investment programme providing revenue stream for digital infrastructure investment",
+    "top_risk": "Extreme smallness, geographic fragmentation, and climate vulnerability creating fundamental AI deployment barriers",
+    "comparable_countries": ["solomon-islands", "samoa"]
+  },
+  {
+    "id": "samoa", "slug": "samoa", "name": "Samoa", "flag": "🇼🇸", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 3, "reasons": ["Digicel Samoa and SamoaTel providing mobile connectivity; Tui-Samoa cable improving bandwidth", "National Broadband Highway project extending connectivity", "Small geography (2,842 km²) aids national coverage relative to Melanesian neighbours"] },
+      "talent": { "score": 3, "reasons": ["National University of Samoa with limited IT programme", "Small population (200,000) with significant emigration to New Zealand and Australia", "Good English language base from New Zealand/Australia ties"] },
+      "governance": { "score": 4, "reasons": ["ICTB policy and developing digital strategy", "Personal data protection regulations in development", "Samoa 2035 development agenda with digital components"] },
+      "investment": { "score": 2, "reasons": ["Development finance primary investment source", "Tourism sector digital investment emerging", "Very limited private sector capacity"] },
+      "economic_readiness": { "score": 1, "reasons": ["200,000 population; remittance and tourism economy", "Mobile banking slowly developing", "Small Pacific island state with strong community but limited commercial AI market"] }
+    },
+    "total_score": 13, "trajectory_score": 1, "trajectory_label": "Neutral", "projected_score_2028": 14,
+    "top_accelerator": "New Zealand ties providing development finance and migration pathway that builds diaspora connections",
+    "top_risk": "Tiny population and economy with no viable standalone AI ecosystem formation",
+    "comparable_countries": ["tonga", "fiji"]
+  },
+  {
+    "id": "tonga", "slug": "tonga", "name": "Tonga", "flag": "🇹🇴", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 3, "reasons": ["Digicel Tonga providing mobile connectivity; Tonga Cable connecting to Fiji fibre backbone", "2022 volcanic eruption disrupted undersea cable — resilience challenge highlighted", "Small geography but multiple islands complicating connectivity economics"] },
+      "talent": { "score": 3, "reasons": ["University of the South Pacific (Tonga campus) with limited IT", "Population of 100,000; significant emigration to New Zealand and Australia", "Growing digital literacy through mobile internet adoption"] },
+      "governance": { "score": 3, "reasons": ["ICT policy developing; data protection in early stage", "Tonga Digital Transformation Roadmap published", "Constitutional monarchy with stable governance"] },
+      "investment": { "score": 1, "reasons": ["Development bank and donor-funded digital investment", "Very limited private sector", "Remittances from diaspora primary economic input"] },
+      "economic_readiness": { "score": 1, "reasons": ["100,000 population; agricultural and remittance economy", "Mobile money slowly emerging", "Climate vulnerability and seismic risk creating resilience-focused AI demand"] }
+    },
+    "total_score": 11, "trajectory_score": 1, "trajectory_label": "Neutral", "projected_score_2028": 12,
+    "top_accelerator": "New Zealand and Australian development partnerships providing digital infrastructure funding",
+    "top_risk": "Natural disaster risk and tiny economy creating no viable AI ecosystem",
+    "comparable_countries": ["samoa", "fiji"]
+  },
+  {
+    "id": "kiribati", "slug": "kiribati", "name": "Kiribati", "flag": "🇰🇮", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 2, "reasons": ["Telecom Services Kiribati providing basic mobile connectivity with significant gaps", "Geographic spread across 3.5M km² of ocean creating extreme connectivity challenges", "Climate vulnerability making infrastructure investment high-risk"] },
+      "talent": { "score": 2, "reasons": ["Kiribati Institute of Technology with very limited IT programme", "Very small population (120,000) with high emigration", "Basic digital literacy growing through mobile adoption"] },
+      "governance": { "score": 2, "reasons": ["ICT policy developing with Australian development assistance", "Climate change is the dominant policy priority — AI for climate adaptation most relevant", "Limited governance capacity overall"] },
+      "investment": { "score": 1, "reasons": ["Development aid primary investment; very limited private sector", "Climate relocation planning consuming limited government resources", "Pacific Fund and World Bank digital projects"] },
+      "economic_readiness": { "score": 2, "reasons": ["120,000 population across 33 atolls at sea level — climate existential threat", "Mobile money emerging as primary fintech access point", "Exclusive Economic Zone management is highest-value AI application"] }
+    },
+    "total_score": 9, "trajectory_score": 1, "trajectory_label": "Neutral", "projected_score_2028": 10,
+    "top_accelerator": "EEZ management AI for fisheries optimisation and climate monitoring",
+    "top_risk": "Existential climate flooding risk making long-term AI investment uncertain",
+    "comparable_countries": ["tuvalu", "marshall-islands"]
+  },
+  {
+    "id": "marshall-islands", "slug": "marshall-islands", "name": "Marshall Islands", "flag": "🇲🇭", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 2, "reasons": ["NTSC providing basic mobile connectivity; limited broadband", "Compact of Free Association with US providing infrastructure standards alignment", "Low-lying atoll geography creating resilience challenges"] },
+      "talent": { "score": 2, "reasons": ["College of the Marshall Islands with limited IT programme", "Very small population (42,000) with significant emigration to US", "US compact providing educational opportunities and diaspora connection"] },
+      "governance": { "score": 3, "reasons": ["US-aligned governance through Compact of Free Association", "Digital strategy developing with US technical assistance", "Democratic governance with free association provisions"] },
+      "investment": { "score": 1, "reasons": ["US Compact grants primary funding source", "RMI Sovereign Wealth Fund for future generations — limited current digital investment", "Very limited private sector capacity"] },
+      "economic_readiness": { "score": 1, "reasons": ["42,000 population; US compact economy with fishing and shipping registry", "Mobile money very early stage", "Ship registry revenue creating some government investment capacity"] }
+    },
+    "total_score": 9, "trajectory_score": 1, "trajectory_label": "Neutral", "projected_score_2028": 10,
+    "top_accelerator": "US Compact providing development support and educational access creating diaspora connections",
+    "top_risk": "Existential climate risk and micro-state constraints making sustainable AI development impossible without external support",
+    "comparable_countries": ["kiribati", "tuvalu"]
+  },
+  {
+    "id": "palau", "slug": "palau", "name": "Palau", "flag": "🇵🇼", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 3, "reasons": ["PNCC and Palau Telecom providing mobile connectivity; HANTRU-1 cable connectivity", "Small geography (460 km²) enabling complete coverage despite small provider scale", "Compact of Free Association with US providing telecommunications standards alignment"] },
+      "talent": { "score": 3, "reasons": ["Palau Community College with limited IT programme", "Population of 18,000 — smallest country in this index by population", "US compact educational access creates diaspora connections"] },
+      "governance": { "score": 3, "reasons": ["US-aligned governance through Compact of Free Association", "Digital Palau programme with e-government components", "Democratic governance with US standards influence"] },
+      "investment": { "score": 1, "reasons": ["US Compact and Taiwan aid primary funding sources (dual recognition)", "Tourism sector primary economic driver with some digital investment", "Very limited private sector capacity"] },
+      "economic_readiness": { "score": 1, "reasons": ["18,000 population; luxury eco-tourism economy", "Marine protected areas creating AI opportunity in ocean monitoring", "Very small market; tourism AI the only viable commercial application"] }
+    },
+    "total_score": 11, "trajectory_score": 1, "trajectory_label": "Neutral", "projected_score_2028": 12,
+    "top_accelerator": "Ocean monitoring AI for world-class marine protected area management",
+    "top_risk": "World's smallest economy by viable AI market — essentially requires external AI deployment rather than local development",
+    "comparable_countries": ["marshall-islands", "nauru"]
+  },
+  {
+    "id": "nauru", "slug": "nauru", "name": "Nauru", "flag": "🇳🇷", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 2, "reasons": ["Digicel Nauru providing mobile connectivity; limited international bandwidth", "World's third smallest country (21 km²) limiting infrastructure scale", "HANTRU-1 cable providing satellite backup"] },
+      "talent": { "score": 2, "reasons": ["No university; most education through University of South Pacific distance learning", "Population of 10,000 — effectively no domestic AI talent pipeline", "Australia provides educational support through development assistance"] },
+      "governance": { "score": 2, "reasons": ["Australian-supported governance with developing digital policies", "ICT strategy in development", "Small parliament; governance capacity extremely limited"] },
+      "investment": { "score": 1, "reasons": ["Australia Compact providing primary budget support", "Nauru Phosphate Royalties Trust limited investment capacity", "No private sector of any scale"] },
+      "economic_readiness": { "score": 1, "reasons": ["10,000 population; phosphate mining exhausted; now Australian immigration processing facility economy", "Very limited digital economy; basic mobile services only", "Smallest viable economy of any country in this index"] }
+    },
+    "total_score": 8, "trajectory_score": 0, "trajectory_label": "Neutral", "projected_score_2028": 8,
+    "top_accelerator": "Australian development support providing minimal digital infrastructure",
+    "top_risk": "World's smallest population with no viable domestic AI market or talent base",
+    "comparable_countries": ["tuvalu", "palau"]
+  },
+  {
+    "id": "tuvalu", "slug": "tuvalu", "name": "Tuvalu", "flag": "🇹🇻", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 2, "reasons": ["Tuvalu Telecommunications Corporation providing basic mobile connectivity", "TVCS cable connectivity providing modest international bandwidth", "Extreme geographic dispersal (26 km² total land across 9 atolls) creating severe infrastructure challenges"] },
+      "talent": { "score": 2, "reasons": ["No university; University of the South Pacific distance learning", "Population of 11,000 — no domestic AI talent pipeline", "Significant emigration to New Zealand and Australia through Pacific Access Category"] },
+      "governance": { "score": 2, "reasons": ["Developing ICT policy with Australian support", "Tuvalu Digital Government developing slowly", "Climate change is the dominant policy focus — existential flooding risk"] },
+      "investment": { "score": 1, "reasons": [".tv domain name licensing provides some government revenue for digital investment", "Development aid primary funding source", "No private sector investment of any scale"] },
+      "economic_readiness": { "score": 1, "reasons": ["11,000 population; .tv domain royalties and development aid economy", "Existential climate flooding threat makes long-term investment planning challenging", "Mobile money very early stage; subsistence economy dominant"] }
+    },
+    "total_score": 8, "trajectory_score": 0, "trajectory_label": "Neutral", "projected_score_2028": 8,
+    "top_accelerator": ".tv domain revenue providing a unique income stream for digital infrastructure investment",
+    "top_risk": "Existential climate risk — most projections show Tuvalu submerging within decades",
+    "comparable_countries": ["nauru", "kiribati"]
+  },
+  {
+    "id": "timor-leste", "slug": "timor-leste", "name": "Timor-Leste", "flag": "🇹🇱", "region": "Asia-Pacific",
+    "scores": {
+      "infrastructure": { "score": 4, "reasons": ["Telkomcel and Telemor providing 4G/LTE; limited fibre backbone", "SEA-ME-WE cable project including Timor-Leste improving international connectivity", "Limited data centre infrastructure; mainly dependent on Australian and Indonesian facilities"] },
+      "talent": { "score": 3, "reasons": ["National University of Timor-Lorosa'e with developing IT programmes", "Small population (1.3M) with brain drain to Portugal and Australia", "Portuguese and Tetum language environment requiring multilingual AI approaches"] },
+      "governance": { "score": 4, "reasons": ["Personal Data Protection Law developing; SCITL ICT authority operational", "Digital Economy Agenda for Timor-Leste with AI components", "Young democracy with improving governance trajectory"] },
+      "investment": { "score": 2, "reasons": ["Petroleum Fund assets ($17B) creating investment capacity for digital transformation", "Development bank and Australian AID primary digital investment", "Limited private sector; oil wealth not yet directed to tech ecosystem"] },
+      "economic_readiness": { "score": 2, "reasons": ["1.3M population; oil-dependent economy with significant youth unemployment", "Mobile money growing; OctoPay and other platforms emerging", "Petroleum Fund wealth creating unique opportunity to invest in AI for diversification"] }
+    },
+    "total_score": 15, "trajectory_score": 2, "trajectory_label": "Positive", "projected_score_2028": 17,
+    "top_accelerator": "Petroleum Fund wealth creating investment capacity and improving democratic governance",
+    "top_risk": "Oil dependency, brain drain, and very small economy limiting AI ecosystem formation",
+    "comparable_countries": ["cambodia", "laos"]
+  }
+]

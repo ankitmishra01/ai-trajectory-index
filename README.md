@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Trajectory Index
 
-## Getting Started
+A live, interactive tool scoring 20 countries on their current AI readiness AND their forward-looking AI trajectory over 3–5 years. Built by [Ankit Mishra](https://ankitmishra.ca).
 
-First, run the development server:
+**Live:** [ai-index.ankitmishra.ca](https://ai-index.ankitmishra.ca)
+
+## What it does
+
+- Scores 20 countries across 5 dimensions: Infrastructure, Talent, Governance, Investment, Economic Readiness (20 pts each, total 100)
+- Shows trajectory scores (-10 to +10) indicating acceleration or decline
+- Projects scores to 2028
+- Country detail pages with expandable dimension evidence, comparable countries, and a Phase 2 AI narrative placeholder
+
+## Running locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Create `.env.local`:
 
-## Learn More
+```
+OPENROUTER_API_KEY=your_key_here
+NEXT_PUBLIC_SITE_URL=https://ai-index.ankitmishra.ca
+```
 
-To learn more about Next.js, take a look at the following resources:
+`OPENROUTER_API_KEY` is only needed for Phase 2 (AI narratives).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Tech stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Next.js 14 (App Router)
+- Tailwind CSS
+- Recharts (Phase 2 charts)
+- OpenRouter / Gemini 2.0 Flash (Phase 2 narratives)
+- Vercel
 
-## Deploy on Vercel
+## Roadmap
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**Phase 1 (current):** Hardcoded data, scoring model, filterable grid, country detail pages.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Phase 2:** Live AI-generated strategic narratives via OpenRouter, animated charts, more countries.
