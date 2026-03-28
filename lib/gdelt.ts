@@ -22,22 +22,25 @@ const ARTICLE_TTL_MS = 60 * 60 * 1000; // 1 hour
 
 // Slugs where the country name alone is ambiguous or won't match well
 const QUERY_OVERRIDES: Record<string, string> = {
-  usa:                            '"United States" "artificial intelligence"',
-  "united-kingdom":               '"United Kingdom" "artificial intelligence"',
-  "south-korea":                  '"South Korea" "artificial intelligence"',
-  "north-korea":                  '"North Korea" technology',
-  "democratic-republic-of-congo": "Congo artificial intelligence",
-  "ivory-coast":                  '"Ivory Coast" OR "Côte d\'Ivoire" technology',
-  "trinidad-tobago":              '"Trinidad" "artificial intelligence"',
-  "bosnia-herzegovina":           '"Bosnia" "artificial intelligence"',
-  "north-macedonia":              '"North Macedonia" technology',
-  "el-salvador":                  '"El Salvador" "artificial intelligence"',
-  "costa-rica":                   '"Costa Rica" "artificial intelligence"',
-  "new-zealand":                  '"New Zealand" "artificial intelligence"',
-  "saudi-arabia":                 '"Saudi Arabia" "artificial intelligence"',
-  "cape-verde":                   '"Cape Verde" technology',
-  "south-africa":                 '"South Africa" "artificial intelligence"',
-  "sri-lanka":                    '"Sri Lanka" "artificial intelligence"',
+  // Slugs where the stored country name differs from how Guardian writes it
+  usa:                  '"United States" "artificial intelligence"',
+  uk:                   '"United Kingdom" "artificial intelligence"',
+  uae:                  '"United Arab Emirates" "artificial intelligence"',
+  drc:                  '"Democratic Republic of Congo" OR "DRC" "artificial intelligence"',
+  "south-korea":        '"South Korea" "artificial intelligence"',
+  "north-korea":        '"North Korea" technology',
+  "ivory-coast":        '"Ivory Coast" OR "Cote d\'Ivoire" technology',
+  "trinidad-tobago":    '"Trinidad and Tobago" OR "Trinidad" "artificial intelligence"',
+  "bosnia-herzegovina": '"Bosnia" "artificial intelligence"',
+  "north-macedonia":    '"North Macedonia" technology',
+  "el-salvador":        '"El Salvador" "artificial intelligence"',
+  "costa-rica":         '"Costa Rica" "artificial intelligence"',
+  "new-zealand":        '"New Zealand" "artificial intelligence"',
+  "saudi-arabia":       '"Saudi Arabia" "artificial intelligence"',
+  "cape-verde":         '"Cape Verde" technology',
+  "south-africa":       '"South Africa" "artificial intelligence"',
+  "sri-lanka":          '"Sri Lanka" "artificial intelligence"',
+  "hong-kong":          '"Hong Kong" "artificial intelligence"',
 };
 
 function buildCountryQuery(countryName: string, slug: string): string {

@@ -13,29 +13,31 @@ interface Props {
 }
 
 export default function DualRadar({ country, adoption }: Props) {
+  // Each axis pairs the closest conceptual readiness↔adoption dimension.
+  // Labels show both sides so the comparison is legible.
   const data = [
     {
-      subject: "Infrastructure",
+      subject: "Infra / Gov",          // Infrastructure readiness vs Government deployment
       readiness: country.scores.infrastructure.score,
-      adoption: adoption.adoption_scores.government,  // gov maps to infrastructure axis
+      adoption: adoption.adoption_scores.government,
     },
     {
-      subject: "Talent",
+      subject: "Talent / Demand",      // Talent readiness vs Talent demand in labour market
       readiness: country.scores.talent.score,
       adoption: adoption.adoption_scores.talent_demand,
     },
     {
-      subject: "Governance",
+      subject: "Governance / Enterprise", // Policy governance vs Enterprise AI adoption
       readiness: country.scores.governance.score,
       adoption: adoption.adoption_scores.enterprise,
     },
     {
-      subject: "Investment",
+      subject: "Investment / Pipeline", // Investment readiness vs R&D-to-product pipeline
       readiness: country.scores.investment.score,
       adoption: adoption.adoption_scores.pipeline,
     },
     {
-      subject: "Econ Readiness",
+      subject: "Economy / Consumer",   // Economic readiness vs Consumer AI usage
       readiness: country.scores.economic_readiness.score,
       adoption: adoption.adoption_scores.consumer,
     },
@@ -48,7 +50,7 @@ export default function DualRadar({ country, adoption }: Props) {
           Readiness vs Adoption — Radar
         </h3>
         <p className="text-xs mt-0.5" style={{ color: "var(--text-3)" }}>
-          Where green exceeds blue: outperforming. Where blue exceeds green: untapped capacity.
+          Blue = readiness capacity · Green = active adoption · Each axis pairs the closest dimension from each framework
         </p>
       </div>
       <div style={{ height: 280 }}>
