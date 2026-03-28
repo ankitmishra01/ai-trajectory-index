@@ -5,12 +5,13 @@
 const WB_BASE = "https://api.worldbank.org/v2";
 
 const INDICATORS = {
-  internet: "IT.NET.USER.ZS", // Internet users (% of population)
-  mobile: "IT.CEL.SETS.P2", // Mobile subscriptions per 100 people
-  tertiary: "SE.TER.ENRR", // Tertiary school enrollment (%)
-  rd: "GB.XPD.RSDV.GD.ZS", // R&D expenditure (% of GDP)
-  gdp: "NY.GDP.PCAP.CD", // GDP per capita (current USD)
-  electricity: "EG.ELC.ACCS.ZS", // Access to electricity (% of population)
+  internet: "IT.NET.USER.ZS",     // Internet users (% of population)
+  mobile: "IT.CEL.SETS.P2",       // Mobile subscriptions per 100 people
+  tertiary: "SE.TER.ENRR",        // Tertiary school enrollment (%)
+  rd: "GB.XPD.RSDV.GD.ZS",       // R&D expenditure (% of GDP)
+  gdp: "NY.GDP.PCAP.CD",          // GDP per capita (current USD)
+  electricity: "EG.ELC.ACCS.ZS",  // Access to electricity (% of population)
+  labor_productivity: "SL.GDP.PCAP.EM.KD", // GDP per person employed (constant 2017 PPP$)
 } as const;
 
 export type IndicatorKey = keyof typeof INDICATORS;
@@ -29,6 +30,7 @@ export type WorldBankData = Record<
     rd: IndicatorValues;
     gdp: IndicatorValues;
     electricity: IndicatorValues;
+    labor_productivity: IndicatorValues;
   }
 >;
 
@@ -74,13 +76,14 @@ async function fetchIndicator(
 }
 
 export async function fetchWorldBankIndicators(): Promise<WorldBankData> {
-  const [internet, mobile, tertiary, rd, gdp, electricity] = await Promise.all([
+  const [internet, mobile, tertiary, rd, gdp, electricity, labor_productivity] = await Promise.all([
     fetchIndicator(INDICATORS.internet),
     fetchIndicator(INDICATORS.mobile),
     fetchIndicator(INDICATORS.tertiary),
     fetchIndicator(INDICATORS.rd),
     fetchIndicator(INDICATORS.gdp),
     fetchIndicator(INDICATORS.electricity),
+    fetchIndicator(INDICATORS.labor_productivity),
   ]);
 
   // Merge all indicators keyed by ISO2
@@ -92,6 +95,7 @@ export async function fetchWorldBankIndicators(): Promise<WorldBankData> {
       ...Object.keys(rd),
       ...Object.keys(gdp),
       ...Object.keys(electricity),
+      ...Object.keys(labor_productivity),
     ])
   );
 
@@ -106,6 +110,7 @@ export async function fetchWorldBankIndicators(): Promise<WorldBankData> {
       rd: rd[iso] ?? empty,
       gdp: gdp[iso] ?? empty,
       electricity: electricity[iso] ?? empty,
+      labor_productivity: labor_productivity[iso] ?? empty,
     };
   }
 

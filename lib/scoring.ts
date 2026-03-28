@@ -57,40 +57,72 @@ function scoreInfrastructure(
 }
 
 // ─── Talent (0-20) ──────────────────────────────────────────────────────────
+//
+// Re-weighted to include labor productivity (GDP per employed person, 2017 PPP$):
+//   Tertiary enrollment:  6 pts  (was 8)
+//   R&D spend:            6 pts  (was 8)
+//   Labor productivity:   4 pts  (new) — captures whether talent is productively deployed
+//   Quality proxy:        4 pts  (static sub-score)
+//   Total max:           20 pts
+//
+// Rationale: a country can have high enrollment and R&D spend but still struggle to
+// adopt AI efficiently if underlying labor productivity is low or declining. Canada is
+// a canonical example — strong institutions, but GDP per worker trails OECD peers and
+// is on a declining trend, signalling structural friction in technology absorption.
+
+function scoreLaborProductivity(laborProd: number | null): number {
+  if (laborProd === null) return null as unknown as number; // handled by caller
+  // Thresholds in constant 2017 PPP$ per employed person
+  if (laborProd > 85_000) return 4;   // Top tier: Norway, Ireland, US, Switzerland
+  if (laborProd > 65_000) return 3;   // Strong: Germany, Netherlands, France, Canada, Australia
+  if (laborProd > 40_000) return 2;   // Mid: South Korea, Poland, Czech Republic, China
+  if (laborProd > 18_000) return 1;   // Developing: India, Brazil, Mexico, Indonesia
+  return 0.5;                          // Frontier markets: sub-Saharan Africa, low-income
+}
 
 function scoreTalent(
   tertiary: number | null,
   rd: number | null,
+  laborProd: number | null,
   staticScore: number
 ): number {
-  const hasAny = tertiary !== null || rd !== null;
+  const hasAny = tertiary !== null || rd !== null || laborProd !== null;
   if (!hasAny) return staticScore;
 
   let points = 0;
 
+  // Tertiary enrollment (6 pts)
   if (tertiary !== null) {
-    if (tertiary > 60) points += 8;
-    else if (tertiary > 40) points += 6;
-    else if (tertiary > 20) points += 4;
-    else points += 2;
+    if (tertiary > 60) points += 6;
+    else if (tertiary > 40) points += 4.5;
+    else if (tertiary > 20) points += 3;
+    else points += 1.5;
   } else {
-    points += (staticScore / 20) * 8;
+    points += (staticScore / 20) * 6;
   }
 
+  // R&D spend (6 pts)
   if (rd !== null) {
-    if (rd > 2) points += 8;
-    else if (rd > 1) points += 6;
-    else if (rd > 0.5) points += 4;
-    else points += 2;
+    if (rd > 2) points += 6;
+    else if (rd > 1) points += 4.5;
+    else if (rd > 0.5) points += 3;
+    else points += 1.5;
   } else {
-    points += (staticScore / 20) * 8;
+    points += (staticScore / 20) * 6;
   }
 
-  // Remaining 4 points: normalise static score as researcher-quality proxy
-  const qualityProxy = (staticScore / 20) * 4;
-  points += qualityProxy;
+  // Labor productivity (4 pts) — GDP per employed person (constant 2017 PPP$)
+  if (laborProd !== null) {
+    points += scoreLaborProductivity(laborProd);
+  } else {
+    // Fall back to static score as proxy (preserves existing scores when WB data missing)
+    points += (staticScore / 20) * 4;
+  }
 
-  // Max raw = 20 (8+8+4)
+  // Researcher-quality / institutional proxy (4 pts static)
+  points += (staticScore / 20) * 4;
+
+  // Max raw = 20 (6+6+4+4)
   return clamp(Math.round(points), 0, 20);
 }
 
@@ -221,6 +253,14 @@ function scoreEconomicReadiness(
 }
 
 // ─── Trajectory (-10 to +10) ────────────────────────────────────────────────
+//
+// Components:
+//   GDP per capita growth:         25% → ±2.5 pts
+//   Internet penetration growth:   20% → ±2.0 pts
+//   AI strategy recency:           25% → ±2.5 pts
+//   R&D spend trend:               15% → ±1.5 pts
+//   Labor productivity trend:      10% → ±1.0 pts  (new)
+//   Static baseline:                5% → ±0.5 pts  (reduced from 15%)
 
 function calcTrajectoryScore(
   gdpCurrent: number | null,
@@ -229,6 +269,8 @@ function calcTrajectoryScore(
   internetPrevious: number | null,
   rdCurrent: number | null,
   rdPrevious: number | null,
+  laborProdCurrent: number | null,
+  laborProdPrevious: number | null,
   policy: PolicyData,
   staticTrajectory: number
 ): number {
@@ -278,8 +320,22 @@ function calcTrajectoryScore(
     score += (staticTrajectory / 10) * 1.5;
   }
 
-  // 15% — Static hardcoded trajectory
-  score += (staticTrajectory / 10) * 1.5;
+  // 10% — Labor productivity trend (GDP per employed person growth)
+  // Declining productivity is a leading indicator that AI adoption will be uneven.
+  // A country with shrinking output-per-worker faces structural headwinds regardless
+  // of its raw talent pool size (see: Canada, Italy, some Eastern European economies).
+  if (laborProdCurrent !== null && laborProdPrevious !== null && laborProdPrevious > 0) {
+    const prodGrowth = ((laborProdCurrent - laborProdPrevious) / laborProdPrevious) * 100;
+    if (prodGrowth > 3)    score += 1.0;   // Strong growth — economy absorbing technology
+    else if (prodGrowth > 0.5) score += 0.5;
+    else if (prodGrowth > -1)  score -= 0.3; // Stagnant
+    else                       score -= 1.0; // Declining — structural friction
+  } else {
+    score += (staticTrajectory / 10) * 1.0;
+  }
+
+  // 5% — Static baseline (reduced from 15% to make room for productivity trend)
+  score += (staticTrajectory / 10) * 0.5;
 
   return clamp(Math.round(score), -10, 10);
 }
@@ -310,12 +366,14 @@ export function calculateScores(
 
   const hasLiveData = !!wb;
 
-  const internet = wb?.internet.current ?? null;
-  const mobile = wb?.mobile.current ?? null;
-  const electricity = wb?.electricity.current ?? null;
-  const tertiary = wb?.tertiary.current ?? null;
-  const rd = wb?.rd.current ?? null;
-  const gdp = wb?.gdp.current ?? null;
+  const internet    = wb?.internet.current           ?? null;
+  const mobile      = wb?.mobile.current             ?? null;
+  const electricity = wb?.electricity.current        ?? null;
+  const tertiary    = wb?.tertiary.current           ?? null;
+  const rd          = wb?.rd.current                 ?? null;
+  const gdp         = wb?.gdp.current                ?? null;
+  const laborProd   = wb?.labor_productivity.current ?? null;
+  const laborProdPrev = wb?.labor_productivity.previous ?? null;
 
   const infraScore = scoreInfrastructure(
     internet,
@@ -326,6 +384,7 @@ export function calculateScores(
   const talentScore = scoreTalent(
     tertiary,
     rd,
+    laborProd,
     country.scores.talent.score
   );
   const govScore = scoreGovernance(policy, country.scores.governance.score);
@@ -355,6 +414,8 @@ export function calculateScores(
     wb?.internet.previous ?? null,
     rd,
     wb?.rd.previous ?? null,
+    laborProd,
+    laborProdPrev,
     policy,
     country.trajectory_score
   );
