@@ -22,14 +22,22 @@ npm run lint       # ESLint only
 - `lib/scoring.ts` — `calculateScores()` computes live dimension scores + trajectory; falls back to static if WB data is null
 - `app/api/scores/route.ts` — combines WB data + policy data → returns full scored dataset, `revalidate: 86400`
 
-**Score formula summary:**
-- Infrastructure: internet users + mobile subs + electricity access → scale /18 × 20
-- Talent: tertiary enrollment + R&D spend (each 8pts) + static quality proxy (4pts)
-- Governance: AI strategy (8+2 bonus) + regulation (5) + OECD (3) + static proxy (2)
-- Investment: R&D spend (6) + GDP per capita (6) + static VC proxy (8)
-- Economic Readiness: GDP (8) + electricity (4) + internet+mobile (4) + static (4)
-- Trajectory (-10→+10): GDP growth (25%) + internet growth (20%) + AI strategy recency (25%) + R&D trend (15%) + static (15%)
+**Score formula summary (v3 — post-audit):**
+- Infrastructure: fixed broadband (6) + internet users (3) + mobile (3) + electricity (3) + static quality (5)
+- Talent: tertiary enrollment (6) + labor productivity GDP/worker PPP (6) + static talent proxy (8)
+  - Note: R&D spend removed from Talent (was double-counted with Investment)
+- Governance: Rule of Law WGI (5) + Govt Effectiveness WGI (4) + Regulatory Quality WGI (3) + AI strategy (3+2 recency) + AI regulation (1) + static (2)
+  - WGI estimates normalised: `((estimate + 2.5) / 5.0) × maxPts`
+- Investment: R&D spend (6) + FDI net inflows % GDP (5) + static VC proxy (9)
+  - Note: GDP per capita removed from Investment (was double-counted with Econ Readiness)
+- Economic Readiness: GDP per capita PPP (6) + private credit % GDP (3) + trade openness (3) + services share (3) + static (5)
+  - Note: electricity/internet/mobile removed (was triple-counted with Infrastructure)
+  - Uses PPP-adjusted GDP (NY.GDP.PCAP.PP.KD) not nominal USD
+- Trajectory (-10→+10): GDP growth (20%) + R&D trend (15%) + labor productivity trend (15%) + high-tech exports trend (20%) + broadband growth (10%) + AI strategy (10%) + static (10%)
 - projected_score_2028 = clamp(total + trajectory × 1.5, 0, 100)
+
+**WB indicators fetched (17 total, all parallel, 24h cache):**
+`IT.NET.USER.ZS`, `IT.CEL.SETS.P2`, `IT.NET.BBN.P2`, `SE.TER.ENRR`, `SL.GDP.PCAP.EM.KD`, `GB.XPD.RSDV.GD.ZS`, `EG.ELC.ACCS.ZS`, `GE.EST`, `RL.EST`, `RQ.EST`, `BX.KLT.DINV.WD.GD.ZS`, `NY.GDP.PCAP.PP.KD`, `NY.GDP.PCAP.CD`, `FS.AST.PRVT.GD.ZS`, `NE.TRD.GNFS.ZS`, `NV.SRV.TOTL.ZS`, `TX.VAL.TECH.MF.ZS`
 
 **Routing:**
 - `/` — filterable grid, fetches `/api/scores` on mount, static data shown instantly then replaced
