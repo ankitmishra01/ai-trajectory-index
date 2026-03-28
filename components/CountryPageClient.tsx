@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import ScoreGauge from "@/components/ScoreGauge";
 import DimensionBar from "@/components/DimensionBar";
@@ -47,6 +47,7 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
   const [openDim, setOpenDim]   = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<PageTab>("combined");
   const [country, setCountry]   = useState<ScoredCountry>(initialCountry);
+  const urlInitRef = useRef(false);
 
   const adoption = (adoptionData.countries as AdoptionEntry[]).find((a) => a.slug === slug) ?? null;
   const [allCountries, setAllCountries] = useState<ScoredCountry[]>(
@@ -54,6 +55,24 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
   );
   const [narrative, setNarrative] = useState<NarrativeState>({ status: "idle", paragraphs: [] });
   const [copied, setCopied]       = useState(false);
+
+  // Read tab from URL on mount
+  useEffect(() => {
+    if (typeof window === "undefined" || urlInitRef.current) return;
+    urlInitRef.current = true;
+    const t = new URLSearchParams(window.location.search).get("tab");
+    if (t === "readiness" || t === "adoption" || t === "combined") setActiveTab(t);
+  }, []);
+
+  // Write tab to URL on change
+  useEffect(() => {
+    if (!urlInitRef.current) return;
+    const p = new URLSearchParams(window.location.search);
+    if (activeTab === "combined") p.delete("tab");
+    else p.set("tab", activeTab);
+    const qs = p.toString();
+    window.history.replaceState({}, "", qs ? `?${qs}` : window.location.pathname);
+  }, [activeTab]);
 
   useEffect(() => {
     fetch("/api/scores")

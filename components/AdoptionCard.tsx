@@ -7,6 +7,8 @@ import { TIER_COLORS, DIM_COLORS, DIM_LABELS } from "@/lib/adoption";
 interface Props {
   country: EnrichedAdoption;
   rank: number;
+  isComparing?: boolean;
+  onCompareToggle?: (slug: string) => void;
 }
 
 const DIM_KEYS = ["government", "enterprise", "talent_demand", "consumer", "pipeline"] as const;
@@ -19,7 +21,7 @@ const DIM_SHORT: Record<string, string> = {
   pipeline:      "R&D",
 };
 
-export default function AdoptionCard({ country, rank }: Props) {
+export default function AdoptionCard({ country, rank, isComparing = false, onCompareToggle }: Props) {
   const tierStyle = TIER_COLORS[country.adoption_tier] ?? TIER_COLORS["Nascent Adoption"];
   const gap = country.adoption_gap;
 
@@ -44,6 +46,29 @@ export default function AdoptionCard({ country, rank }: Props) {
     >
       {/* Top accent bar — colour-coded by tier */}
       <div className="h-0.5 w-full" style={{ background: tierStyle.color, opacity: 0.7 }} />
+
+      {/* Compare toggle button */}
+      {onCompareToggle && (
+        <button
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onCompareToggle(country.slug); }}
+          className="absolute top-3 right-3 z-10 w-5 h-5 rounded-full flex items-center justify-center transition-all duration-150"
+          title={isComparing ? "Remove from comparison" : "Add to comparison"}
+          style={isComparing
+            ? { background: "#22c55e", border: "1.5px solid #22c55e", boxShadow: "0 0 8px rgba(34,197,94,.5)" }
+            : { background: "transparent", border: "1.5px solid rgba(34,197,94,.35)" }
+          }
+        >
+          {isComparing ? (
+            <svg className="w-2.5 h-2.5" fill="none" stroke="white" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+            </svg>
+          ) : (
+            <svg className="w-2.5 h-2.5" fill="none" stroke="rgba(74,222,128,.8)" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+            </svg>
+          )}
+        </button>
+      )}
 
       <div className="p-5">
         {/* Row 1: Rank · Flag · Country · Score */}
@@ -125,7 +150,27 @@ export default function AdoptionCard({ country, rank }: Props) {
           </div>
         </div>
 
-        {/* Row 4: Top adoption driver */}
+        {/* Row 4: Gap trend + readiness comparison */}
+        <div className="flex items-center justify-between text-xs mb-2">
+          <span style={{ color: "var(--text-3)" }}>
+            Readiness:{" "}
+            <span className="font-bold" style={{ color: "var(--accent)" }}>{country.readiness_total}/100</span>
+          </span>
+          {gap > 5 && (
+            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded"
+              style={{ background: "rgba(74,222,128,.10)", color: "#4ade80", border: "1px solid rgba(74,222,128,.25)" }}>
+              ▲ leapfrogging
+            </span>
+          )}
+          {gap < -5 && (
+            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded"
+              style={{ background: "rgba(245,158,11,.10)", color: "#f59e0b", border: "1px solid rgba(245,158,11,.25)" }}>
+              ▼ underutilising
+            </span>
+          )}
+        </div>
+
+        {/* Row 5: Top adoption driver */}
         <p className="text-xs leading-snug" style={{ color: "var(--text-3)" }}>
           {country.top_adoption_driver}
         </p>

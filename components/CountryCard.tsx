@@ -184,7 +184,7 @@ export default function CountryCard({ country, rank, isComparing = false, onComp
           </div>
         </div>
 
-        {/* ── Row 4: 2028 projection ── */}
+        {/* ── Row 4: 2028 projection + trend ── */}
         <div className="flex items-center justify-between text-xs">
           <span style={{ color: "var(--text-3)" }}>
             Projected 2028:{" "}
@@ -192,10 +192,25 @@ export default function CountryCard({ country, rank, isComparing = false, onComp
               {country.projected_score_2028}/100
             </span>
           </span>
-          <span className="font-semibold"
-            style={{ color: delta > 0 ? "#4ade80" : delta < 0 ? "#f87171" : "var(--text-3)" }}>
-            {delta > 0 ? "+" : ""}{delta} pts
-          </span>
+          <div className="flex items-center gap-1.5">
+            {/* Rank trend from trajectory */}
+            {(country.trajectory_label === "Strong Positive" || country.trajectory_label === "Positive") && (
+              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded"
+                style={{ background: "rgba(74,222,128,.10)", color: "#4ade80", border: "1px solid rgba(74,222,128,.25)" }}>
+                ▲ rising
+              </span>
+            )}
+            {(country.trajectory_label === "Strong Negative" || country.trajectory_label === "Negative") && (
+              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded"
+                style={{ background: "rgba(239,68,68,.10)", color: "#f87171", border: "1px solid rgba(239,68,68,.25)" }}>
+                ▼ falling
+              </span>
+            )}
+            <span className="font-semibold"
+              style={{ color: delta > 0 ? "#4ade80" : delta < 0 ? "#f87171" : "var(--text-3)" }}>
+              {delta > 0 ? "+" : ""}{delta} pts
+            </span>
+          </div>
         </div>
       </div>
 

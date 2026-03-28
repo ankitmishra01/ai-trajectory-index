@@ -7,6 +7,10 @@ import {
   ResponsiveContainer, Cell, Legend,
 } from "recharts";
 import staticData from "@/data/countries.json";
+import adoptionRaw from "@/data/adoption.json";
+import { enrichAdoption } from "@/lib/adoption";
+import { TIER_COLORS, DIM_COLORS } from "@/lib/adoption";
+import type { EnrichedAdoption } from "@/lib/adoption";
 import type { ScoredCountry, ScoresResponse } from "@/lib/types";
 import type { RegionConfig } from "@/lib/regionConfigs";
 
@@ -34,11 +38,15 @@ interface Props {
   config: RegionConfig;
 }
 
+const ADOPT_DIM_KEYS = ["government", "enterprise", "talent_demand", "consumer", "pipeline"] as const;
+const ADOPT_DIM_SHORT: Record<string, string> = { government: "Gov", enterprise: "Biz", talent_demand: "Talent", consumer: "Users", pipeline: "R&D" };
+
 export default function RegionDeepDive({ config }: Props) {
   const [countries, setCountries] = useState<ScoredCountry[]>(() =>
     staticData.countries.map((c) => ({ ...c, data_source: "fallback" as const }))
   );
   const [loading, setLoading] = useState(true);
+  const [lens, setLens] = useState<"readiness" | "adoption">("readiness");
 
   useEffect(() => {
     fetch("/api/scores")
@@ -120,6 +128,29 @@ export default function RegionDeepDive({ config }: Props) {
   const regionAvgTotal = avg(regional.map((c) => c.total_score));
   const globalAvgTotal = avg(countries.map((c) => c.total_score));
 
+  // Adoption data for this region
+  const allEnriched = useMemo(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    () => enrichAdoption(adoptionRaw.countries as any, countries),
+    [countries]
+  );
+  const regionalAdoption: EnrichedAdoption[] = useMemo(
+    () => allEnriched.filter((a) => {
+      const inRegion = config.dataRegions.includes(a.region);
+      const inAllowlist = config.slugAllowlist ? config.slugAllowlist.has(a.slug) : true;
+      return inRegion && inAllowlist;
+    }),
+    [allEnriched, config]
+  );
+  const adoptionSorted = useMemo(
+    () => [...regionalAdoption].sort((a, b) => b.adoption_total - a.adoption_total),
+    [regionalAdoption]
+  );
+  const regionAdoptionAvg = avg(regionalAdoption.map((a) => a.adoption_total));
+  const globalAdoptionAvg = avg(allEnriched.map((a) => a.adoption_total));
+  const topLeapfrog  = [...regionalAdoption].sort((a, b) => b.adoption_gap - a.adoption_gap)[0];
+  const topUnderutil = [...regionalAdoption].sort((a, b) => a.adoption_gap - b.adoption_gap)[0];
+
   return (
     <main className="min-h-screen" style={{ background: "var(--bg)" }}>
       <div className="page-glow" />
@@ -139,6 +170,20 @@ export default function RegionDeepDive({ config }: Props) {
             style={{ background: `rgba(${config.accentRgb},.10)`, color: config.accentColor, border: `1px solid rgba(${config.accentRgb},.22)` }}>
             {regional.length} economies
           </span>
+          {/* Lens toggle */}
+          <div className="flex rounded-xl overflow-hidden" style={{ border: "1px solid var(--border)" }}>
+            {(["readiness", "adoption"] as const).map((l) => (
+              <button key={l} onClick={() => setLens(l)}
+                className="px-3 py-1.5 text-xs font-semibold transition-all"
+                style={lens === l
+                  ? { background: l === "adoption" ? "#22c55e" : "var(--accent)", color: "#fff" }
+                  : { background: "transparent", color: "var(--text-3)" }
+                }>
+                {l === "readiness" ? "📊 Readiness" : "🚀 Adoption"}
+              </button>
+            ))}
+          </div>
+
           {/* Other region nav */}
           <div className="ml-auto flex items-center gap-1.5 flex-wrap">
             {[
@@ -161,6 +206,92 @@ export default function RegionDeepDive({ config }: Props) {
       </header>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-10 space-y-8">
+
+        {/* ── Adoption lens view ── */}
+        {lens === "adoption" && (
+          <div className="space-y-6">
+            {/* Adoption hero stats */}
+            <div className="card rounded-3xl overflow-hidden relative">
+              <div className="absolute inset-x-0 top-0 h-px"
+                style={{ background: "linear-gradient(90deg, transparent, rgba(34,197,94,.35), transparent)" }} />
+              <div className="px-6 sm:px-10 pt-8 pb-6">
+                <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "rgba(74,222,128,.7)" }}>
+                  AI Adoption Scorecard · {config.name}
+                </p>
+                <h2 className="text-2xl font-black mb-4" style={{ color: "var(--text-1)" }}>
+                  {config.emoji} {config.name} — Adoption Rankings
+                </h2>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {[
+                    { label: "Adoption Leader",    value: adoptionSorted[0] ? `${adoptionSorted[0].flag} ${adoptionSorted[0].name.split(" ")[0]}` : "—", sub: adoptionSorted[0] ? `${adoptionSorted[0].adoption_total}/100` : "" },
+                    { label: "Regional Avg",       value: String(regionAdoptionAvg), sub: `Global avg: ${globalAdoptionAvg}` },
+                    { label: "Biggest Leapfrogger", value: topLeapfrog ? `${topLeapfrog.flag} ${topLeapfrog.name.split(" ")[0]}` : "—", sub: topLeapfrog ? `+${topLeapfrog.adoption_gap} vs readiness` : "" },
+                    { label: "Underutiliser",       value: topUnderutil ? `${topUnderutil.flag} ${topUnderutil.name.split(" ")[0]}` : "—", sub: topUnderutil ? `${topUnderutil.adoption_gap} vs readiness` : "" },
+                  ].map((s) => (
+                    <div key={s.label} className="rounded-2xl p-4"
+                      style={{ background: "rgba(6,11,20,.55)", border: "1px solid var(--border)", backdropFilter: "blur(8px)" }}>
+                      <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: "var(--text-3)" }}>{s.label}</p>
+                      <p className="text-lg font-black leading-tight mb-0.5" style={{ color: "#4ade80" }}>{s.value}</p>
+                      {s.sub && <p className="text-[10px]" style={{ color: "var(--text-3)" }}>{s.sub}</p>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Adoption country list */}
+            <div className="card rounded-2xl overflow-hidden">
+              <div className="px-6 py-4" style={{ borderBottom: "1px solid var(--border)" }}>
+                <h3 className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-3)" }}>
+                  Countries by Adoption Score
+                </h3>
+              </div>
+              <div>
+                {adoptionSorted.map((a, i) => {
+                  const ts = TIER_COLORS[a.adoption_tier] ?? TIER_COLORS["Nascent Adoption"];
+                  const gap = a.adoption_gap;
+                  return (
+                    <Link key={a.slug} href={`/country/${a.slug}`}
+                      className="flex items-center gap-3 px-5 py-3 group transition-colors"
+                      style={{ borderBottom: i < adoptionSorted.length - 1 ? "1px solid var(--border)" : undefined }}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = "var(--raised)")}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                    >
+                      <span className="text-xs w-5 text-center font-bold tabular-nums" style={{ color: "var(--text-3)" }}>{i + 1}</span>
+                      <span className="text-xl flex-shrink-0">{a.flag}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold" style={{ color: "var(--text-1)" }}>{a.name}</p>
+                        <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                          <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded"
+                            style={{ background: ts.bg, color: ts.color, border: `1px solid ${ts.border}` }}>
+                            {a.adoption_tier.replace(" Adoption", "")}
+                          </span>
+                          {gap > 2 && <span className="text-[9px]" style={{ color: "#4ade80" }}>↑ +{gap}</span>}
+                          {gap < -2 && <span className="text-[9px]" style={{ color: "#f59e0b" }}>↓ {gap}</span>}
+                        </div>
+                      </div>
+                      {/* Mini dim bars */}
+                      <div className="hidden sm:flex gap-0.5 items-end h-5">
+                        {ADOPT_DIM_KEYS.map((k) => (
+                          <div key={k} title={`${ADOPT_DIM_SHORT[k]}: ${a.adoption_scores[k]}/20`}
+                            className="w-2 rounded-sm"
+                            style={{ height: `${(a.adoption_scores[k] / 20) * 100}%`, background: DIM_COLORS[k], opacity: 0.8 }} />
+                        ))}
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <span className="text-sm font-black" style={{ color: ts.color }}>{a.adoption_total}</span>
+                        <p className="text-[10px]" style={{ color: "var(--text-3)" }}>/100</p>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── Readiness lens view (default) ── */}
+        {lens === "readiness" && (<>
 
         {/* Hero card */}
         <div className="card shine-on-hover rounded-3xl overflow-hidden relative">
@@ -492,6 +623,8 @@ export default function RegionDeepDive({ config }: Props) {
               })}
           </div>
         </div>
+
+        </>)} {/* end readiness lens */}
       </div>
 
       <footer className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-8 mt-4 text-center space-y-1"

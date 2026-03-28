@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import staticData from "@/data/countries.json";
+import adoptionRaw from "@/data/adoption.json";
 import type { ScoredCountry, ScoresResponse } from "@/lib/types";
 import type { CountryContext } from "@/lib/openrouter";
 import type { MapMode } from "@/components/WorldMap";
@@ -47,20 +48,27 @@ export default function MapPage() {
   );
   const [selectedSlugs, setSelectedSlugs] = useState<Set<string>>(new Set());
   const [mode, setMode] = useState<MapMode>("view");
+  const [mapLens, setMapLens] = useState<"readiness" | "adoption">("readiness");
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [thinking, setThinking] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
+  // Adoption score lookup
+  const adoptionScores = useMemo(
+    () => Object.fromEntries(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (adoptionRaw.countries as any[]).map((a) => [a.slug, a.adoption_total])
+    ) as Record<string, number>,
+    []
+  );
+
   // Derived lookups
-  const scores = useMemo(
-    () =>
-      Object.fromEntries(countries.map((c) => [c.slug, c.total_score])) as Record<
-        string,
-        number
-      >,
+  const readinessScores = useMemo(
+    () => Object.fromEntries(countries.map((c) => [c.slug, c.total_score])) as Record<string, number>,
     [countries]
   );
+  const scores = mapLens === "adoption" ? adoptionScores : readinessScores;
   const countryNames = useMemo(
     () =>
       Object.fromEntries(countries.map((c) => [c.slug, c.name])) as Record<
@@ -185,6 +193,23 @@ export default function MapPage() {
             AI Trajectory Map
           </h1>
           <div className="ml-auto flex items-center gap-2">
+            {/* Lens toggle */}
+            <div className="flex rounded-lg overflow-hidden border border-[#1c2847]">
+              {(["readiness", "adoption"] as const).map((lens) => (
+                <button
+                  key={lens}
+                  onClick={() => setMapLens(lens)}
+                  className="px-3 py-1.5 text-xs font-semibold transition-all"
+                  style={mapLens === lens
+                    ? { background: lens === "adoption" ? "#22c55e" : "#3b82f6", color: "#fff" }
+                    : { background: "#0f1628", color: "#64748b" }
+                  }
+                >
+                  {lens === "readiness" ? "Readiness" : "Adoption"}
+                </button>
+              ))}
+            </div>
+
             {/* Mode toggle */}
             <button
               onClick={() => setMode(mode === "view" ? "select" : "view")}
@@ -235,7 +260,11 @@ export default function MapPage() {
             </div>
           ) : (
             <div className="mb-3 px-4 py-2 rounded-lg bg-[#0f1628] border border-[#1c2847] text-slate-500 text-xs flex items-center gap-2">
-              <span>Click a country to select · or use &quot;Draw selection&quot; to lasso a region · hover for details</span>
+              <span>
+                Showing <span style={{ color: mapLens === "adoption" ? "#4ade80" : "#60a5fa", fontWeight: 600 }}>
+                  {mapLens === "adoption" ? "Adoption Scores" : "Readiness Scores"}
+                </span> · Click a country to select · hover for details
+              </span>
             </div>
           )}
 
