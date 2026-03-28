@@ -160,9 +160,14 @@ export default function CountryNewsFeed({ slug, countryName }: Props) {
         )}
 
         {articleError && (
-          <p className="text-sm text-center py-4" style={{ color: "var(--text-3)" }}>
-            {articleError}
-          </p>
+          <div className="text-center py-6">
+            <p className="text-sm mb-1" style={{ color: "var(--text-3)" }}>
+              Could not load news feed
+            </p>
+            <p className="text-[10px]" style={{ color: "var(--text-3)", opacity: 0.5 }}>
+              {articleError}
+            </p>
+          </div>
         )}
 
         {articles !== null && articles.length === 0 && (

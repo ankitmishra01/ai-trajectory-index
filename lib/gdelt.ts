@@ -31,22 +31,30 @@ function parseGdeltDate(s: string): string {
   return `${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6]}Z`;
 }
 
-// Some country names need disambiguation in news search
+// Some country names need disambiguation or alternate phrasings in news search.
+// GDELT query syntax: space = AND, OR keyword = OR, parentheses for grouping.
+// Always scope OR terms inside parentheses so they apply to the country name too.
 const QUERY_OVERRIDES: Record<string, string> = {
-  georgia:      '"Georgia" AI policy -"Georgia Tech" -"Georgia US"',
-  chad:         '"Chad" Africa AI technology',
-  "guinea":     '"Guinea" Africa AI',
-  niger:        '"Niger" Africa AI',
-  jordan:       '"Jordan" AI technology Middle East',
-  iran:         '"Iran" artificial intelligence',
-  turkey:       '"Turkey" OR "Türkiye" AI',
-  "south-korea":"\"South Korea\" AI",
-  "north-korea":"\"North Korea\" AI technology",
+  usa:          '("United States" OR "U.S." OR "American") ("artificial intelligence" OR "AI policy" OR "AI strategy" OR "AI regulation")',
+  "united-kingdom": '("United Kingdom" OR "UK" OR "Britain" OR "British") ("artificial intelligence" OR "AI policy" OR "AI strategy")',
+  georgia:      '"Georgia" (AI OR "artificial intelligence") -"Georgia Tech"',
+  chad:         '"Chad" Africa (AI OR "artificial intelligence")',
+  guinea:       '"Guinea" Africa (AI OR "artificial intelligence")',
+  niger:        '"Niger" Africa (AI OR "artificial intelligence")',
+  jordan:       '"Jordan" ("artificial intelligence" OR "AI policy") "Middle East"',
+  iran:         '"Iran" ("artificial intelligence" OR "AI policy" OR "AI strategy")',
+  turkey:       '("Turkey" OR "Türkiye") ("artificial intelligence" OR "AI policy")',
+  "south-korea": '"South Korea" ("artificial intelligence" OR "AI policy" OR "AI strategy")',
+  "north-korea": '"North Korea" ("artificial intelligence" OR "AI technology")',
+  "democratic-republic-of-congo": '("Congo" OR "DRC") ("artificial intelligence" OR "AI")',
 };
 
 function buildQuery(countryName: string, slug: string): string {
   if (QUERY_OVERRIDES[slug]) return QUERY_OVERRIDES[slug];
-  return `"${countryName}" "artificial intelligence" OR "AI policy" OR "AI investment" OR "AI strategy"`;
+  // Parenthesise the OR group so all terms stay scoped to the country name.
+  // Without parentheses, "Country" "AI policy" OR "AI strategy" is parsed as
+  // ("Country" AND "AI policy") OR ("AI strategy" globally) — wrong.
+  return `"${countryName}" ("artificial intelligence" OR "AI policy" OR "AI strategy" OR "AI investment" OR "AI regulation")`;
 }
 
 export async function fetchCountryNews(
@@ -71,33 +79,33 @@ export async function fetchCountryNews(
 
   const endpoint = `https://api.gdeltproject.org/api/v2/doc/doc?${params.toString()}`;
 
-  try {
-    const res = await fetch(endpoint, {
-      headers: { "User-Agent": "AI-Trajectory-Index/1.0" },
-      signal: AbortSignal.timeout(10_000),
-    });
+  const res = await fetch(endpoint, {
+    headers: { "User-Agent": "AI-Trajectory-Index/1.0" },
+    signal: AbortSignal.timeout(12_000),
+  });
 
-    if (!res.ok) throw new Error(`GDELT ${res.status}`);
-    const data = await res.json();
+  if (!res.ok) throw new Error(`GDELT HTTP ${res.status}`);
 
-    const articles: NewsArticle[] = ((data.articles ?? []) as GdeltArticle[])
-      .filter((a) => a.url && a.title)
-      .map((a) => ({
-        title:    a.title!.trim(),
-        url:      a.url!,
-        domain:   a.domain ?? new URL(a.url!).hostname.replace("www.", ""),
-        date:     parseGdeltDate(a.seendate ?? ""),
-        language: a.language ?? "English",
-        image:    a.socialimage ?? null,
-      }));
+  const data = await res.json();
 
-    articleCache.set(cacheKey, { articles, ts: Date.now() });
-    return articles;
-  } catch {
-    // Return cached stale data if available rather than nothing
-    const stale = articleCache.get(cacheKey);
-    return stale?.articles ?? [];
+  // GDELT returns { articles: [...] } on success, or { status: "error", message: "..." }
+  if (data.status === "error") {
+    throw new Error(`GDELT error: ${data.message ?? "unknown"}`);
   }
+
+  const articles: NewsArticle[] = ((data.articles ?? []) as GdeltArticle[])
+    .filter((a) => a.url && a.title)
+    .map((a) => ({
+      title:    a.title!.trim(),
+      url:      a.url!,
+      domain:   a.domain ?? new URL(a.url!).hostname.replace("www.", ""),
+      date:     parseGdeltDate(a.seendate ?? ""),
+      language: a.language ?? "English",
+      image:    a.socialimage ?? null,
+    }));
+
+  articleCache.set(cacheKey, { articles, ts: Date.now() });
+  return articles;
 }
 
 // Global AI news — no country filter, broad query

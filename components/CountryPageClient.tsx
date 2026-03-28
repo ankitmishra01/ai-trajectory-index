@@ -345,7 +345,18 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
               <div className="flex items-start gap-3 p-4 rounded-xl"
                 style={{ background: "rgba(245,158,11,.06)", border: "1px solid rgba(245,158,11,.22)" }}>
                 <span className="text-amber-400 mt-0.5">⚠</span>
-                <p className="text-sm text-amber-400/90">Analysis temporarily unavailable. Check back shortly.</p>
+                <div>
+                  <p className="text-sm text-amber-400/90 mb-1">
+                    {narrative.error?.includes("not configured")
+                      ? "OpenRouter API key is not set — add OPENROUTER_API_KEY to your Vercel environment variables."
+                      : narrative.error?.includes("All models")
+                      ? "All free AI models are currently rate-limited. Try again in a few minutes."
+                      : (narrative.error ?? "Analysis temporarily unavailable.")}
+                  </p>
+                  {narrative.error && !narrative.error.includes("not configured") && (
+                    <p className="text-[10px] text-amber-400/50">Detail: {narrative.error}</p>
+                  )}
+                </div>
               </div>
             )}
             {narrative.status === "done" && narrative.paragraphs.length > 0 && (
