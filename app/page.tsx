@@ -139,10 +139,13 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            <Link href="/africa"
-              className="btn-secondary hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl">
-              🌍 Africa
-            </Link>
+            <div className="hidden sm:flex items-center gap-1.5">
+              <Link href="/americas" className="btn-secondary flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-xl">🌎 Americas</Link>
+              <Link href="/europe" className="btn-secondary flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-xl">🌍 Europe</Link>
+              <Link href="/africa" className="btn-secondary flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-xl">🌍 Africa</Link>
+              <Link href="/middle-east" className="btn-secondary flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-xl">🕌 Middle East</Link>
+              <Link href="/asia-pacific" className="btn-secondary flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-xl">🌏 Asia-Pacific</Link>
+            </div>
             <Link href="/methodology"
               className="btn-secondary hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl">
               Methodology
@@ -338,16 +341,14 @@ export default function Home() {
               className="hover:text-blue-400 transition-colors">Ankit Mishra</a>
             {" "}— Commercial Portfolio Director at Holocene · Forbes contributor · SRI AI & Trust Working Group
           </p>
-          <div className="flex items-center justify-center gap-4 pt-1">
-            <Link href="/methodology" className="text-xs hover:text-blue-400 transition-colors" style={{ color: "var(--text-3)" }}>
-              Methodology
-            </Link>
-            <Link href="/africa" className="text-xs hover:text-blue-400 transition-colors" style={{ color: "var(--text-3)" }}>
-              Africa Focus
-            </Link>
-            <Link href="/map" className="text-xs hover:text-blue-400 transition-colors" style={{ color: "var(--text-3)" }}>
-              Map View
-            </Link>
+          <div className="flex items-center justify-center gap-4 pt-1 flex-wrap">
+            <Link href="/americas" className="text-xs hover:text-blue-400 transition-colors" style={{ color: "var(--text-3)" }}>Americas</Link>
+            <Link href="/europe" className="text-xs hover:text-blue-400 transition-colors" style={{ color: "var(--text-3)" }}>Europe</Link>
+            <Link href="/africa" className="text-xs hover:text-blue-400 transition-colors" style={{ color: "var(--text-3)" }}>Africa</Link>
+            <Link href="/middle-east" className="text-xs hover:text-blue-400 transition-colors" style={{ color: "var(--text-3)" }}>Middle East</Link>
+            <Link href="/asia-pacific" className="text-xs hover:text-blue-400 transition-colors" style={{ color: "var(--text-3)" }}>Asia-Pacific</Link>
+            <Link href="/methodology" className="text-xs hover:text-blue-400 transition-colors" style={{ color: "var(--text-3)" }}>Methodology</Link>
+            <Link href="/map" className="text-xs hover:text-blue-400 transition-colors" style={{ color: "var(--text-3)" }}>Map View</Link>
           </div>
         </footer>
       </div>
