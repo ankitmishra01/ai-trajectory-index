@@ -5,125 +5,60 @@ interface ScoreGaugeProps {
   size?: number;
 }
 
-function polarToCartesian(
-  cx: number,
-  cy: number,
-  r: number,
-  angleDeg: number
-) {
-  const rad = ((angleDeg - 90) * Math.PI) / 180;
-  return {
-    x: cx + r * Math.cos(rad),
-    y: cy + r * Math.sin(rad),
-  };
+function polar(cx: number, cy: number, r: number, deg: number) {
+  const rad = ((deg - 90) * Math.PI) / 180;
+  return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
 }
 
-function arcPath(cx: number, cy: number, r: number, startDeg: number, endDeg: number) {
-  const start = polarToCartesian(cx, cy, r, endDeg);
-  const end = polarToCartesian(cx, cy, r, startDeg);
-  const largeArc = endDeg - startDeg <= 180 ? "0" : "1";
-  return `M ${start.x} ${start.y} A ${r} ${r} 0 ${largeArc} 0 ${end.x} ${end.y}`;
+function arc(cx: number, cy: number, r: number, a1: number, a2: number) {
+  const s = polar(cx, cy, r, a2);
+  const e = polar(cx, cy, r, a1);
+  return `M ${s.x} ${s.y} A ${r} ${r} 0 ${a2 - a1 <= 180 ? "0" : "1"} 0 ${e.x} ${e.y}`;
 }
 
-function getColor(score: number) {
-  if (score >= 80) return "#22c55e";
-  if (score >= 60) return "#3b82f6";
-  if (score >= 40) return "#f59e0b";
-  return "#ef4444";
-}
-
-function getGlowColor(score: number) {
-  if (score >= 80) return "rgba(34,197,94,0.5)";
-  if (score >= 60) return "rgba(59,130,246,0.5)";
-  if (score >= 40) return "rgba(245,158,11,0.5)";
-  return "rgba(239,68,68,0.5)";
+function colors(score: number) {
+  if (score >= 80) return { stroke: "#22c55e", glow: "rgba(34,197,94,.55)",  text: "#4ade80" };
+  if (score >= 60) return { stroke: "#3b82f6", glow: "rgba(59,130,246,.55)", text: "#93c5fd" };
+  if (score >= 40) return { stroke: "#f59e0b", glow: "rgba(245,158,11,.55)", text: "#fcd34d" };
+  return               { stroke: "#ef4444", glow: "rgba(239,68,68,.55)",  text: "#fca5a5" };
 }
 
 export default function ScoreGauge({ score, size = 200 }: ScoreGaugeProps) {
   const cx = size / 2;
   const cy = size / 2 + 10;
-  const r = size * 0.38;
-  const strokeWidth = size * 0.075;
-
-  const startAngle = -210;
-  const endAngle = 30;
-  const totalSpan = endAngle - startAngle;
-
-  const filledEnd = startAngle + (score / 100) * totalSpan;
-
-  const bgPath = arcPath(cx, cy, r, startAngle, endAngle);
-  const fillPath = arcPath(cx, cy, r, startAngle, filledEnd);
-
-  const color = getColor(score);
-  const glowColor = getGlowColor(score);
-  const filterId = `gauge-glow-${size}`;
+  const r  = size * 0.38;
+  const sw = size * 0.075;
+  const a1 = -210, a2 = 30;
+  const filled = a1 + (score / 100) * (a2 - a1);
+  const { stroke, glow, text } = colors(score);
 
   return (
     <div className="flex flex-col items-center">
       <svg width={size} height={size * 0.7} viewBox={`0 0 ${size} ${size * 0.7}`}>
-        <defs>
-          <filter id={filterId} x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="3" result="blur" />
-            <feComposite in="SourceGraphic" in2="blur" operator="over" />
-          </filter>
-        </defs>
-
-        {/* Background track */}
-        <path
-          d={bgPath}
-          fill="none"
-          stroke="#1a2540"
-          strokeWidth={strokeWidth}
-          strokeLinecap="round"
-        />
+        {/* Track */}
+        <path d={arc(cx, cy, r, a1, a2)} fill="none" stroke="var(--raised)" strokeWidth={sw} strokeLinecap="round" />
 
         {/* Glow layer */}
         {score > 0 && (
-          <path
-            d={fillPath}
-            fill="none"
-            stroke={glowColor}
-            strokeWidth={strokeWidth + 4}
-            strokeLinecap="round"
-            style={{ filter: `blur(6px)` }}
-            opacity={0.6}
-          />
+          <path d={arc(cx, cy, r, a1, filled)} fill="none" stroke={glow}
+            strokeWidth={sw + 6} strokeLinecap="round" style={{ filter: "blur(6px)" }} opacity={0.7} />
         )}
 
-        {/* Filled arc */}
+        {/* Main arc */}
         {score > 0 && (
-          <path
-            d={fillPath}
-            fill="none"
-            stroke={color}
-            strokeWidth={strokeWidth}
-            strokeLinecap="round"
-          />
+          <path d={arc(cx, cy, r, a1, filled)} fill="none" stroke={stroke}
+            strokeWidth={sw} strokeLinecap="round" />
         )}
 
-        {/* Score text */}
-        <text
-          x={cx}
-          y={cy + 2}
-          textAnchor="middle"
-          dominantBaseline="middle"
-          fill={color}
-          fontSize={size * 0.22}
-          fontWeight="900"
+        {/* Score */}
+        <text x={cx} y={cy + 2} textAnchor="middle" dominantBaseline="middle"
+          fill={text} fontSize={size * 0.22} fontWeight="900"
           fontFamily="Inter, system-ui, sans-serif"
-          style={{ filter: `drop-shadow(0 0 8px ${glowColor})` }}
-        >
+          style={{ filter: `drop-shadow(0 0 8px ${glow})` }}>
           {score}
         </text>
-        <text
-          x={cx}
-          y={cy + size * 0.17}
-          textAnchor="middle"
-          dominantBaseline="middle"
-          fill="#475569"
-          fontSize={size * 0.08}
-          fontFamily="Inter, system-ui, sans-serif"
-        >
+        <text x={cx} y={cy + size * 0.17} textAnchor="middle" dominantBaseline="middle"
+          fill="var(--text-3)" fontSize={size * 0.08} fontFamily="Inter, system-ui, sans-serif">
           / 100
         </text>
       </svg>
