@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import AdoptionCard from "@/components/AdoptionCard";
 import GapMatrix from "@/components/GapMatrix";
@@ -12,13 +12,62 @@ import type { ScoredCountry } from "@/lib/types";
 
 type SortKey = "adoption_total" | "adoption_gap" | "gap_negative" | "government" | "consumer";
 type Region = "All" | "Americas" | "Europe" | "Asia-Pacific" | "Middle East & Africa";
+type TierFilter = "All" | "High Adoption" | "Growing Adoption" | "Early Adoption" | "Nascent Adoption";
 
 const REGIONS: Region[] = ["All", "Americas", "Europe", "Asia-Pacific", "Middle East & Africa"];
+const TIERS: TierFilter[] = ["All", "High Adoption", "Growing Adoption", "Early Adoption", "Nascent Adoption"];
+
+const TIER_COLORS: Record<string, { color: string; bg: string; border: string }> = {
+  "High Adoption":    { color: "#4ade80", bg: "rgba(74,222,128,.10)",  border: "rgba(74,222,128,.30)"  },
+  "Growing Adoption": { color: "#60a5fa", bg: "rgba(96,165,250,.10)",  border: "rgba(96,165,250,.30)"  },
+  "Early Adoption":   { color: "#f59e0b", bg: "rgba(245,158,11,.10)",  border: "rgba(245,158,11,.30)"  },
+  "Nascent Adoption": { color: "#f87171", bg: "rgba(248,113,113,.10)", border: "rgba(248,113,113,.30)" },
+};
+
+function triggerDownload(content: string, filename: string, type: string) {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function buildAdoptionCSV(countries: EnrichedAdoption[], ranks: Record<string, number>): string {
+  const headers = [
+    "Rank", "Country", "Flag", "Region",
+    "Adoption_Score", "Tier", "Gap_vs_Readiness",
+    "Government", "Enterprise", "Talent_Demand", "Consumer", "Pipeline",
+  ];
+  const rows = [...countries]
+    .sort((a, b) => (ranks[a.slug] ?? 999) - (ranks[b.slug] ?? 999))
+    .map((c) => [
+      ranks[c.slug] ?? "",
+      `"${c.name}"`,
+      c.flag,
+      `"${c.region}"`,
+      c.adoption_total,
+      `"${c.adoption_tier}"`,
+      c.adoption_gap,
+      c.adoption_scores.government,
+      c.adoption_scores.enterprise,
+      c.adoption_scores.talent_demand,
+      c.adoption_scores.consumer,
+      c.adoption_scores.pipeline,
+    ]);
+  return [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+}
 
 export default function AdoptionPage() {
-  const [region, setRegion] = useState<Region>("All");
-  const [sort, setSort] = useState<SortKey>("adoption_total");
-  const [search, setSearch] = useState("");
+  const [region, setRegion]     = useState<Region>("All");
+  const [sort, setSort]         = useState<SortKey>("adoption_total");
+  const [search, setSearch]     = useState("");
+  const [tier, setTier]         = useState<TierFilter>("All");
+  const [shareToast, setShareToast] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
+
+  const urlInitialisedRef = useRef(false);
 
   const countries = useMemo(
     () => countriesRaw.countries.map((c) => ({ ...c, data_source: "fallback" as const })) as ScoredCountry[],
@@ -37,21 +86,52 @@ export default function AdoptionPage() {
     let arr = enriched.filter((c) => {
       const ms = c.name.toLowerCase().includes(search.toLowerCase());
       const mr = region === "All" || c.region === region;
-      return ms && mr;
+      const mt = tier === "All" || c.adoption_tier === tier;
+      return ms && mr && mt;
     });
     if (sort === "adoption_total") arr = arr.sort((a, b) => b.adoption_total - a.adoption_total);
-    else if (sort === "adoption_gap") arr = arr.sort((a, b) => b.adoption_gap - a.adoption_gap);
-    else if (sort === "gap_negative") arr = arr.sort((a, b) => a.adoption_gap - b.adoption_gap);
-    else if (sort === "government") arr = arr.sort((a, b) => b.adoption_scores.government - a.adoption_scores.government);
-    else if (sort === "consumer") arr = arr.sort((a, b) => b.adoption_scores.consumer - a.adoption_scores.consumer);
+    else if (sort === "adoption_gap")  arr = arr.sort((a, b) => b.adoption_gap - a.adoption_gap);
+    else if (sort === "gap_negative")  arr = arr.sort((a, b) => a.adoption_gap - b.adoption_gap);
+    else if (sort === "government")    arr = arr.sort((a, b) => b.adoption_scores.government - a.adoption_scores.government);
+    else if (sort === "consumer")      arr = arr.sort((a, b) => b.adoption_scores.consumer - a.adoption_scores.consumer);
     return arr;
-  }, [enriched, region, sort, search]);
+  }, [enriched, region, sort, search, tier]);
+
+  // ── URL state: read on mount ──────────────────────────────────────────────
+  useEffect(() => {
+    if (typeof window === "undefined" || urlInitialisedRef.current) return;
+    urlInitialisedRef.current = true;
+    const p = new URLSearchParams(window.location.search);
+    const r  = p.get("region"); if (r)    setRegion(decodeURIComponent(r) as Region);
+    const t  = p.get("tier");   if (t)    setTier(decodeURIComponent(t) as TierFilter);
+    const s  = p.get("sort");   if (s)    setSort(s as SortKey);
+    const q  = p.get("q");      if (q)    setSearch(decodeURIComponent(q));
+  }, []);
+
+  // ── URL state: write on change ────────────────────────────────────────────
+  useEffect(() => {
+    if (!urlInitialisedRef.current) return;
+    const p = new URLSearchParams();
+    if (region !== "All")          p.set("region", region);
+    if (tier !== "All")            p.set("tier", tier);
+    if (sort !== "adoption_total") p.set("sort", sort);
+    if (search)                    p.set("q", search);
+    const qs = p.toString();
+    window.history.replaceState({}, "", qs ? `?${qs}` : window.location.pathname);
+  }, [region, tier, sort, search]);
+
+  function shareView() {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      setShareToast(true);
+      setTimeout(() => setShareToast(false), 2500);
+    });
+  }
 
   // Hero stats
-  const topCountry     = sorted[0];
-  const avgScore       = Math.round(enriched.reduce((s, c) => s + c.adoption_total, 0) / (enriched.length || 1));
-  const topOverperform = [...enriched].sort((a, b) => b.adoption_gap - a.adoption_gap)[0];
-  const topUnderperform= [...enriched].sort((a, b) => a.adoption_gap - b.adoption_gap)[0];
+  const topCountry      = sorted[0];
+  const avgScore        = Math.round(enriched.reduce((s, c) => s + c.adoption_total, 0) / (enriched.length || 1));
+  const topOverperform  = [...enriched].sort((a, b) => b.adoption_gap - a.adoption_gap)[0];
+  const topUnderperform = [...enriched].sort((a, b) => a.adoption_gap - b.adoption_gap)[0];
 
   const globalRanks = useMemo(
     () => Object.fromEntries(sorted.map((c, i) => [c.slug, i + 1])),
@@ -191,9 +271,9 @@ export default function AdoptionPage() {
             {/* Hero stats */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
-                { label: "Highest Adoption", value: topCountry ? `${topCountry.flag} ${topCountry.name}` : "—", sub: topCountry ? `${topCountry.adoption_total}/100` : "" },
-                { label: "Global Average",   value: `${avgScore}`, sub: "out of 100" },
-                { label: "Biggest Leapfrogger", value: topOverperform ? `${topOverperform.flag} ${topOverperform.name.split(" ")[0]}` : "—", sub: topOverperform ? `+${topOverperform.adoption_gap} pts above readiness` : "" },
+                { label: "Highest Adoption",     value: topCountry     ? `${topCountry.flag} ${topCountry.name}` : "—",                        sub: topCountry     ? `${topCountry.adoption_total}/100` : "" },
+                { label: "Global Average",        value: `${avgScore}`,                                                                          sub: "out of 100" },
+                { label: "Biggest Leapfrogger",   value: topOverperform  ? `${topOverperform.flag} ${topOverperform.name.split(" ")[0]}` : "—",  sub: topOverperform  ? `+${topOverperform.adoption_gap} pts above readiness` : "" },
                 { label: "Biggest Underutiliser", value: topUnderperform ? `${topUnderperform.flag} ${topUnderperform.name.split(" ")[0]}` : "—", sub: topUnderperform ? `${topUnderperform.adoption_gap} pts below readiness` : "" },
               ].map((s) => (
                 <div key={s.label} className="rounded-2xl p-4"
@@ -232,25 +312,103 @@ export default function AdoptionPage() {
         {/* ── Gap Matrix ── */}
         <GapMatrix data={enriched} />
 
-        {/* ── Filters ── */}
-        <div className="flex flex-wrap gap-3 items-center">
-          {/* Search */}
-          <div className="relative flex-1 min-w-48">
-            <input
-              type="text"
-              placeholder="Search countries…"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="input-base pr-8 text-sm"
-            />
-            {search && (
-              <button onClick={() => setSearch("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs"
-                style={{ color: "var(--text-3)" }}>✕</button>
-            )}
+        {/* ── Filter bar ── */}
+        <div className="flex flex-col gap-3">
+          {/* Row 1: search + sort + count */}
+          <div className="flex flex-wrap gap-3 items-center">
+            <div className="relative flex-1 min-w-48">
+              <input
+                type="text"
+                placeholder="Search countries…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="input-base pr-8 text-sm"
+              />
+              {search && (
+                <button onClick={() => setSearch("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs"
+                  style={{ color: "var(--text-3)" }}>✕</button>
+              )}
+            </div>
+
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value as SortKey)}
+              className="input-base text-xs"
+              style={{ width: "auto", minWidth: 190 }}
+            >
+              <option value="adoption_total">Sort: Adoption Score</option>
+              <option value="adoption_gap">Sort: Biggest Leapfrogger</option>
+              <option value="gap_negative">Sort: Biggest Underutiliser</option>
+              <option value="government">Sort: Government Deployment</option>
+              <option value="consumer">Sort: Consumer Usage</option>
+            </select>
+
+            <span className="text-xs" style={{ color: "var(--text-3)" }}>
+              {filtered.length} of {enriched.length} countries
+            </span>
+
+            {/* Utility buttons */}
+            <div className="ml-auto flex items-center gap-2">
+              {/* Share */}
+              <div className="relative">
+                <button
+                  onClick={shareView}
+                  className="btn-secondary flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl"
+                  title="Copy link to this filtered view"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                      d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                  </svg>
+                  <span className="hidden sm:inline">Share view</span>
+                </button>
+                {shareToast && (
+                  <div className="absolute right-0 top-full mt-2 z-50 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap"
+                    style={{ background: "var(--surface)", border: "1px solid var(--border)", color: "#4ade80" }}>
+                    Link copied!
+                  </div>
+                )}
+              </div>
+
+              {/* Export */}
+              <div className="relative">
+                <button
+                  onClick={() => setExportOpen((o) => !o)}
+                  className="btn-secondary flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Export
+                </button>
+                {exportOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setExportOpen(false)} />
+                    <div className="absolute right-0 top-full mt-2 z-50 rounded-xl overflow-hidden shadow-xl"
+                      style={{ background: "var(--surface)", border: "1px solid var(--border)", minWidth: 160 }}>
+                      <button
+                        onClick={() => { triggerDownload(buildAdoptionCSV(filtered, globalRanks), "ai_adoption_scorecard_2026.csv", "text/csv"); setExportOpen(false); }}
+                        className="w-full flex items-center gap-2.5 px-4 py-3 text-xs font-semibold text-left transition-colors"
+                        style={{ color: "var(--text-1)" }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "var(--raised)")}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                      >
+                        <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                            d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Download CSV
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
 
-          {/* Region pills */}
+          {/* Row 2: Region pills */}
           <div className="flex gap-1.5 flex-wrap">
             {REGIONS.map((r) => (
               <button key={r} onClick={() => setRegion(r)}
@@ -264,23 +422,26 @@ export default function AdoptionPage() {
             ))}
           </div>
 
-          {/* Sort */}
-          <select
-            value={sort}
-            onChange={(e) => setSort(e.target.value as SortKey)}
-            className="input-base text-xs"
-            style={{ width: "auto", minWidth: 180 }}
-          >
-            <option value="adoption_total">Sort: Adoption Score</option>
-            <option value="adoption_gap">Sort: Biggest Leapfrogger</option>
-            <option value="gap_negative">Sort: Biggest Underutiliser</option>
-            <option value="government">Sort: Government Deployment</option>
-            <option value="consumer">Sort: Consumer Usage</option>
-          </select>
-
-          <span className="text-xs ml-auto" style={{ color: "var(--text-3)" }}>
-            {filtered.length} of {enriched.length} countries
-          </span>
+          {/* Row 3: Tier pills */}
+          <div className="flex gap-1.5 flex-wrap items-center">
+            <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--text-3)" }}>Tier:</span>
+            {TIERS.map((t) => {
+              const ts = t !== "All" ? TIER_COLORS[t] : null;
+              const isActive = tier === t;
+              return (
+                <button key={t} onClick={() => setTier(t)}
+                  className="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"
+                  style={isActive && ts
+                    ? { background: ts.bg, color: ts.color, border: `1px solid ${ts.border}` }
+                    : isActive
+                    ? { background: "var(--accent)", color: "#fff", border: "1px solid var(--accent)" }
+                    : { background: "transparent", color: "var(--text-3)", border: "1px solid var(--border)" }
+                  }>
+                  {t}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* ── Cards section header ── */}
@@ -294,7 +455,7 @@ export default function AdoptionPage() {
         </div>
 
         {/* ── Cards grid ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {filtered.map((country) => (
             <AdoptionCard
               key={country.slug}
@@ -305,8 +466,10 @@ export default function AdoptionPage() {
         </div>
 
         {filtered.length === 0 && (
-          <div className="text-center py-16">
-            <p className="text-sm" style={{ color: "var(--text-3)" }}>No countries match your filters.</p>
+          <div className="text-center py-20">
+            <p className="text-4xl mb-4">🚀</p>
+            <p className="text-lg font-semibold" style={{ color: "var(--text-2)" }}>No countries found</p>
+            <p className="text-sm mt-2" style={{ color: "var(--text-3)" }}>Try adjusting your search or filters</p>
           </div>
         )}
 
