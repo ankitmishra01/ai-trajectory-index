@@ -25,6 +25,8 @@ interface CountryData {
 interface CountryCardProps {
   country: CountryData;
   rank: number;
+  isComparing?: boolean;
+  onCompareToggle?: (slug: string) => void;
 }
 
 const PILLARS = [
@@ -58,7 +60,7 @@ function scoreBand(score: number) {
   return                   { label: "Nascent",     color: "#fca5a5", bg: "rgba(248,113,113,.10)", border: "rgba(248,113,113,.25)" };
 }
 
-export default function CountryCard({ country, rank }: CountryCardProps) {
+export default function CountryCard({ country, rank, isComparing = false, onCompareToggle }: CountryCardProps) {
   const traj  = TRAJ_CONFIG[country.trajectory_label] ?? TRAJ_CONFIG["Neutral"];
   const band  = scoreBand(country.total_score);
   const delta = country.projected_score_2028 - country.total_score;
@@ -83,6 +85,30 @@ export default function CountryCard({ country, rank }: CountryCardProps) {
     >
       {/* Top accent bar — colour-coded by score band */}
       <div className="h-0.5 w-full" style={{ background: band.color, opacity: 0.7 }} />
+
+      {/* Compare toggle button */}
+      {onCompareToggle && (
+        <button
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onCompareToggle(country.slug); }}
+          className="absolute top-3 right-3 z-10 w-5 h-5 rounded-full flex items-center justify-center transition-all duration-150"
+          title={isComparing ? "Remove from comparison" : "Add to comparison"}
+          style={
+            isComparing
+              ? { background: "var(--accent)", border: "1.5px solid var(--accent)", boxShadow: "0 0 8px rgba(59,130,246,.5)" }
+              : { background: "transparent", border: "1.5px solid rgba(59,130,246,.35)" }
+          }
+        >
+          {isComparing ? (
+            <svg className="w-2.5 h-2.5" fill="none" stroke="white" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+            </svg>
+          ) : (
+            <svg className="w-2.5 h-2.5" fill="none" stroke="rgba(96,165,250,.8)" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+            </svg>
+          )}
+        </button>
+      )}
 
       <div className="p-5">
         {/* ── Row 1: Rank · Flag · Country · Score ── */}
