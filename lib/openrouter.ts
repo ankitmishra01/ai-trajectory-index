@@ -45,6 +45,14 @@ export interface CountryContext {
   top_risk: string;
 }
 
+export interface NewsSignal {
+  sentiment: "positive" | "neutral" | "negative";
+  summary: string;
+  key_events: string[];
+  pillars_affected: string[];
+  momentum: "accelerating" | "stable" | "slowing";
+}
+
 async function callOpenRouter(
   systemPrompt: string,
   userMessage: string
@@ -164,4 +172,35 @@ export async function askAboutCountries(
   const userMessage = `Selected countries:\n${context}\n\nQuestion: ${question}`;
 
   return callOpenRouter(systemPrompt, userMessage);
+}
+
+export async function analyzeNewsSignal(
+  countryName: string,
+  headlines: string[]
+): Promise<NewsSignal> {
+  const systemPrompt = `You are an AI policy analyst. Given news headlines about a country, extract structured intelligence about AI-related developments. Respond ONLY with valid JSON, no prose.`;
+
+  const userMessage = `Country: ${countryName}
+Recent AI-related headlines (last 14 days):
+${headlines.map((h, i) => `${i + 1}. ${h}`).join("\n")}
+
+Respond with this exact JSON structure:
+{
+  "sentiment": "positive" | "neutral" | "negative",
+  "summary": "1-2 sentence summary of the most significant AI developments",
+  "key_events": ["event 1", "event 2", "event 3"],
+  "pillars_affected": ["governance" | "investment" | "talent" | "infrastructure" | "economic_readiness"],
+  "momentum": "accelerating" | "stable" | "slowing"
+}
+
+Base sentiment on policy announcements, investment news, strategy launches (positive) vs. bans, brain drain, funding cuts (negative). If headlines are unrelated to AI, return neutral/stable.`;
+
+  const raw = await callOpenRouter(systemPrompt, userMessage);
+
+  // Parse JSON from LLM output (may have surrounding text)
+  const jsonMatch = raw.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) throw new Error("No JSON in signal response");
+
+  const parsed = JSON.parse(jsonMatch[0]) as NewsSignal;
+  return parsed;
 }

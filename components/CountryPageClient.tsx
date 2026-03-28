@@ -5,6 +5,7 @@ import Link from "next/link";
 import ScoreGauge from "@/components/ScoreGauge";
 import DimensionBar from "@/components/DimensionBar";
 import TrajectoryArrow from "@/components/TrajectoryArrow";
+import CountryNewsFeed from "@/components/CountryNewsFeed";
 import staticData from "@/data/countries.json";
 import type { ScoredCountry, ScoresResponse } from "@/lib/types";
 
@@ -375,6 +376,9 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
             )}
           </div>
         </div>
+
+        {/* Live News Feed */}
+        <CountryNewsFeed slug={slug} countryName={country.name} />
 
         {/* Comparable Countries */}
         {comparables.length > 0 && (
