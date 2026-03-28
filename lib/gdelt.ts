@@ -2,8 +2,6 @@
 // Free tier works with api-key=test (up to 12 req/s, 5000 req/day).
 // Register a free production key at https://open-platform.theguardian.com/access/
 // and set GUARDIAN_API_KEY in your environment for higher limits.
-//
-// Falls back to a short curated list so the UI never shows a broken state.
 
 export interface NewsArticle {
   title: string;
@@ -20,14 +18,26 @@ const GUARDIAN_BASE = "https://content.guardianapis.com";
 const articleCache = new Map<string, { articles: NewsArticle[]; ts: number }>();
 const ARTICLE_TTL_MS = 60 * 60 * 1000; // 1 hour
 
-// ── Query builders ────────────────────────────────────────────────────────────
+// ── Query builders ─────────────────────────────────────────────────────────────
 
+// Slugs where the country name alone is ambiguous or won't match well
 const QUERY_OVERRIDES: Record<string, string> = {
-  usa:              '"United States" "artificial intelligence"',
-  "united-kingdom": '"United Kingdom" "artificial intelligence"',
-  "south-korea":    '"South Korea" "artificial intelligence"',
-  "north-korea":    '"North Korea" technology',
+  usa:                            '"United States" "artificial intelligence"',
+  "united-kingdom":               '"United Kingdom" "artificial intelligence"',
+  "south-korea":                  '"South Korea" "artificial intelligence"',
+  "north-korea":                  '"North Korea" technology',
   "democratic-republic-of-congo": "Congo artificial intelligence",
+  "ivory-coast":                  '"Ivory Coast" OR "Côte d\'Ivoire" technology',
+  "trinidad-tobago":              '"Trinidad" "artificial intelligence"',
+  "bosnia-herzegovina":           '"Bosnia" "artificial intelligence"',
+  "north-macedonia":              '"North Macedonia" technology',
+  "el-salvador":                  '"El Salvador" "artificial intelligence"',
+  "costa-rica":                   '"Costa Rica" "artificial intelligence"',
+  "new-zealand":                  '"New Zealand" "artificial intelligence"',
+  "saudi-arabia":                 '"Saudi Arabia" "artificial intelligence"',
+  "cape-verde":                   '"Cape Verde" technology',
+  "south-africa":                 '"South Africa" "artificial intelligence"',
+  "sri-lanka":                    '"Sri Lanka" "artificial intelligence"',
 };
 
 function buildCountryQuery(countryName: string, slug: string): string {
@@ -35,7 +45,7 @@ function buildCountryQuery(countryName: string, slug: string): string {
   return `"${countryName}" "artificial intelligence"`;
 }
 
-// ── The Guardian fetch ────────────────────────────────────────────────────────
+// ── The Guardian fetch ─────────────────────────────────────────────────────────
 
 interface GuardianResult {
   webTitle: string;
@@ -47,23 +57,26 @@ interface GuardianResult {
 async function fetchGuardian(
   query: string,
   cacheKey: string,
-  pageSize: number
+  pageSize: number,
+  tagFilter?: string
 ): Promise<NewsArticle[]> {
   const hit = articleCache.get(cacheKey);
   if (hit && Date.now() - hit.ts < ARTICLE_TTL_MS) return hit.articles;
 
   const apiKey = process.env.GUARDIAN_API_KEY ?? "test";
 
-  const params = new URLSearchParams({
+  const paramObj: Record<string, string> = {
     q:           query,
     "api-key":   apiKey,
     "page-size": String(pageSize),
     "order-by":  "newest",
     "show-tags": "keyword",
-    tag:         "technology/artificialintelligenceai,technology/technology,world/world",
-  });
+  };
+  // Tag filter is only applied for the global feed. Country queries rely on
+  // text search alone so articles tagged world/canada (not technology/ai) aren't dropped.
+  if (tagFilter) paramObj.tag = tagFilter;
 
-  const url = `${GUARDIAN_BASE}/search?${params.toString()}`;
+  const url = `${GUARDIAN_BASE}/search?${new URLSearchParams(paramObj).toString()}`;
 
   const res = await fetch(url, {
     headers: { "User-Agent": "AI-Trajectory-Index/1.0" },
@@ -88,7 +101,7 @@ async function fetchGuardian(
   return articles;
 }
 
-// ── Public API ────────────────────────────────────────────────────────────────
+// ── Public API ─────────────────────────────────────────────────────────────────
 
 export async function fetchCountryNews(
   countryName: string,
@@ -100,38 +113,10 @@ export async function fetchCountryNews(
 }
 
 export async function fetchGlobalAINews(maxRecords = 20): Promise<NewsArticle[]> {
-  // Tag-scoped: returns only articles in The Guardian's AI technology section
-  const params = new URLSearchParams({
-    "api-key":   process.env.GUARDIAN_API_KEY ?? "test",
-    "page-size": String(maxRecords),
-    "order-by":  "newest",
-    section:     "technology",
-    tag:         "technology/artificialintelligenceai",
-  });
-
-  const cacheKey = "__global__";
-  const hit = articleCache.get(cacheKey);
-  if (hit && Date.now() - hit.ts < ARTICLE_TTL_MS) return hit.articles;
-
-  const res = await fetch(`${GUARDIAN_BASE}/search?${params.toString()}`, {
-    headers: { "User-Agent": "AI-Trajectory-Index/1.0" },
-    signal: AbortSignal.timeout(10_000),
-  });
-
-  if (!res.ok) throw new Error(`Guardian API ${res.status}`);
-
-  const data = await res.json();
-  const results: GuardianResult[] = data?.response?.results ?? [];
-
-  const articles: NewsArticle[] = results.map((r) => ({
-    title:    r.webTitle.trim(),
-    url:      r.webUrl,
-    domain:   "theguardian.com",
-    date:     r.webPublicationDate,
-    language: "English",
-    image:    null,
-  }));
-
-  articleCache.set(cacheKey, { articles, ts: Date.now() });
-  return articles;
+  return fetchGuardian(
+    "artificial intelligence",
+    "__global__",
+    maxRecords,
+    "technology/artificialintelligenceai"   // tag-scoped for the global ticker
+  );
 }

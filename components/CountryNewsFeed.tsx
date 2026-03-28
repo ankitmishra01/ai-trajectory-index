@@ -77,7 +77,7 @@ export default function CountryNewsFeed({ slug, countryName }: Props) {
             Live AI News Feed
           </h2>
           <p className="text-xs mt-0.5" style={{ color: "var(--text-3)" }}>
-            Real-time headlines from GDELT · Updated hourly
+            AI headlines from The Guardian · Updated hourly
           </p>
         </div>
         {/* AI Signal button */}
@@ -176,7 +176,7 @@ export default function CountryNewsFeed({ slug, countryName }: Props) {
               No recent AI headlines found for {countryName}
             </p>
             <p className="text-xs" style={{ color: "var(--text-3)", opacity: 0.6 }}>
-              GDELT searches the last 14 days · Try again later or check global news above
+              The Guardian is searched for recent AI coverage · Try again later
             </p>
           </div>
         )}
