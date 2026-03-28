@@ -93,6 +93,7 @@ export default function Home() {
       .sort((a, b) => {
         if (sort === "alphabetical")    return a.name.localeCompare(b.name);
         if (sort === "trajectory_gain") return (b.projected_score_2028 - b.total_score) - (a.projected_score_2028 - a.total_score);
+        if (sort === "governance_gap")  return (b.total_score / 5 - b.scores.governance.score) - (a.total_score / 5 - a.scores.governance.score);
         return (b[sort] as number) - (a[sort] as number);
       }),
     [countries, search, region, sort, tier, trajectoryFilter]
@@ -292,15 +293,6 @@ export default function Home() {
               </span>
             )}
             <div className="ml-auto flex items-center gap-2">
-              {compareList.length > 0 && (
-                <button
-                  onClick={() => setCompareList([])}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
-                  style={{ background: "rgba(59,130,246,.10)", color: "var(--accent)", border: "1px solid rgba(59,130,246,.22)" }}
-                >
-                  Comparing {compareList.length} · Clear
-                </button>
-              )}
               <ExportButton countries={filtered} globalRanks={globalRanks} />
             </div>
           </div>
@@ -321,7 +313,7 @@ export default function Home() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"
-            style={{ paddingBottom: compareList.length >= 2 ? "340px" : undefined }}>
+            style={{ paddingBottom: compareList.length >= 1 ? "96px" : undefined }}>
             {filtered.map((c) => (
               <CountryCard
                 key={c.slug}

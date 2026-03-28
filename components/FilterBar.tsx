@@ -1,6 +1,6 @@
 "use client";
 
-export type SortKey = "total_score" | "trajectory_gain" | "projected_score_2028" | "alphabetical";
+export type SortKey = "total_score" | "trajectory_gain" | "projected_score_2028" | "alphabetical" | "governance_gap";
 export type Region = "All" | "Americas" | "Europe" | "Asia-Pacific" | "Middle East & Africa";
 export type TierFilter = "All" | "Leading" | "Advanced" | "Developing" | "Nascent";
 export type TrajectoryFilter = "All" | "Strong Positive" | "Positive" | "Neutral" | "Negative";
@@ -24,10 +24,11 @@ const REGIONS: Region[] = ["All", "Americas", "Europe", "Asia-Pacific", "Middle 
 const TIERS: TierFilter[] = ["All", "Leading", "Advanced", "Developing", "Nascent"];
 const TRAJECTORIES: TrajectoryFilter[] = ["All", "Strong Positive", "Positive", "Neutral", "Negative"];
 const SORTS: { value: SortKey; label: string }[] = [
-  { value: "total_score",          label: "Current Score"   },
-  { value: "trajectory_gain",      label: "Trajectory Gain" },
-  { value: "projected_score_2028", label: "Projected 2028"  },
-  { value: "alphabetical",         label: "A – Z"           },
+  { value: "total_score",          label: "Current Score"      },
+  { value: "trajectory_gain",      label: "Trajectory Momentum"},
+  { value: "projected_score_2028", label: "Projected 2028"     },
+  { value: "governance_gap",       label: "Governance Gap"     },
+  { value: "alphabetical",         label: "A – Z"              },
 ];
 
 const TIER_COLORS: Record<TierFilter, { bg: string; color: string; border: string }> = {
@@ -99,18 +100,24 @@ export default function FilterBar({
             className="input-base pl-10"
           />
         </div>
-        <select
-          value={sort}
-          onChange={(e) => onSort(e.target.value as SortKey)}
-          className="input-base min-w-[200px] cursor-pointer"
-          style={{ color: "var(--text-1)", background: "var(--raised)" }}
-        >
-          {SORTS.map((s) => (
-            <option key={s.value} value={s.value} style={{ background: "var(--surface)" }}>
-              Sort: {s.label}
-            </option>
-          ))}
-        </select>
+        <div className="relative">
+          <select
+            value={sort}
+            onChange={(e) => onSort(e.target.value as SortKey)}
+            className="input-base min-w-[210px] cursor-pointer pr-8"
+            style={{ color: "var(--text-1)", background: "var(--raised)" }}
+          >
+            {SORTS.map((s) => (
+              <option key={s.value} value={s.value} style={{ background: "var(--surface)" }}>
+                Sort: {s.label}
+              </option>
+            ))}
+          </select>
+          {sort !== "total_score" && (
+            <span className="absolute right-8 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full"
+              style={{ background: "var(--accent)" }} />
+          )}
+        </div>
       </div>
 
       {/* Row 2: Region pills */}
