@@ -168,8 +168,11 @@ function scoreTalent(
 
 function normalizeWGI(estimate: number | null, maxPts: number): number | null {
   if (estimate === null) return null;
-  // Clamp to ±3 to handle rare extreme outliers before normalizing
-  const clamped = Math.max(-3, Math.min(3, estimate));
+  // WGI z-scores are defined on [-2.5, +2.5]. Clamp to that range so the
+  // normalisation never produces a negative value or overflows maxPts.
+  // (Using ±3 as the clamp boundary caused a 10% overflow at +3 and a
+  //  negative contribution at -3, both of which violated the point budget.)
+  const clamped = Math.max(-2.5, Math.min(2.5, estimate));
   return ((clamped + 2.5) / 5.0) * maxPts;
 }
 
