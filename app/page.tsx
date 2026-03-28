@@ -263,8 +263,8 @@ export default function Home() {
             </h2>
             <p className="text-base max-w-2xl mb-8 leading-relaxed fade-up-2" style={{ color: "var(--text-2)" }}>
               Scoring {countries.length} economies across five pillars — Infrastructure, Talent,
-              Governance, Investment and Economic Readiness — with live World Bank data and
-              AI-generated country analysis.
+              Governance, Investment and Economic Readiness — drawing on World Bank, IMF, OECD,
+              Stanford HAI, Oxford Insights, and the Anthropic Economic Index.
             </p>
 
             {/* ── Guided entry points ── */}
