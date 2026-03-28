@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Comfortaa:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Comfortaa:wght@400;600;700&family=DM+Serif+Display:ital@0;1&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -37,6 +37,44 @@ body {
 .font-display {
   font-family: 'Comfortaa', 'Inter', system-ui, sans-serif;
 }
+
+/* Institutional serif — for hero headlines (WEF/HDI style) */
+.font-serif-display {
+  font-family: 'DM Serif Display', Georgia, 'Times New Roman', serif;
+}
+
+/* Rankings table */
+.rankings-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.rankings-table th {
+  padding: .625rem 1rem;
+  text-align: left;
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  color: var(--text-3);
+  border-bottom: 1px solid var(--border);
+  background: var(--raised);
+  transition: color .15s;
+}
+.rankings-table th:hover { color: var(--text-1); }
+.rankings-table td {
+  padding: .75rem 1rem;
+  font-size: .875rem;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  color: var(--text-2);
+  transition: background .15s;
+}
+.rankings-table tr:last-child td { border-bottom: none; }
+.rankings-table tr:hover td { background: var(--raised); }
 
 /* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 5px; }

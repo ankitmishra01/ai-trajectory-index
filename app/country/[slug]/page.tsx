@@ -128,7 +128,7 @@ export default function CountryPage({ params }: { params: Promise<{ slug: string
                 <span className="text-6xl">{country.flag}</span>
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h1 className="text-3xl font-black font-display" style={{ color: "var(--text-1)" }}>
+                    <h1 className="text-3xl font-black font-serif-display" style={{ color: "var(--text-1)" }}>
                       {country.name}
                     </h1>
                     <span className="text-xs px-2 py-0.5 rounded-full"
@@ -151,7 +151,7 @@ export default function CountryPage({ params }: { params: Promise<{ slug: string
         {/* Score Breakdown */}
         <div className="card rounded-2xl p-6 sm:p-8">
           <h2 className="text-xs font-bold uppercase tracking-wider mb-6" style={{ color: "var(--text-3)" }}>
-            Score Breakdown
+            Pillar Scores
           </h2>
           <div className="space-y-5">
             {Object.entries(country.scores).map(([key, val]) => (
@@ -217,10 +217,10 @@ export default function CountryPage({ params }: { params: Promise<{ slug: string
         <div className="card rounded-2xl overflow-hidden">
           <div className="px-6 sm:px-8 py-5" style={{ borderBottom: "1px solid var(--border)" }}>
             <h2 className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-3)" }}>
-              Dimension Detail
+              Pillar Detail
             </h2>
             <p className="text-xs mt-1" style={{ color: "var(--text-3)" }}>
-              Click any dimension to see the supporting evidence
+              Click any pillar to see supporting indicators and evidence
             </p>
           </div>
           <div>
