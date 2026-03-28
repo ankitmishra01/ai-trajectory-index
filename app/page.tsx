@@ -355,45 +355,48 @@ export default function Home() {
         </div>
 
         {/* ── Two Lenses ── */}
-        <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* Readiness lens — active */}
-          <div className="rounded-2xl p-5 flex flex-col gap-3"
-            style={{ background: "var(--surface)", border: "2px solid rgba(59,130,246,.35)" }}>
-            <div className="flex items-center gap-2">
-              <span className="text-lg">📊</span>
-              <div>
+        <div className="mb-6">
+          <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: "var(--text-3)" }}>
+            Two ways to look at the AI race
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Readiness lens — active */}
+            <div className="rounded-2xl p-5 flex flex-col gap-2"
+              style={{ background: "var(--surface)", border: "2px solid rgba(59,130,246,.35)" }}>
+              <div className="flex items-center gap-2">
+                <span className="text-lg">📊</span>
                 <p className="text-sm font-black" style={{ color: "var(--text-1)" }}>Readiness Index</p>
-                <p className="text-xs" style={{ color: "var(--text-3)" }}>Which countries CAN develop AI?</p>
+                <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-lg"
+                  style={{ background: "rgba(59,130,246,.12)", color: "var(--accent)", border: "1px solid rgba(59,130,246,.25)" }}>You are here</span>
               </div>
-              <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-lg"
-                style={{ background: "rgba(59,130,246,.12)", color: "var(--accent)", border: "1px solid rgba(59,130,246,.25)" }}>Active</span>
+              <p className="text-sm font-semibold" style={{ color: "var(--accent)" }}>Can this country build AI?</p>
+              <p className="text-xs leading-relaxed" style={{ color: "var(--text-3)" }}>
+                Measures the underlying capacity — infrastructure, talent pipelines, governance, investment, and economic strength. Think of it as the foundation: does the country have what it takes to develop and sustain AI?
+              </p>
+              <p className="text-[10px] mt-1" style={{ color: "var(--text-3)", opacity: 0.6 }}>
+                Infrastructure · Talent · Governance · Investment · Economic Readiness
+              </p>
             </div>
-            <p className="text-xs leading-relaxed" style={{ color: "var(--text-3)" }}>
-              Infrastructure · Talent · Governance · Investment · Economic Readiness
-            </p>
-            <Link href="/" className="text-xs font-semibold" style={{ color: "var(--accent)" }}>
-              View Readiness →
+            {/* Adoption lens */}
+            <Link href="/adoption" style={{ textDecoration: "none" }}>
+              <div className="rounded-2xl p-5 flex flex-col gap-2 h-full cursor-pointer transition-all hover:scale-[1.01]"
+                style={{ background: "var(--surface)", border: "1px solid rgba(74,222,128,.25)" }}>
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">🚀</span>
+                  <p className="text-sm font-black" style={{ color: "var(--text-1)" }}>Adoption Scorecard</p>
+                  <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-lg"
+                    style={{ background: "rgba(74,222,128,.10)", color: "#4ade80", border: "1px solid rgba(74,222,128,.25)" }}>New</span>
+                </div>
+                <p className="text-sm font-semibold" style={{ color: "#4ade80" }}>Is this country using AI now?</p>
+                <p className="text-xs leading-relaxed" style={{ color: "var(--text-3)" }}>
+                  Measures active deployment — AI in government services, businesses, jobs markets, and daily consumer life. Readiness and adoption often diverge: some countries deploy AI well beyond their capacity, others sit on untapped potential.
+                </p>
+                <p className="text-[10px] mt-1" style={{ color: "var(--text-3)", opacity: 0.6 }}>
+                  Government Deployment · Enterprise · Consumer Usage · Talent Demand · R&D Pipeline
+                </p>
+              </div>
             </Link>
           </div>
-          {/* Adoption lens */}
-          <Link href="/adoption" style={{ textDecoration: "none" }}>
-            <div className="rounded-2xl p-5 flex flex-col gap-3 h-full cursor-pointer transition-all hover:scale-[1.01]"
-              style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-              <div className="flex items-center gap-2">
-                <span className="text-lg">🚀</span>
-                <div>
-                  <p className="text-sm font-black" style={{ color: "var(--text-1)" }}>Adoption Scorecard</p>
-                  <p className="text-xs" style={{ color: "var(--text-3)" }}>Which countries ARE using AI?</p>
-                </div>
-              </div>
-              <p className="text-xs leading-relaxed" style={{ color: "var(--text-3)" }}>
-                Government · Enterprise · Consumer · Talent Demand · Pipeline
-              </p>
-              <span className="text-xs font-semibold" style={{ color: "#4ade80" }}>
-                View Adoption →
-              </span>
-            </div>
-          </Link>
         </div>
 
         {/* ── Key Insights strip ── */}

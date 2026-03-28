@@ -184,20 +184,29 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
 
         {/* Tab toggle */}
         {adoption && (
-          <div className="flex justify-center">
+          <div className="flex flex-col items-center gap-2">
             <div className="inline-flex rounded-2xl p-1 gap-1"
               style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-              {(["combined", "readiness", "adoption"] as PageTab[]).map((tab) => (
-                <button key={tab} onClick={() => setActiveTab(tab)}
-                  className="px-4 py-1.5 rounded-xl text-xs font-semibold transition-all capitalize"
-                  style={activeTab === tab
+              {([
+                { key: "combined",  label: "Combined View" },
+                { key: "readiness", label: "Readiness" },
+                { key: "adoption",  label: "Adoption" },
+              ] as { key: PageTab; label: string }[]).map(({ key, label }) => (
+                <button key={key} onClick={() => setActiveTab(key)}
+                  className="px-4 py-1.5 rounded-xl text-xs font-semibold transition-all"
+                  style={activeTab === key
                     ? { background: "var(--accent)", color: "#fff" }
                     : { color: "var(--text-3)", background: "transparent" }
                   }>
-                  {tab}
+                  {label}
                 </button>
               ))}
             </div>
+            <p className="text-[10px]" style={{ color: "var(--text-3)" }}>
+              {activeTab === "combined"  && "Readiness = capacity to build AI · Adoption = AI actually in use today"}
+              {activeTab === "readiness" && "Infrastructure, talent, governance, investment & economic capacity"}
+              {activeTab === "adoption"  && "Government deployment, enterprise, consumer usage, talent demand & R&D pipeline"}
+            </p>
           </div>
         )}
 
@@ -215,7 +224,11 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Readiness card */}
                 <div className="card rounded-2xl p-5">
-                  <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: "var(--text-3)" }}>Readiness Score</p>
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <span className="text-xs">📊</span>
+                    <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--text-3)" }}>Readiness Score</p>
+                  </div>
+                  <p className="text-xs mb-3" style={{ color: "var(--text-3)" }}>Can this country build AI?</p>
                   <div className="flex items-end gap-2 mb-2">
                     <span className="text-4xl font-black" style={{ color: "var(--accent)" }}>{country.total_score}</span>
                     <span className="text-sm pb-1" style={{ color: "var(--text-3)" }}>/100</span>
@@ -224,7 +237,11 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
                 </div>
                 {/* Adoption card */}
                 <div className="card rounded-2xl p-5">
-                  <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: "var(--text-3)" }}>Adoption Score</p>
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <span className="text-xs">🚀</span>
+                    <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--text-3)" }}>Adoption Score</p>
+                  </div>
+                  <p className="text-xs mb-3" style={{ color: "var(--text-3)" }}>Is this country using AI now?</p>
                   <div className="flex items-end gap-2 mb-2">
                     <span className="text-4xl font-black" style={{ color: tierStyle.color }}>{adoption.adoption_total}</span>
                     <span className="text-sm pb-1" style={{ color: "var(--text-3)" }}>/100</span>

@@ -148,11 +148,45 @@ export default function AdoptionPage() {
                 WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text"
               }}>actually using AI</em>?
             </h2>
-            <p className="text-base max-w-2xl mb-8 leading-relaxed" style={{ color: "var(--text-2)" }}>
-              Readiness measures capacity. Adoption measures reality. Some highly-ready countries deploy
-              AI slowly. Others leapfrog their readiness score through mobile-first AI tools. The gap between
-              the two is the most interesting story in the AI race.
+            <p className="text-base max-w-2xl mb-6 leading-relaxed" style={{ color: "var(--text-2)" }}>
+              Having the infrastructure and talent to build AI is not the same as actually using it.
+              This scorecard measures real deployment — in government services, businesses, and everyday
+              life — across 186 countries.
             </p>
+
+            {/* Readiness vs Adoption explainer */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8 max-w-2xl">
+              <div className="rounded-2xl p-4"
+                style={{ background: "rgba(59,130,246,.07)", border: "1px solid rgba(59,130,246,.22)" }}>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-base">📊</span>
+                  <span className="text-xs font-black uppercase tracking-wider" style={{ color: "var(--accent)" }}>
+                    Readiness Score
+                  </span>
+                </div>
+                <p className="text-sm font-semibold mb-1" style={{ color: "var(--text-1)" }}>
+                  Can this country build AI?
+                </p>
+                <p className="text-xs leading-relaxed" style={{ color: "var(--text-3)" }}>
+                  Measures the underlying capacity — digital infrastructure, AI talent, investment, governance frameworks, and economic strength. A high score means the foundations are in place.
+                </p>
+              </div>
+              <div className="rounded-2xl p-4"
+                style={{ background: "rgba(34,197,94,.07)", border: "1px solid rgba(34,197,94,.22)" }}>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-base">🚀</span>
+                  <span className="text-xs font-black uppercase tracking-wider" style={{ color: "#4ade80" }}>
+                    Adoption Score
+                  </span>
+                </div>
+                <p className="text-sm font-semibold mb-1" style={{ color: "var(--text-1)" }}>
+                  Is this country using AI now?
+                </p>
+                <p className="text-xs leading-relaxed" style={{ color: "var(--text-3)" }}>
+                  Measures active deployment — AI in public services, businesses, labour markets, and consumer apps. A high score means AI is already embedded in daily economic life.
+                </p>
+              </div>
+            </div>
 
             {/* Hero stats */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -169,6 +203,28 @@ export default function AdoptionPage() {
                   {s.sub && <p className="text-xs" style={{ color: "var(--text-3)" }}>{s.sub}</p>}
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ── The Gap explainer ── */}
+        <div className="rounded-2xl p-6"
+          style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
+          <h3 className="text-sm font-black mb-3" style={{ color: "var(--text-1)" }}>
+            Why the gap between readiness and adoption matters
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs leading-relaxed" style={{ color: "var(--text-2)" }}>
+            <div>
+              <p className="font-bold mb-1" style={{ color: "#4ade80" }}>Leapfroggers ↑</p>
+              <p>Countries adopting AI faster than their readiness predicts. Often driven by mobile-first technology — Kenya&apos;s M-Pesa, the Philippines&apos; GCash, Bangladesh&apos;s bKash embedded AI into daily financial life before broadband or desktop infrastructure arrived.</p>
+            </div>
+            <div>
+              <p className="font-bold mb-1" style={{ color: "var(--accent)" }}>Aligned ≈</p>
+              <p>Countries where deployment roughly matches capacity. The US, UK, and China are broadly aligned — their high readiness scores translate into correspondingly high real-world AI use.</p>
+            </div>
+            <div>
+              <p className="font-bold mb-1" style={{ color: "#f59e0b" }}>Underutilisers ↓</p>
+              <p>Countries with strong AI foundations that are slow to deploy. Japan, Germany, Switzerland, and Italy consistently underperform their readiness — due to conservative adoption culture, regulatory caution, or legacy enterprise systems resisting change.</p>
             </div>
           </div>
         </div>
@@ -225,6 +281,16 @@ export default function AdoptionPage() {
           <span className="text-xs ml-auto" style={{ color: "var(--text-3)" }}>
             {filtered.length} of {enriched.length} countries
           </span>
+        </div>
+
+        {/* ── Cards section header ── */}
+        <div>
+          <h2 className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: "var(--text-3)" }}>
+            All Countries · Adoption Rankings
+          </h2>
+          <p className="text-xs mb-4" style={{ color: "var(--text-3)" }}>
+            Each card shows the adoption score (0–100), how it compares to the country&apos;s readiness score, and the five adoption dimensions. Click any card to see the full country profile.
+          </p>
         </div>
 
         {/* ── Cards grid ── */}
