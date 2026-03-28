@@ -24,6 +24,13 @@ const DIMENSION_DESCRIPTIONS: Record<string, string> = {
   economic_readiness: "Economy's capacity to adopt and commercialise AI across sectors.",
 };
 
+interface NarrativeState {
+  status: "idle" | "loading" | "done" | "error";
+  paragraphs: string[];
+  generatedAt?: string;
+  error?: string;
+}
+
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
@@ -32,7 +39,6 @@ export default function CountryPage({ params }: PageProps) {
   const { slug } = use(params);
   const [openDimension, setOpenDimension] = useState<string | null>(null);
 
-  // Start with static data for instant render, then upgrade to live scores
   const staticCountry = staticData.countries.find((c) => c.slug === slug);
   const [country, setCountry] = useState<ScoredCountry | null>(
     staticCountry ? { ...staticCountry, data_source: "fallback" as const } : null
@@ -40,6 +46,8 @@ export default function CountryPage({ params }: PageProps) {
   const [allCountries, setAllCountries] = useState<ScoredCountry[]>(
     staticData.countries.map((c) => ({ ...c, data_source: "fallback" as const }))
   );
+
+  const [narrative, setNarrative] = useState<NarrativeState>({ status: "idle", paragraphs: [] });
 
   useEffect(() => {
     fetch("/api/scores")
@@ -52,9 +60,32 @@ export default function CountryPage({ params }: PageProps) {
       .catch(() => {/* keep static fallback */});
   }, [slug]);
 
+  const generateNarrative = async () => {
+    setNarrative({ status: "loading", paragraphs: [] });
+    try {
+      const res = await fetch(`/api/narrative/${slug}`);
+      const data = await res.json();
+      if (data.error) {
+        setNarrative({ status: "error", paragraphs: [], error: data.error });
+      } else {
+        setNarrative({
+          status: "done",
+          paragraphs: data.paragraphs,
+          generatedAt: data.generatedAt,
+        });
+      }
+    } catch {
+      setNarrative({
+        status: "error",
+        paragraphs: [],
+        error: "Network error — please try again.",
+      });
+    }
+  };
+
   if (!country) {
     return (
-      <main className="min-h-screen bg-[#0a0f1e] flex items-center justify-center">
+      <main className="min-h-screen bg-[#060b14] flex items-center justify-center">
         <div className="text-center">
           <p className="text-6xl mb-4">🌐</p>
           <h1 className="text-2xl font-bold text-white mb-2">Country not found</h1>
@@ -73,20 +104,22 @@ export default function CountryPage({ params }: PageProps) {
   const rankedAll = [...allCountries].sort((a, b) => b.total_score - a.total_score);
   const rank = rankedAll.findIndex((c) => c.slug === slug) + 1;
 
+  const scoreDelta = country.projected_score_2028 - country.total_score;
+
   return (
-    <main className="min-h-screen bg-[#0a0f1e]">
+    <main className="min-h-screen bg-[#060b14]">
       {/* Header */}
-      <header className="border-b border-[#1c2847] sticky top-0 z-50 bg-[#0a0f1e]/95 backdrop-blur-sm">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center gap-4">
+      <header className="border-b border-[#1a2540] sticky top-0 z-50 bg-[#060b14]/95 backdrop-blur-sm">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3.5 flex items-center gap-4">
           <Link
             href="/"
-            className="text-slate-400 hover:text-white transition-colors text-sm flex items-center gap-1"
+            className="text-slate-500 hover:text-white transition-colors text-sm flex items-center gap-1.5"
           >
-            ← Back
+            ← Index
           </Link>
-          <span className="text-[#1c2847]">|</span>
-          <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">
-            AI Trajectory Index
+          <span className="text-[#1a2540]">|</span>
+          <span className="text-xs text-slate-600 font-medium uppercase tracking-wider">
+            Country Profile
           </span>
           {country.data_source === "live" && (
             <span className="ml-auto flex items-center gap-1 text-xs text-emerald-400/70">
@@ -97,19 +130,23 @@ export default function CountryPage({ params }: PageProps) {
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10 space-y-8">
-        {/* Hero: Country name + score */}
-        <div className="bg-[#0f1628] border border-[#1c2847] rounded-2xl p-6 sm:p-8">
-          <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-center">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10 space-y-6">
+
+        {/* Hero card */}
+        <div className="relative bg-[#0c1322] border border-[#1a2540] rounded-2xl p-6 sm:p-8 overflow-hidden">
+          <div className="absolute inset-0 hero-glow pointer-events-none" />
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-500/25 to-transparent" />
+
+          <div className="relative flex flex-col sm:flex-row gap-6 items-start sm:items-center">
             <div className="flex-1">
-              <div className="flex items-center gap-3 mb-2">
-                <span className="text-5xl">{country.flag}</span>
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-6xl">{country.flag}</span>
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h1 className="text-3xl font-black text-white">
+                    <h1 className="text-3xl font-black text-white font-display">
                       {country.name}
                     </h1>
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-[#1c2847] text-slate-400 border border-[#1c2847]">
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-[#1a2540] text-slate-400 border border-[#243360]">
                       #{rank} globally
                     </span>
                   </div>
@@ -126,16 +163,14 @@ export default function CountryPage({ params }: PageProps) {
             </div>
             <div className="flex-shrink-0">
               <ScoreGauge score={country.total_score} size={180} />
-              <p className="text-center text-xs text-slate-500 mt-1">
-                Current Score
-              </p>
+              <p className="text-center text-xs text-slate-600 mt-1">AI Readiness Score</p>
             </div>
           </div>
         </div>
 
-        {/* Dimension Breakdown */}
-        <div className="bg-[#0f1628] border border-[#1c2847] rounded-2xl p-6 sm:p-8">
-          <h2 className="text-lg font-bold text-white mb-6">
+        {/* Score Breakdown */}
+        <div className="bg-[#0c1322] border border-[#1a2540] rounded-2xl p-6 sm:p-8">
+          <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-6">
             Score Breakdown
           </h2>
           <div className="space-y-5">
@@ -144,60 +179,67 @@ export default function CountryPage({ params }: PageProps) {
                 key={key}
                 label={DIMENSION_LABELS[key]}
                 score={val.score}
-                height={10}
+                height={12}
                 showScore
               />
             ))}
           </div>
         </div>
 
-        {/* Trajectory Section */}
+        {/* Trajectory + Accelerator/Risk */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Projected */}
-          <div className="bg-[#0f1628] border border-[#1c2847] rounded-2xl p-6">
-            <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">
+          <div className="bg-[#0c1322] border border-[#1a2540] rounded-2xl p-6">
+            <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">
               Trajectory Outlook
             </h2>
-            <div className="flex items-end gap-2 mb-4">
-              <span className="text-4xl font-black text-blue-400">
+            <div className="flex items-baseline gap-2 mb-3">
+              <span className="text-5xl font-black text-blue-400 leading-none">
                 {country.projected_score_2028}
               </span>
-              <span className="text-slate-500 mb-1">/ 100 by 2028</span>
+              <div>
+                <span className="text-slate-500 text-sm">/100</span>
+                <p className="text-xs text-slate-600">by 2028</p>
+              </div>
             </div>
-            <div className="flex items-center gap-2 text-sm text-slate-400">
-              <span>From {country.total_score}</span>
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-slate-500">{country.total_score} now</span>
               <span className="text-blue-500">→</span>
-              <span className="text-blue-400 font-semibold">
-                {country.projected_score_2028}
-              </span>
-              <span className="text-xs ml-auto px-2 py-0.5 rounded bg-blue-500/10 text-blue-400">
-                {country.projected_score_2028 > country.total_score ? "+" : ""}
-                {country.projected_score_2028 - country.total_score} pts
+              <span
+                className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                  scoreDelta > 0
+                    ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                    : scoreDelta < 0
+                    ? "bg-red-500/10 text-red-400 border border-red-500/20"
+                    : "bg-slate-500/10 text-slate-400 border border-slate-500/20"
+                }`}
+              >
+                {scoreDelta > 0 ? "+" : ""}{scoreDelta} pts
               </span>
             </div>
           </div>
 
           {/* Accelerator / Risk */}
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-5">
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-emerald-400 text-lg">▲</span>
-                <h3 className="text-sm font-bold text-emerald-400 uppercase tracking-wider">
+                <span className="text-emerald-400">▲</span>
+                <h3 className="text-xs font-bold text-emerald-400 uppercase tracking-wider">
                   Top Accelerator
                 </h3>
               </div>
-              <p className="text-sm text-emerald-300/90 leading-relaxed">
+              <p className="text-sm text-emerald-300/80 leading-relaxed">
                 {country.top_accelerator}
               </p>
             </div>
             <div className="bg-red-500/5 border border-red-500/20 rounded-2xl p-5">
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-red-400 text-lg">▼</span>
-                <h3 className="text-sm font-bold text-red-400 uppercase tracking-wider">
+                <span className="text-red-400">▼</span>
+                <h3 className="text-xs font-bold text-red-400 uppercase tracking-wider">
                   Top Risk
                 </h3>
               </div>
-              <p className="text-sm text-red-300/90 leading-relaxed">
+              <p className="text-sm text-red-300/80 leading-relaxed">
                 {country.top_risk}
               </p>
             </div>
@@ -205,20 +247,20 @@ export default function CountryPage({ params }: PageProps) {
         </div>
 
         {/* Dimension Detail Accordions */}
-        <div className="bg-[#0f1628] border border-[#1c2847] rounded-2xl overflow-hidden">
-          <div className="px-6 sm:px-8 py-5 border-b border-[#1c2847]">
-            <h2 className="text-lg font-bold text-white">Dimension Detail</h2>
-            <p className="text-xs text-slate-500 mt-1">
+        <div className="bg-[#0c1322] border border-[#1a2540] rounded-2xl overflow-hidden">
+          <div className="px-6 sm:px-8 py-5 border-b border-[#1a2540]">
+            <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Dimension Detail</h2>
+            <p className="text-xs text-slate-600 mt-1">
               Click any dimension to see the supporting evidence
             </p>
           </div>
-          <div className="divide-y divide-[#1c2847]">
+          <div className="divide-y divide-[#1a2540]">
             {Object.entries(country.scores).map(([key, val]) => {
               const isOpen = openDimension === key;
               return (
                 <div key={key}>
                   <button
-                    className="w-full px-6 sm:px-8 py-4 flex items-center gap-4 hover:bg-[#111827] transition-colors text-left"
+                    className="w-full px-6 sm:px-8 py-4 flex items-center gap-4 hover:bg-[#0e1929] transition-colors text-left"
                     onClick={() => setOpenDimension(isOpen ? null : key)}
                   >
                     <div className="flex-1 min-w-0">
@@ -238,7 +280,7 @@ export default function CountryPage({ params }: PageProps) {
                       />
                     </div>
                     <span
-                      className={`text-slate-500 text-lg transition-transform duration-200 flex-shrink-0 ${
+                      className={`text-slate-600 text-sm transition-transform duration-200 flex-shrink-0 ${
                         isOpen ? "rotate-180" : ""
                       }`}
                     >
@@ -246,8 +288,8 @@ export default function CountryPage({ params }: PageProps) {
                     </span>
                   </button>
                   {isOpen && (
-                    <div className="px-6 sm:px-8 pb-5 bg-[#0a0f1e]/40">
-                      <p className="text-xs text-slate-500 mb-3 italic">
+                    <div className="px-6 sm:px-8 pb-5 bg-[#060b14]/60">
+                      <p className="text-xs text-slate-600 mb-3 italic">
                         {DIMENSION_DESCRIPTIONS[key]}
                       </p>
                       <ul className="space-y-2">
@@ -256,9 +298,7 @@ export default function CountryPage({ params }: PageProps) {
                             key={i}
                             className="flex gap-3 items-start text-sm text-slate-300"
                           >
-                            <span className="text-blue-400 mt-0.5 flex-shrink-0">
-                              ·
-                            </span>
+                            <span className="text-blue-500 mt-0.5 flex-shrink-0">·</span>
                             {reason}
                           </li>
                         ))}
@@ -271,90 +311,141 @@ export default function CountryPage({ params }: PageProps) {
           </div>
         </div>
 
+        {/* AI Narrative */}
+        <div className="bg-[#0c1322] border border-[#1a2540] rounded-2xl overflow-hidden">
+          <div className="px-6 sm:px-8 py-5 border-b border-[#1a2540] flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider">AI Analysis</h2>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 font-semibold">
+                  Gemini via OpenRouter
+                </span>
+              </div>
+              <p className="text-xs text-slate-600">
+                Current State · Trajectory · Outlook
+              </p>
+            </div>
+            {narrative.status === "idle" || narrative.status === "error" ? (
+              <button
+                onClick={generateNarrative}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all border border-blue-500 hover:border-blue-400 shadow-[0_0_16px_rgba(59,130,246,0.3)]"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                Generate AI Analysis
+              </button>
+            ) : narrative.status === "loading" ? (
+              <div className="flex items-center gap-2 text-xs text-blue-400 px-4 py-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse [animation-delay:0.2s]" />
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse [animation-delay:0.4s]" />
+                <span className="ml-1">Analysing {country.name}…</span>
+              </div>
+            ) : null}
+          </div>
+
+          <div className="px-6 sm:px-8 py-6">
+            {narrative.status === "idle" && (
+              <p className="text-sm text-slate-600 text-center py-4">
+                Click &ldquo;Generate AI Analysis&rdquo; for a strategic assessment of {country.name}&apos;s AI trajectory.
+              </p>
+            )}
+
+            {narrative.status === "loading" && (
+              <div className="space-y-3 animate-pulse">
+                <div className="h-4 bg-[#1a2540] rounded-full w-full" />
+                <div className="h-4 bg-[#1a2540] rounded-full w-5/6" />
+                <div className="h-4 bg-[#1a2540] rounded-full w-4/5" />
+              </div>
+            )}
+
+            {narrative.status === "error" && (
+              <div className="flex items-start gap-3 p-4 bg-amber-500/5 border border-amber-500/20 rounded-xl">
+                <span className="text-amber-400 mt-0.5">⚠</span>
+                <p className="text-sm text-amber-400/90">
+                  Analysis temporarily unavailable. Check back shortly.
+                </p>
+              </div>
+            )}
+
+            {narrative.status === "done" && narrative.paragraphs.length > 0 && (
+              <div className="space-y-6">
+                {[
+                  { label: "Current State", index: 0 },
+                  { label: "Trajectory", index: 1 },
+                  { label: "Outlook", index: 2 },
+                ]
+                  .filter(({ index }) => narrative.paragraphs[index])
+                  .map(({ label, index }) => (
+                    <div key={label} className="border-l-2 border-blue-500/40 pl-4">
+                      <p className="text-[10px] font-bold text-blue-400/70 uppercase tracking-widest mb-2">
+                        {label}
+                      </p>
+                      <p className="text-sm text-slate-300 leading-relaxed">
+                        {narrative.paragraphs[index]}
+                      </p>
+                    </div>
+                  ))}
+                <p className="text-[11px] text-slate-700 pt-2 border-t border-[#1a2540]">
+                  Analysis generated by AI based on World Bank and OECD data. Updated weekly.
+                  {narrative.generatedAt && (
+                    <span className="ml-1">
+                      Generated{" "}
+                      {new Intl.DateTimeFormat("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      }).format(new Date(narrative.generatedAt))}
+                    </span>
+                  )}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Comparable Countries */}
         {comparables.length > 0 && (
-          <div className="bg-[#0f1628] border border-[#1c2847] rounded-2xl p-6 sm:p-8">
-            <h2 className="text-lg font-bold text-white mb-2">
+          <div className="bg-[#0c1322] border border-[#1a2540] rounded-2xl p-6 sm:p-8">
+            <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">
               Similar Trajectory
             </h2>
-            <p className="text-xs text-slate-500 mb-5">
+            <p className="text-xs text-slate-600 mb-5">
               Countries on a comparable AI development path
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {comparables.map((comp) => (
                 <Link
                   key={comp.slug}
                   href={`/country/${comp.slug}`}
-                  className="flex items-center gap-4 p-4 bg-[#0a0f1e] border border-[#1c2847] rounded-xl hover:border-blue-500/40 hover:bg-[#0f1628] transition-all duration-200 group"
+                  className="flex items-center gap-4 p-4 bg-[#060b14] border border-[#1a2540] rounded-xl hover:border-blue-500/40 hover:bg-[#0e1929] transition-all duration-200 group"
                 >
                   <span className="text-3xl">{comp.flag}</span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-white group-hover:text-blue-300 transition-colors">
+                    <p className="text-sm font-bold text-white group-hover:text-blue-300 transition-colors truncate">
                       {comp.name}
                     </p>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      Score: {comp.total_score}/100 · Trajectory:{" "}
-                      {comp.trajectory_label}
+                    <p className="text-xs text-slate-600 mt-0.5">
+                      {comp.total_score}/100 · {comp.trajectory_label}
                     </p>
                   </div>
-                  <span className="text-slate-600 group-hover:text-blue-400 transition-colors">
-                    →
-                  </span>
+                  <span className="text-slate-700 group-hover:text-blue-400 transition-colors text-sm">→</span>
                 </Link>
               ))}
             </div>
           </div>
         )}
-
-        {/* AI Narrative — Phase 3 Placeholder */}
-        <div className="bg-[#0f1628] border border-[#1c2847] rounded-2xl p-6 sm:p-8 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent pointer-events-none" />
-          <div className="relative">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 font-semibold">
-                Coming in Phase 3
-              </span>
-            </div>
-            <h2 className="text-lg font-bold text-white mb-2">AI Narrative</h2>
-            <p className="text-sm text-slate-400 mb-5">
-              A real-time AI-generated strategic analysis of this country&apos;s
-              AI trajectory — powered by Gemini via OpenRouter.
-            </p>
-            <button
-              disabled
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#1c2847] text-slate-500 text-sm font-semibold cursor-not-allowed border border-[#1c2847] opacity-60"
-            >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 10V3L4 14h7v7l9-11h-7z"
-                />
-              </svg>
-              Generate Analysis
-            </button>
-          </div>
-        </div>
       </div>
 
-      <footer className="max-w-4xl mx-auto px-4 sm:px-6 py-8 mt-4 border-t border-[#1c2847] text-center space-y-1">
-        <p className="text-xs text-slate-500">
+      <footer className="max-w-4xl mx-auto px-4 sm:px-6 py-8 mt-4 border-t border-[#1a2540] text-center space-y-1">
+        <p className="text-xs text-slate-600">
           Data: World Bank API · OECD AI Policy Observatory · Scores updated daily.
         </p>
-        <p className="text-xs text-slate-600">
+        <p className="text-xs text-slate-700">
           AI Trajectory Index · Built by{" "}
-          <a
-            href="https://ankitmishra.ca"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-slate-500 hover:text-blue-400 transition-colors"
-          >
+          <a href="https://ankitmishra.ca" target="_blank" rel="noopener noreferrer"
+            className="text-slate-500 hover:text-blue-400 transition-colors">
             Ankit Mishra
           </a>
         </p>

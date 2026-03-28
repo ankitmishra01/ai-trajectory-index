@@ -1,46 +1,41 @@
 # AI Trajectory Index
 
-A live, interactive tool scoring 20 countries on their current AI readiness AND their forward-looking AI trajectory over 3–5 years. Built by [Ankit Mishra](https://ankitmishra.ca).
-
-**Live:** [ai-index.ankitmishra.ca](https://ai-index.ankitmishra.ca)
+A live, interactive tool scoring 186 countries on current AI readiness and 3–5 year trajectory.
 
 ## What it does
-
-- Scores 20 countries across 5 dimensions: Infrastructure, Talent, Governance, Investment, Economic Readiness (20 pts each, total 100)
-- Shows trajectory scores (-10 to +10) indicating acceleration or decline
-- Projects scores to 2028
-- Country detail pages with expandable dimension evidence, comparable countries, and a Phase 2 AI narrative placeholder
-
-## Running locally
-
-```bash
-npm install
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000).
-
-## Environment variables
-
-Create `.env.local`:
-
-```
-OPENROUTER_API_KEY=your_key_here
-NEXT_PUBLIC_SITE_URL=https://ai-index.ankitmishra.ca
-```
-
-`OPENROUTER_API_KEY` is only needed for Phase 2 (AI narratives).
+- Scores every country across 5 dimensions: Infrastructure, Talent, Governance, Investment, Economic Readiness
+- Shows trajectory: where each country is headed over 3-5 years based on policy momentum, capital flows, talent pipeline, and infrastructure growth
+- Generates AI-powered country narratives explaining the why behind each score
+- Live data from World Bank API and OECD AI Policy Observatory, updated daily
+- Interactive world map with lasso selection and AI-powered country comparison chat
 
 ## Tech stack
+Next.js 14 · Tailwind CSS · OpenRouter API (Gemini 2.0 Flash) · World Bank API · Vercel
 
-- Next.js 14 (App Router)
-- Tailwind CSS
-- Recharts (Phase 2 charts)
-- OpenRouter / Gemini 2.0 Flash (Phase 2 narratives)
-- Vercel
+## Live site
+https://ai-trajectory-index.vercel.app
 
-## Roadmap
+## Built by
+[Ankit Mishra](https://ankitmishra.ca) — Commercial Portfolio Director at Holocene, Forbes contributor, SRI AI & Trust Working Group
 
-**Phase 1 (current):** Hardcoded data, scoring model, filterable grid, country detail pages.
+## Setup
+1. Clone the repo
+2. `cp .env.example .env.local`
+3. Add your `OPENROUTER_API_KEY`
+4. `npm install`
+5. `npm run dev`
 
-**Phase 2:** Live AI-generated strategic narratives via OpenRouter, animated charts, more countries.
+## Data sources
+- World Bank Open Data API (free, no key required)
+- OECD AI Policy Observatory (static dataset)
+- OpenRouter API for narrative generation (free tier, Gemini 2.0 Flash)
+
+## Architecture
+- `/data/countries.json` — 186 countries with static baseline scores
+- `/data/ai-policies.json` — policy metadata (AI strategies, OECD membership)
+- `/lib/worldbank.ts` — live World Bank API client (6 indicators, 24h cache)
+- `/lib/scoring.ts` — score calculation engine
+- `/lib/openrouter.ts` — OpenRouter client for AI narrative generation
+- `/app/api/scores` — scored country data endpoint
+- `/app/api/narrative/[country]` — on-demand AI narrative with 7-day cache
+- `/app/api/chat` — map page AI chat for selected country comparison

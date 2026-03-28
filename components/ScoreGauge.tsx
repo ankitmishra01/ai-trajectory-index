@@ -32,16 +32,22 @@ function getColor(score: number) {
   return "#ef4444";
 }
 
+function getGlowColor(score: number) {
+  if (score >= 80) return "rgba(34,197,94,0.5)";
+  if (score >= 60) return "rgba(59,130,246,0.5)";
+  if (score >= 40) return "rgba(245,158,11,0.5)";
+  return "rgba(239,68,68,0.5)";
+}
+
 export default function ScoreGauge({ score, size = 200 }: ScoreGaugeProps) {
   const cx = size / 2;
   const cy = size / 2 + 10;
   const r = size * 0.38;
-  const strokeWidth = size * 0.08;
+  const strokeWidth = size * 0.075;
 
-  // Arc spans from -210° to 30° (240° sweep) centred on bottom
   const startAngle = -210;
   const endAngle = 30;
-  const totalSpan = endAngle - startAngle; // 240
+  const totalSpan = endAngle - startAngle;
 
   const filledEnd = startAngle + (score / 100) * totalSpan;
 
@@ -49,18 +55,41 @@ export default function ScoreGauge({ score, size = 200 }: ScoreGaugeProps) {
   const fillPath = arcPath(cx, cy, r, startAngle, filledEnd);
 
   const color = getColor(score);
+  const glowColor = getGlowColor(score);
+  const filterId = `gauge-glow-${size}`;
 
   return (
     <div className="flex flex-col items-center">
       <svg width={size} height={size * 0.7} viewBox={`0 0 ${size} ${size * 0.7}`}>
+        <defs>
+          <filter id={filterId} x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+          </filter>
+        </defs>
+
         {/* Background track */}
         <path
           d={bgPath}
           fill="none"
-          stroke="#1c2847"
+          stroke="#1a2540"
           strokeWidth={strokeWidth}
           strokeLinecap="round"
         />
+
+        {/* Glow layer */}
+        {score > 0 && (
+          <path
+            d={fillPath}
+            fill="none"
+            stroke={glowColor}
+            strokeWidth={strokeWidth + 4}
+            strokeLinecap="round"
+            style={{ filter: `blur(6px)` }}
+            opacity={0.6}
+          />
+        )}
+
         {/* Filled arc */}
         {score > 0 && (
           <path
@@ -69,28 +98,29 @@ export default function ScoreGauge({ score, size = 200 }: ScoreGaugeProps) {
             stroke={color}
             strokeWidth={strokeWidth}
             strokeLinecap="round"
-            style={{ filter: `drop-shadow(0 0 6px ${color}80)` }}
           />
         )}
+
         {/* Score text */}
         <text
           x={cx}
-          y={cy + 4}
+          y={cy + 2}
           textAnchor="middle"
           dominantBaseline="middle"
           fill={color}
-          fontSize={size * 0.2}
-          fontWeight="800"
+          fontSize={size * 0.22}
+          fontWeight="900"
           fontFamily="Inter, system-ui, sans-serif"
+          style={{ filter: `drop-shadow(0 0 8px ${glowColor})` }}
         >
           {score}
         </text>
         <text
           x={cx}
-          y={cy + size * 0.16}
+          y={cy + size * 0.17}
           textAnchor="middle"
           dominantBaseline="middle"
-          fill="#64748b"
+          fill="#475569"
           fontSize={size * 0.08}
           fontFamily="Inter, system-ui, sans-serif"
         >

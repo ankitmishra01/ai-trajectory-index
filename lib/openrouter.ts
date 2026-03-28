@@ -19,6 +19,18 @@ export interface NarrativeRequest {
   projectedScore: number;
   topAccelerator: string;
   topRisk: string;
+  scores: {
+    infrastructure: number;
+    talent: number;
+    governance: number;
+    investment: number;
+    economic_readiness: number;
+  };
+  // optional enrichment from policies / WB
+  internetPct?: number;
+  gdpPerCapita?: number;
+  rdSpendPct?: number;
+  hasAiStrategy?: boolean;
 }
 
 export interface CountryContext {
@@ -83,10 +95,42 @@ async function callOpenRouter(
 }
 
 export async function generateNarrative(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _request: NarrativeRequest
+  request: NarrativeRequest
 ): Promise<string> {
-  throw new Error("Phase 3 feature — not yet implemented.");
+  const {
+    countryName,
+    totalScore,
+    trajectoryLabel,
+    trajectoryScore,
+    projectedScore,
+    topAccelerator,
+    topRisk,
+    scores,
+    internetPct,
+    gdpPerCapita,
+    rdSpendPct,
+    hasAiStrategy,
+  } = request;
+
+  const systemPrompt = `You are an expert in AI policy, technology economics, and emerging markets. You write concise, data-driven analysis for policymakers and investors. Your tone is direct, factual, and forward-looking. Never use filler phrases. Always ground analysis in specific indicators and policy decisions.`;
+
+  const userMessage = `Write a 3-paragraph analysis of ${countryName}'s AI trajectory.
+
+Current scores: Infrastructure ${scores.infrastructure}/20, Talent ${scores.talent}/20, Governance ${scores.governance}/20, Investment ${scores.investment}/20, Economic Readiness ${scores.economic_readiness}/20. Total: ${totalScore}/100.
+Trajectory: ${trajectoryLabel} (${trajectoryScore > 0 ? "+" : ""}${trajectoryScore}). Projected 2028 score: ${projectedScore}/100.
+Top accelerator: ${topAccelerator}. Top risk: ${topRisk}.${
+    internetPct !== undefined || gdpPerCapita !== undefined || rdSpendPct !== undefined || hasAiStrategy !== undefined
+      ? `\nKey data:${internetPct !== undefined ? ` Internet penetration ${internetPct}%,` : ""}${gdpPerCapita !== undefined ? ` GDP per capita $${Math.round(gdpPerCapita).toLocaleString()},` : ""}${rdSpendPct !== undefined ? ` R&D spend ${rdSpendPct}% of GDP,` : ""}${hasAiStrategy !== undefined ? ` National AI strategy: ${hasAiStrategy ? "yes" : "no"}.` : ""}`
+      : ""
+  }
+
+Paragraph 1 — Current State: What the scores reveal about where this country stands in the AI race and why.
+Paragraph 2 — Trajectory: What is driving acceleration or stagnation, with specific reference to policy, capital, and talent dynamics.
+Paragraph 3 — Outlook: What needs to happen for this country to improve its position, and what the realistic 2028 scenario looks like.
+
+Keep each paragraph to 3-4 sentences. Be specific. No generic statements. Do not use section headers or labels — just write the three paragraphs separated by blank lines.`;
+
+  return callOpenRouter(systemPrompt, userMessage);
 }
 
 export async function askAboutCountries(

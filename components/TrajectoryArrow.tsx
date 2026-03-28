@@ -8,13 +8,22 @@ interface TrajectoryArrowProps {
 
 const CONFIG: Record<
   string,
-  { arrow: string; color: string; bg: string; border: string }
+  {
+    arrow: string;
+    color: string;
+    bg: string;
+    border: string;
+    glow?: string;
+    shadow?: string;
+  }
 > = {
   "Strong Positive": {
     arrow: "↑↑",
     color: "text-emerald-400",
-    bg: "bg-emerald-400/10",
-    border: "border-emerald-400/30",
+    bg: "bg-emerald-400/15",
+    border: "border-emerald-400/40",
+    glow: "trajectory-glow-positive",
+    shadow: "shadow-[0_0_16px_rgba(34,197,94,0.35)]",
   },
   Positive: {
     arrow: "↑",
@@ -25,8 +34,8 @@ const CONFIG: Record<
   Neutral: {
     arrow: "→",
     color: "text-slate-400",
-    bg: "bg-slate-400/10",
-    border: "border-slate-400/30",
+    bg: "bg-slate-400/8",
+    border: "border-slate-400/25",
   },
   Negative: {
     arrow: "↓",
@@ -37,8 +46,10 @@ const CONFIG: Record<
   "Strong Negative": {
     arrow: "↓↓",
     color: "text-red-400",
-    bg: "bg-red-400/10",
-    border: "border-red-400/30",
+    bg: "bg-red-400/15",
+    border: "border-red-400/40",
+    glow: "trajectory-glow-negative",
+    shadow: "shadow-[0_0_16px_rgba(239,68,68,0.35)]",
   },
 };
 
@@ -50,19 +61,21 @@ export default function TrajectoryArrow({
   const cfg = CONFIG[label] ?? CONFIG["Neutral"];
 
   const arrowSize =
-    size === "sm" ? "text-base" : size === "lg" ? "text-3xl" : "text-xl";
+    size === "sm" ? "text-sm" : size === "lg" ? "text-2xl" : "text-lg";
   const labelSize =
     size === "sm" ? "text-xs" : size === "lg" ? "text-sm" : "text-xs";
+  const px =
+    size === "sm" ? "px-2.5 py-1" : size === "lg" ? "px-4 py-2" : "px-3 py-1.5";
 
   return (
     <div
-      className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border ${cfg.bg} ${cfg.border}`}
+      className={`inline-flex items-center gap-2 ${px} rounded-full border ${cfg.bg} ${cfg.border} ${cfg.shadow ?? ""}`}
     >
-      <span className={`${arrowSize} ${cfg.color} font-bold leading-none`}>
+      <span className={`${arrowSize} ${cfg.color} font-black leading-none`}>
         {cfg.arrow}
       </span>
       <span className={`${labelSize} ${cfg.color} font-semibold`}>{label}</span>
-      <span className={`${labelSize} text-slate-400`}>
+      <span className={`${labelSize} text-slate-400/80`}>
         ({score > 0 ? "+" : ""}
         {score})
       </span>
