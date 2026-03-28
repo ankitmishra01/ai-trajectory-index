@@ -2,17 +2,16 @@
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 // Tried in order until one succeeds.
-// Mix large + small models so if the large ones are rate-limited the small ones
-// (separate provider rate limits) still work.
+// Mix providers so rate limits don't cascade — Meta, Google, Mistral, Alibaba
+// all have independent free-tier quotas.
 const MODELS = [
-  "google/gemini-2.0-flash-exp:free",        // Google — fast, high quality
-  "meta-llama/llama-3.3-70b-instruct:free",  // Meta — large, best quality
-  "meta-llama/llama-3.1-8b-instruct:free",   // Meta 8b — separate rate limit pool from 70b
-  "google/gemma-3-27b-it:free",              // Google Gemma
+  "meta-llama/llama-3.3-70b-instruct:free",
+  "google/gemma-3-27b-it:free",
   "mistralai/mistral-small-3.1-24b-instruct:free",
-  "qwen/qwen-2.5-7b-instruct:free",          // Alibaba 7b — very rarely rate-limited
-  "microsoft/phi-3-mini-128k-instruct:free", // Microsoft small model
-  "qwen/qwen3-4b:free",                      // Smallest fallback
+  "meta-llama/llama-3.1-8b-instruct:free",
+  "qwen/qwen-2.5-7b-instruct:free",
+  "qwen/qwen3-4b:free",
+  "microsoft/phi-3-mini-128k-instruct:free",
 ];
 
 export interface NarrativeRequest {
@@ -102,9 +101,16 @@ async function callOpenRouter(
     }
     clearTimeout(timeoutId);
 
-    if (res.status === 429 || res.status === 503) {
-      lastError = `${model} rate-limited (${res.status})`;
-      continue; // try next model
+    // 404 = model no longer available, 429 = rate-limited, 503 = overloaded
+    // All three: skip to next model instead of aborting the whole chain
+    if (res.status === 404 || res.status === 429 || res.status === 503) {
+      const text = await res.text().catch(() => "");
+      lastError = `${model} skipped (${res.status})`;
+      if (res.status === 404) {
+        // Log 404s so we notice when model IDs go stale
+        console.warn(`OpenRouter model not found: ${model}`, text.slice(0, 200));
+      }
+      continue;
     }
 
     if (!res.ok) {

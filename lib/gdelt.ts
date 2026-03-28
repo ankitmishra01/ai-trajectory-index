@@ -1,9 +1,9 @@
-// News client — primary source: Google News RSS (free, no API key, reliable from cloud)
-// Fallback was GDELT 2.0, removed because GDELT blocks Vercel/AWS IP ranges.
+// News client — The Guardian Open Platform API
+// Free tier works with api-key=test (up to 12 req/s, 5000 req/day).
+// Register a free production key at https://open-platform.theguardian.com/access/
+// and set GUARDIAN_API_KEY in your environment for higher limits.
 //
-// Google News RSS endpoint:
-//   https://news.google.com/rss/search?q=QUERY&hl=en-US&gl=US&ceid=US:en
-// Returns standard RSS 2.0 XML with <item> elements.
+// Falls back to a short curated list so the UI never shows a broken state.
 
 export interface NewsArticle {
   title: string;
@@ -14,140 +14,124 @@ export interface NewsArticle {
   image: string | null;
 }
 
-const GOOGLE_NEWS_RSS = "https://news.google.com/rss/search";
+const GUARDIAN_BASE = "https://content.guardianapis.com";
 
 // In-memory cache: cacheKey → { articles, ts }
 const articleCache = new Map<string, { articles: NewsArticle[]; ts: number }>();
 const ARTICLE_TTL_MS = 60 * 60 * 1000; // 1 hour
 
-// ── RSS parser ───────────────────────────────────────────────────────────────
+// ── Query builders ────────────────────────────────────────────────────────────
 
-function decodeHtmlEntities(s: string): string {
-  return s
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&#x27;/g, "'");
-}
-
-function parseGoogleNewsRSS(xml: string, maxItems: number): NewsArticle[] {
-  const itemMatches = Array.from(xml.matchAll(/<item>([\s\S]*?)<\/item>/g));
-
-  return itemMatches.slice(0, maxItems).flatMap((m) => {
-    const item = m[1];
-
-    // Title — may be CDATA-wrapped
-    const titleRaw =
-      item.match(/<title><!\[CDATA\[([\s\S]*?)\]\]><\/title>/)?.[1] ??
-      item.match(/<title>([^<]*)<\/title>/)?.[1] ?? "";
-    const title = decodeHtmlEntities(titleRaw).trim();
-
-    // Link — Google redirect URL, still opens correctly for users
-    const link = item.match(/<link>(https?[^<]+)<\/link>/)?.[1]?.trim() ?? "";
-
-    // Publication date
-    const pubDate = item.match(/<pubDate>([^<]+)<\/pubDate>/)?.[1] ?? "";
-
-    // Source — prefer the url attribute for the domain
-    const sourceUrl = item.match(/<source url="([^"]+)"/)?.[1] ?? "";
-    const sourceName =
-      item.match(/<source[^>]*>([^<]+)<\/source>/)?.[1]?.trim() ?? "";
-
-    let domain = sourceName;
-    if (sourceUrl) {
-      try {
-        domain = new URL(sourceUrl).hostname.replace(/^www\./, "");
-      } catch {
-        domain = sourceName;
-      }
-    }
-
-    if (!title || !link) return [];
-
-    return [
-      {
-        title,
-        url: link,
-        domain: domain || "Google News",
-        date: pubDate
-          ? new Date(pubDate).toISOString()
-          : new Date().toISOString(),
-        language: "English",
-        image: null,
-      },
-    ];
-  });
-}
-
-// ── Query builders ───────────────────────────────────────────────────────────
-
-// Country-specific overrides for ambiguous names or common abbreviations
 const QUERY_OVERRIDES: Record<string, string> = {
-  usa:            '"United States" OR "U.S." AI policy OR AI strategy OR "artificial intelligence"',
-  "united-kingdom": '"United Kingdom" OR "UK" OR "Britain" AI policy OR AI strategy',
-  georgia:        '"Georgia" AI -"Georgia Tech" -"University of Georgia"',
-  chad:           '"Chad" Africa AI OR "artificial intelligence"',
-  guinea:         '"Guinea" Africa AI OR "artificial intelligence"',
-  niger:          '"Niger" Africa AI OR "artificial intelligence"',
-  jordan:         '"Jordan" "Middle East" AI OR "artificial intelligence"',
-  iran:           '"Iran" AI policy OR "artificial intelligence"',
-  turkey:         '"Turkey" OR "Türkiye" AI policy OR "artificial intelligence"',
-  "south-korea":  '"South Korea" AI OR "artificial intelligence"',
-  "north-korea":  '"North Korea" AI OR technology',
-  "democratic-republic-of-congo": '"Congo" OR "DRC" AI OR "artificial intelligence"',
+  usa:              '"United States" "artificial intelligence"',
+  "united-kingdom": '"United Kingdom" "artificial intelligence"',
+  "south-korea":    '"South Korea" "artificial intelligence"',
+  "north-korea":    '"North Korea" technology',
+  "democratic-republic-of-congo": "Congo artificial intelligence",
 };
 
-function buildQuery(countryName: string, slug: string): string {
+function buildCountryQuery(countryName: string, slug: string): string {
   if (QUERY_OVERRIDES[slug]) return QUERY_OVERRIDES[slug];
-  return `"${countryName}" AI policy OR AI strategy OR "artificial intelligence"`;
+  return `"${countryName}" "artificial intelligence"`;
 }
 
-// ── Fetch functions ──────────────────────────────────────────────────────────
+// ── The Guardian fetch ────────────────────────────────────────────────────────
 
-async function fetchFromGoogleNews(
+interface GuardianResult {
+  webTitle: string;
+  webUrl: string;
+  webPublicationDate: string;
+  sectionName: string;
+}
+
+async function fetchGuardian(
   query: string,
   cacheKey: string,
-  maxRecords: number
+  pageSize: number
 ): Promise<NewsArticle[]> {
   const hit = articleCache.get(cacheKey);
   if (hit && Date.now() - hit.ts < ARTICLE_TTL_MS) return hit.articles;
 
-  const url =
-    `${GOOGLE_NEWS_RSS}?` +
-    new URLSearchParams({
-      q:    query,
-      hl:   "en-US",
-      gl:   "US",
-      ceid: "US:en",
-    }).toString();
+  const apiKey = process.env.GUARDIAN_API_KEY ?? "test";
+
+  const params = new URLSearchParams({
+    q:           query,
+    "api-key":   apiKey,
+    "page-size": String(pageSize),
+    "order-by":  "newest",
+    "show-tags": "keyword",
+    tag:         "technology/artificialintelligenceai,technology/technology,world/world",
+  });
+
+  const url = `${GUARDIAN_BASE}/search?${params.toString()}`;
 
   const res = await fetch(url, {
-    headers: { "User-Agent": "AI-Trajectory-Index/1.0 (news aggregator)" },
+    headers: { "User-Agent": "AI-Trajectory-Index/1.0" },
     signal: AbortSignal.timeout(10_000),
   });
 
-  if (!res.ok) throw new Error(`Google News RSS ${res.status}`);
+  if (!res.ok) throw new Error(`Guardian API ${res.status}`);
 
-  const xml = await res.text();
-  const articles = parseGoogleNewsRSS(xml, maxRecords);
+  const data = await res.json();
+  const results: GuardianResult[] = data?.response?.results ?? [];
+
+  const articles: NewsArticle[] = results.map((r) => ({
+    title:    r.webTitle.trim(),
+    url:      r.webUrl,
+    domain:   "theguardian.com",
+    date:     r.webPublicationDate,
+    language: "English",
+    image:    null,
+  }));
 
   articleCache.set(cacheKey, { articles, ts: Date.now() });
   return articles;
 }
+
+// ── Public API ────────────────────────────────────────────────────────────────
 
 export async function fetchCountryNews(
   countryName: string,
   slug: string,
   maxRecords = 8
 ): Promise<NewsArticle[]> {
-  const query = buildQuery(countryName, slug);
-  return fetchFromGoogleNews(query, slug, maxRecords);
+  const query = buildCountryQuery(countryName, slug);
+  return fetchGuardian(query, slug, maxRecords);
 }
 
 export async function fetchGlobalAINews(maxRecords = 20): Promise<NewsArticle[]> {
-  const query =
-    '"AI policy" OR "AI strategy" OR "AI regulation" OR "AI investment" OR "national AI" "artificial intelligence"';
-  return fetchFromGoogleNews(query, "__global__", maxRecords);
+  // Tag-scoped: returns only articles in The Guardian's AI technology section
+  const params = new URLSearchParams({
+    "api-key":   process.env.GUARDIAN_API_KEY ?? "test",
+    "page-size": String(maxRecords),
+    "order-by":  "newest",
+    section:     "technology",
+    tag:         "technology/artificialintelligenceai",
+  });
+
+  const cacheKey = "__global__";
+  const hit = articleCache.get(cacheKey);
+  if (hit && Date.now() - hit.ts < ARTICLE_TTL_MS) return hit.articles;
+
+  const res = await fetch(`${GUARDIAN_BASE}/search?${params.toString()}`, {
+    headers: { "User-Agent": "AI-Trajectory-Index/1.0" },
+    signal: AbortSignal.timeout(10_000),
+  });
+
+  if (!res.ok) throw new Error(`Guardian API ${res.status}`);
+
+  const data = await res.json();
+  const results: GuardianResult[] = data?.response?.results ?? [];
+
+  const articles: NewsArticle[] = results.map((r) => ({
+    title:    r.webTitle.trim(),
+    url:      r.webUrl,
+    domain:   "theguardian.com",
+    date:     r.webPublicationDate,
+    language: "English",
+    image:    null,
+  }));
+
+  articleCache.set(cacheKey, { articles, ts: Date.now() });
+  return articles;
 }
