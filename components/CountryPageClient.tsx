@@ -6,7 +6,12 @@ import ScoreGauge from "@/components/ScoreGauge";
 import DimensionBar from "@/components/DimensionBar";
 import TrajectoryArrow from "@/components/TrajectoryArrow";
 import CountryNewsFeed from "@/components/CountryNewsFeed";
+import CountryRoadmap from "@/components/CountryRoadmap";
+import DualRadar from "@/components/DualRadar";
 import staticData from "@/data/countries.json";
+import adoptionData from "@/data/adoption.json";
+import { TIER_COLORS, DIM_LABELS as ADOPT_DIM_LABELS, DIM_COLORS as ADOPT_DIM_COLORS } from "@/lib/adoption";
+import type { AdoptionEntry } from "@/lib/adoption";
 import type { ScoredCountry, ScoresResponse } from "@/lib/types";
 
 const DIM_LABELS: Record<string, string> = {
@@ -31,6 +36,8 @@ interface NarrativeState {
   error?: string;
 }
 
+type PageTab = "readiness" | "adoption" | "combined";
+
 interface Props {
   slug: string;
   initialCountry: ScoredCountry;
@@ -38,7 +45,10 @@ interface Props {
 
 export default function CountryPageClient({ slug, initialCountry }: Props) {
   const [openDim, setOpenDim]   = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<PageTab>("combined");
   const [country, setCountry]   = useState<ScoredCountry>(initialCountry);
+
+  const adoption = (adoptionData.countries as AdoptionEntry[]).find((a) => a.slug === slug) ?? null;
   const [allCountries, setAllCountries] = useState<ScoredCountry[]>(
     staticData.countries.map((c) => ({ ...c, data_source: "fallback" as const }))
   );
@@ -172,20 +182,139 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
           </div>
         </div>
 
-        {/* Score Breakdown */}
-        <div className="card rounded-2xl p-6 sm:p-8">
-          <h2 className="text-xs font-bold uppercase tracking-wider mb-6" style={{ color: "var(--text-3)" }}>
-            Pillar Scores
-          </h2>
-          <div className="space-y-5">
-            {Object.entries(country.scores).map(([key, val]) => (
-              <DimensionBar key={key} label={DIM_LABELS[key]} score={val.score} height={12} showScore />
-            ))}
+        {/* Tab toggle */}
+        {adoption && (
+          <div className="flex justify-center">
+            <div className="inline-flex rounded-2xl p-1 gap-1"
+              style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
+              {(["combined", "readiness", "adoption"] as PageTab[]).map((tab) => (
+                <button key={tab} onClick={() => setActiveTab(tab)}
+                  className="px-4 py-1.5 rounded-xl text-xs font-semibold transition-all capitalize"
+                  style={activeTab === tab
+                    ? { background: "var(--accent)", color: "#fff" }
+                    : { color: "var(--text-3)", background: "transparent" }
+                  }>
+                  {tab}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Trajectory + Accelerator/Risk */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Combined view: side-by-side score cards */}
+        {adoption && (activeTab === "combined") && (() => {
+          const gap = adoption.adoption_gap;
+          const tierStyle = TIER_COLORS[adoption.adoption_tier] ?? TIER_COLORS["Nascent Adoption"];
+          const gapStatement = Math.abs(gap) <= 2
+            ? `${country.name} is deploying AI roughly in line with its readiness capacity.`
+            : gap > 0
+            ? `${country.name}'s adoption score (${adoption.adoption_total}) is ${gap} points above its readiness score (${country.total_score}) — deploying AI faster than its capacity would predict.`
+            : `${country.name}'s adoption score (${adoption.adoption_total}) is ${Math.abs(gap)} points below its readiness score (${country.total_score}) — significant untapped capacity not yet being deployed.`;
+          return (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Readiness card */}
+                <div className="card rounded-2xl p-5">
+                  <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: "var(--text-3)" }}>Readiness Score</p>
+                  <div className="flex items-end gap-2 mb-2">
+                    <span className="text-4xl font-black" style={{ color: "var(--accent)" }}>{country.total_score}</span>
+                    <span className="text-sm pb-1" style={{ color: "var(--text-3)" }}>/100</span>
+                  </div>
+                  <TrajectoryArrow label={country.trajectory_label} score={country.trajectory_score} size="sm" />
+                </div>
+                {/* Adoption card */}
+                <div className="card rounded-2xl p-5">
+                  <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: "var(--text-3)" }}>Adoption Score</p>
+                  <div className="flex items-end gap-2 mb-2">
+                    <span className="text-4xl font-black" style={{ color: tierStyle.color }}>{adoption.adoption_total}</span>
+                    <span className="text-sm pb-1" style={{ color: "var(--text-3)" }}>/100</span>
+                  </div>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg"
+                    style={{ background: tierStyle.bg, color: tierStyle.color, border: `1px solid ${tierStyle.border}` }}>
+                    {adoption.adoption_tier}
+                  </span>
+                </div>
+              </div>
+              {/* Gap statement */}
+              <div className="rounded-2xl p-4"
+                style={{
+                  background: Math.abs(gap) <= 2 ? "rgba(148,163,184,.05)" : gap > 0 ? "rgba(74,222,128,.05)" : "rgba(245,158,11,.05)",
+                  border: `1px solid ${Math.abs(gap) <= 2 ? "rgba(148,163,184,.18)" : gap > 0 ? "rgba(74,222,128,.22)" : "rgba(245,158,11,.22)"}`,
+                }}>
+                <p className="text-sm leading-relaxed" style={{ color: "var(--text-2)" }}>{gapStatement}</p>
+              </div>
+              <DualRadar country={country} adoption={adoption} />
+            </div>
+          );
+        })()}
+
+        {/* Score Breakdown — hidden on pure adoption tab */}
+        {(!adoption || activeTab !== "adoption") && (
+          <div className="card rounded-2xl p-6 sm:p-8">
+            <h2 className="text-xs font-bold uppercase tracking-wider mb-6" style={{ color: "var(--text-3)" }}>
+              Pillar Scores
+            </h2>
+            <div className="space-y-5">
+              {Object.entries(country.scores).map(([key, val]) => (
+                <DimensionBar key={key} label={DIM_LABELS[key]} score={val.score} height={12} showScore />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Adoption dimension breakdown — shown on adoption + combined tabs */}
+        {adoption && activeTab !== "readiness" && (() => {
+          const dims = Object.entries(adoption.adoption_scores) as [keyof typeof adoption.adoption_scores, number][];
+          const tierStyle = TIER_COLORS[adoption.adoption_tier] ?? TIER_COLORS["Nascent Adoption"];
+          const maxScore = Math.max(...dims.map(([, v]) => v));
+          const minScore = Math.min(...dims.map(([, v]) => v));
+          return (
+            <div className="card rounded-2xl p-6 sm:p-8">
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-3)" }}>
+                  Adoption Dimension Breakdown
+                </h2>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg"
+                  style={{ background: tierStyle.bg, color: tierStyle.color, border: `1px solid ${tierStyle.border}` }}>
+                  {adoption.adoption_tier}
+                </span>
+              </div>
+              <div className="space-y-4">
+                {dims.map(([key, score]) => {
+                  const isMax = score === maxScore;
+                  const isMin = score === minScore;
+                  const color = ADOPT_DIM_COLORS[key];
+                  return (
+                    <div key={key}>
+                      <div className="flex justify-between items-center mb-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium" style={{ color: "var(--text-2)" }}>
+                            {ADOPT_DIM_LABELS[key]}
+                          </span>
+                          {isMax && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded"
+                            style={{ background: "rgba(74,222,128,.10)", color: "#4ade80", border: "1px solid rgba(74,222,128,.25)" }}>Strongest</span>}
+                          {isMin && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded"
+                            style={{ background: "rgba(245,158,11,.10)", color: "#f59e0b", border: "1px solid rgba(245,158,11,.25)" }}>Weakest</span>}
+                        </div>
+                        <span className="text-sm font-black" style={{ color: "var(--text-1)" }}>{score}/20</span>
+                      </div>
+                      <div className="h-2.5 rounded-full overflow-hidden" style={{ background: "var(--raised)" }}>
+                        <div className="h-full rounded-full transition-all"
+                          style={{ width: `${(score / 20) * 100}%`, background: color }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="text-[11px] mt-4 pt-3" style={{ borderTop: "1px solid var(--border)", color: "var(--text-3)" }}>
+                {adoption.top_adoption_driver}
+              </p>
+            </div>
+          );
+        })()}
+
+        {/* Trajectory + Accelerator/Risk — hidden on pure adoption tab */}
+        {(!adoption || activeTab !== "adoption") && <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="card rounded-2xl p-6">
             <h2 className="text-xs font-bold uppercase tracking-wider mb-4" style={{ color: "var(--text-3)" }}>
               Trajectory Outlook
@@ -235,9 +364,10 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
               </p>
             </div>
           </div>
-        </div>
+        </div>}
 
-        {/* Dimension Detail */}
+        {/* Dimension Detail — hidden on adoption tab */}
+        {(!adoption || activeTab !== "adoption") &&
         <div className="card rounded-2xl overflow-hidden">
           <div className="px-6 sm:px-8 py-5" style={{ borderBottom: "1px solid var(--border)" }}>
             <h2 className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-3)" }}>
@@ -290,9 +420,10 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
               );
             })}
           </div>
-        </div>
+        </div>}
 
-        {/* AI Narrative */}
+        {/* AI Narrative — hidden on adoption tab */}
+        {(!adoption || activeTab !== "adoption") &&
         <div className="card rounded-2xl overflow-hidden">
           <div className="px-6 sm:px-8 py-5 flex items-center justify-between"
             style={{ borderBottom: "1px solid var(--border)" }}>
@@ -386,7 +517,10 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
               </div>
             )}
           </div>
-        </div>
+        </div>}
+
+        {/* AI Development Roadmap — hidden on adoption tab */}
+        {(!adoption || activeTab !== "adoption") && <CountryRoadmap country={country} />}
 
         {/* Live News Feed */}
         <CountryNewsFeed slug={slug} countryName={country.name} />

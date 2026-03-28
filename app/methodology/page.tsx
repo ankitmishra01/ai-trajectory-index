@@ -558,6 +558,50 @@ export default function MethodologyPage() {
         </div>
       </div>
 
+      {/* ── Adoption Scorecard section ── */}
+      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 mt-12 mb-8">
+        <div className="card rounded-2xl p-8">
+          <div className="flex items-center gap-3 mb-6">
+            <span className="text-2xl">🚀</span>
+            <div>
+              <h2 className="text-lg font-black" style={{ color: "var(--text-1)" }}>AI Adoption Scorecard</h2>
+              <p className="text-xs mt-0.5" style={{ color: "var(--text-3)" }}>Methodology · 2026</p>
+            </div>
+          </div>
+          <div className="space-y-5 text-sm leading-relaxed" style={{ color: "var(--text-2)" }}>
+            <p>
+              The Adoption Scorecard measures whether countries are actively <strong style={{ color: "var(--text-1)" }}>deploying and using AI</strong> — distinct from the Readiness Index which measures capacity. A country can score highly on readiness but deploy AI slowly due to cultural, regulatory, or economic friction. Conversely, some countries deploy AI rapidly through mobile-first channels despite lower readiness scores. This gap between readiness and adoption is one of the most important insights the combined platform reveals.
+            </p>
+            <p>
+              <strong style={{ color: "var(--text-1)" }}>The gap</strong> is calculated as: <code className="px-1.5 py-0.5 rounded text-xs font-mono"
+                style={{ background: "var(--raised)", color: "var(--accent)", border: "1px solid var(--border)" }}>adoption_score − readiness_score</code>.<br />
+              A positive gap means the country is adopting faster than its capacity predicts. A negative gap means it has untapped AI capacity not yet being utilised.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+              {[
+                { icon: "🏛️", key: "Government Deployment (0–20)", desc: "Active AI in public services: e-government AI integration, AI in healthcare delivery, algorithmic public administration, smart city deployments, government AI procurement.", sources: "Oxford Insights Government AI Readiness Index, UNDP e-government surveys, national AI strategy implementation reports" },
+                { icon: "🏢", key: "Enterprise Adoption (0–20)", desc: "Business AI usage: World Bank Enterprise Survey digital adoption rates, OECD business AI data, fintech AI penetration, manufacturing and retail AI adoption.", sources: "OECD Business AI Adoption Survey, World Bank Enterprise Surveys, McKinsey Global AI Survey" },
+                { icon: "💼", key: "Talent Demand (0–20)", desc: "Labour market AI demand: AI/ML job postings as % of total, YoY growth rate, AI skills salary premium, AI startups per million population.", sources: "OECD.AI job postings data, LinkedIn Economic Graph, Indeed AI jobs tracker" },
+                { icon: "📱", key: "Consumer Usage (0–20)", desc: "Everyday AI adoption: smartphone AI assistant penetration, AI-powered mobile payments, voice assistant adoption, AI in e-commerce and healthcare apps. Mobile-first fintech (M-Pesa, GCash, bKash) is a key signal for emerging markets.", sources: "GSMA Mobile Economy, Statista AI consumer surveys, fintech adoption data" },
+                { icon: "🔬", key: "R&D Pipeline (0–20)", desc: "Research-to-deployment velocity: AI patent filings per million (WIPO), university-to-industry AI transfer rate, AI unicorn and soonicorn count per capita, AI accelerator density.", sources: "WIPO Patent Database, Crunchbase AI unicorn tracking, Stanford HAI AI Index" },
+              ].map(({ icon, key, desc, sources }) => (
+                <div key={key} className="rounded-xl p-4" style={{ background: "var(--raised)", border: "1px solid var(--border)" }}>
+                  <p className="text-xs font-black mb-1" style={{ color: "var(--text-1)" }}>{icon} {key}</p>
+                  <p className="text-xs leading-relaxed mb-2" style={{ color: "var(--text-2)" }}>{desc}</p>
+                  <p className="text-[10px]" style={{ color: "var(--text-3)" }}>Sources: {sources}</p>
+                </div>
+              ))}
+            </div>
+            <div className="rounded-xl p-4 mt-2" style={{ background: "rgba(74,222,128,.05)", border: "1px solid rgba(74,222,128,.18)" }}>
+              <p className="text-xs font-bold mb-1" style={{ color: "#4ade80" }}>The Leapfrogging Effect</p>
+              <p className="text-xs leading-relaxed" style={{ color: "var(--text-2)" }}>
+                Several Sub-Saharan African and Southeast Asian economies score higher on adoption than their readiness would predict. This is the <em>mobile-first leapfrogging effect</em>: countries without legacy banking or desktop internet infrastructure have adopted mobile-first AI tools (M-Pesa in Kenya, GCash in the Philippines, bKash in Bangladesh) at scale, embedding AI into daily financial life ahead of their overall digital infrastructure development.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <footer className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-8 mt-4 text-center space-y-1"
         style={{ borderTop: "1px solid var(--border)" }}>
         <p className="text-xs" style={{ color: "var(--text-3)" }}>

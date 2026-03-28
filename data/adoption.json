@@ -1,0 +1,2608 @@
+{
+  "countries": [
+    {
+      "slug": "usa",
+      "adoption_scores": {
+        "government": 18,
+        "enterprise": 19,
+        "talent_demand": 17,
+        "consumer": 19,
+        "pipeline": 19
+      },
+      "adoption_total": 92,
+      "adoption_tier": "High Adoption",
+      "top_adoption_driver": "World-leading enterprise AI deployment across cloud, finance, and tech sectors drives mass adoption.",
+      "adoption_gap": 1
+    },
+    {
+      "slug": "china",
+      "adoption_scores": {
+        "government": 19,
+        "enterprise": 18,
+        "talent_demand": 16,
+        "consumer": 20,
+        "pipeline": 17
+      },
+      "adoption_total": 90,
+      "adoption_tier": "High Adoption",
+      "top_adoption_driver": "State-driven AI integration across surveillance, commerce, and consumer apps creates the world's largest AI user base.",
+      "adoption_gap": 8
+    },
+    {
+      "slug": "uk",
+      "adoption_scores": {
+        "government": 16,
+        "enterprise": 16,
+        "talent_demand": 15,
+        "consumer": 16,
+        "pipeline": 16
+      },
+      "adoption_total": 79,
+      "adoption_tier": "High Adoption",
+      "top_adoption_driver": "London's financial and tech sectors drive strong enterprise AI adoption backed by an active government AI strategy.",
+      "adoption_gap": 3
+    },
+    {
+      "slug": "germany",
+      "adoption_scores": {
+        "government": 12,
+        "enterprise": 14,
+        "talent_demand": 12,
+        "consumer": 13,
+        "pipeline": 14
+      },
+      "adoption_total": 65,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "Industrial automation in manufacturing leads AI adoption despite cautious regulatory and consumer attitudes.",
+      "adoption_gap": -5
+    },
+    {
+      "slug": "france",
+      "adoption_scores": {
+        "government": 14,
+        "enterprise": 14,
+        "talent_demand": 13,
+        "consumer": 13,
+        "pipeline": 13
+      },
+      "adoption_total": 67,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "Strong government AI investment and a growing startup ecosystem drive moderate enterprise adoption.",
+      "adoption_gap": -2
+    },
+    {
+      "slug": "singapore",
+      "adoption_scores": {
+        "government": 19,
+        "enterprise": 17,
+        "talent_demand": 15,
+        "consumer": 17,
+        "pipeline": 16
+      },
+      "adoption_total": 84,
+      "adoption_tier": "High Adoption",
+      "top_adoption_driver": "Government-led national AI strategy and dense fintech ecosystem make Singapore Asia's top AI adopter per capita.",
+      "adoption_gap": 5
+    },
+    {
+      "slug": "uae",
+      "adoption_scores": {
+        "government": 19,
+        "enterprise": 17,
+        "talent_demand": 14,
+        "consumer": 17,
+        "pipeline": 14
+      },
+      "adoption_total": 81,
+      "adoption_tier": "High Adoption",
+      "top_adoption_driver": "UAE's national AI minister and vision-driven public sector projects lead one of the most ambitious state AI adoption programs.",
+      "adoption_gap": 8
+    },
+    {
+      "slug": "india",
+      "adoption_scores": {
+        "government": 16,
+        "enterprise": 14,
+        "talent_demand": 15,
+        "consumer": 17,
+        "pipeline": 13
+      },
+      "adoption_total": 75,
+      "adoption_tier": "High Adoption",
+      "top_adoption_driver": "India Stack digital infrastructure and a massive IT services industry propel rapid AI adoption across enterprise and consumer segments.",
+      "adoption_gap": 10
+    },
+    {
+      "slug": "canada",
+      "adoption_scores": {
+        "government": 14,
+        "enterprise": 15,
+        "talent_demand": 14,
+        "consumer": 14,
+        "pipeline": 16
+      },
+      "adoption_total": 73,
+      "adoption_tier": "High Adoption",
+      "top_adoption_driver": "Deep AI research clusters in Toronto and Montreal translate into growing enterprise and government adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "australia",
+      "adoption_scores": {
+        "government": 13,
+        "enterprise": 13,
+        "talent_demand": 12,
+        "consumer": 14,
+        "pipeline": 14
+      },
+      "adoption_total": 66,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "Financial services and mining sectors lead enterprise AI adoption with growing government investment in digital transformation.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "japan",
+      "adoption_scores": {
+        "government": 12,
+        "enterprise": 14,
+        "talent_demand": 12,
+        "consumer": 14,
+        "pipeline": 13
+      },
+      "adoption_total": 65,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "Robotics and manufacturing automation remain AI strengths, but slow digital transformation constrains broader adoption.",
+      "adoption_gap": -6
+    },
+    {
+      "slug": "south-korea",
+      "adoption_scores": {
+        "government": 17,
+        "enterprise": 18,
+        "talent_demand": 16,
+        "consumer": 18,
+        "pipeline": 16
+      },
+      "adoption_total": 85,
+      "adoption_tier": "High Adoption",
+      "top_adoption_driver": "Samsung, LG, and Kakao drive world-class AI integration across consumer electronics, finance, and enterprise services.",
+      "adoption_gap": 11
+    },
+    {
+      "slug": "sweden",
+      "adoption_scores": {
+        "government": 13,
+        "enterprise": 14,
+        "talent_demand": 13,
+        "consumer": 13,
+        "pipeline": 14
+      },
+      "adoption_total": 67,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "Strong enterprise adoption in engineering and fintech underpinned by high digital literacy and startup density.",
+      "adoption_gap": -5
+    },
+    {
+      "slug": "israel",
+      "adoption_scores": {
+        "government": 16,
+        "enterprise": 17,
+        "talent_demand": 17,
+        "consumer": 16,
+        "pipeline": 18
+      },
+      "adoption_total": 84,
+      "adoption_tier": "High Adoption",
+      "top_adoption_driver": "Israel's startup nation culture and deep defense-tech AI expertise generate world-leading per-capita AI pipeline activity.",
+      "adoption_gap": 10
+    },
+    {
+      "slug": "poland",
+      "adoption_scores": {
+        "government": 10,
+        "enterprise": 12,
+        "talent_demand": 11,
+        "consumer": 11,
+        "pipeline": 11
+      },
+      "adoption_total": 55,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "Rising IT outsourcing hub with growing enterprise AI adoption in financial and shared-services sectors.",
+      "adoption_gap": -4
+    },
+    {
+      "slug": "vietnam",
+      "adoption_scores": {
+        "government": 12,
+        "enterprise": 12,
+        "talent_demand": 11,
+        "consumer": 15,
+        "pipeline": 10
+      },
+      "adoption_total": 60,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "Young tech-savvy population and fast-growing digital payments ecosystem drive strong consumer AI adoption.",
+      "adoption_gap": 8
+    },
+    {
+      "slug": "brazil",
+      "adoption_scores": {
+        "government": 10,
+        "enterprise": 11,
+        "talent_demand": 10,
+        "consumer": 13,
+        "pipeline": 11
+      },
+      "adoption_total": 55,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "Fintech unicorns like Nubank and a large mobile-first population accelerate consumer and enterprise AI uptake.",
+      "adoption_gap": -1
+    },
+    {
+      "slug": "south-africa",
+      "adoption_scores": {
+        "government": 9,
+        "enterprise": 10,
+        "talent_demand": 8,
+        "consumer": 14,
+        "pipeline": 8
+      },
+      "adoption_total": 49,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Mobile-first banking and a growing tech startup scene drive consumer AI adoption above infrastructure levels.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "nigeria",
+      "adoption_scores": {
+        "government": 9,
+        "enterprise": 10,
+        "talent_demand": 9,
+        "consumer": 15,
+        "pipeline": 7
+      },
+      "adoption_total": 50,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "Explosive mobile fintech growth and Africa's largest tech startup ecosystem drive consumer AI adoption well above infrastructure.",
+      "adoption_gap": 8
+    },
+    {
+      "slug": "kenya",
+      "adoption_scores": {
+        "government": 11,
+        "enterprise": 9,
+        "talent_demand": 8,
+        "consumer": 16,
+        "pipeline": 7
+      },
+      "adoption_total": 51,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "M-Pesa mobile money infrastructure and Nairobi's iHub ecosystem make Kenya Africa's leading AI leapfrogger.",
+      "adoption_gap": 10
+    },
+    {
+      "slug": "netherlands",
+      "adoption_scores": {
+        "government": 13,
+        "enterprise": 15,
+        "talent_demand": 13,
+        "consumer": 14,
+        "pipeline": 14
+      },
+      "adoption_total": 69,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "High enterprise digitalization, ASML semiconductor leadership, and strong startup ecosystem drive steady AI adoption.",
+      "adoption_gap": -5
+    },
+    {
+      "slug": "switzerland",
+      "adoption_scores": {
+        "government": 13,
+        "enterprise": 15,
+        "talent_demand": 13,
+        "consumer": 14,
+        "pipeline": 14
+      },
+      "adoption_total": 69,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "Banking, pharma, and precision manufacturing sectors lead enterprise AI adoption in one of Europe's wealthiest economies.",
+      "adoption_gap": -7
+    },
+    {
+      "slug": "ireland",
+      "adoption_scores": {
+        "government": 12,
+        "enterprise": 14,
+        "talent_demand": 12,
+        "consumer": 13,
+        "pipeline": 13
+      },
+      "adoption_total": 64,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "Dublin's role as European HQ for Google, Microsoft, and Meta drives significant enterprise AI deployment and talent concentration.",
+      "adoption_gap": -3
+    },
+    {
+      "slug": "italy",
+      "adoption_scores": {
+        "government": 10,
+        "enterprise": 11,
+        "talent_demand": 10,
+        "consumer": 12,
+        "pipeline": 11
+      },
+      "adoption_total": 54,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "Industrial automation in manufacturing and design sectors provides a base for AI adoption despite slower digital transformation.",
+      "adoption_gap": -7
+    },
+    {
+      "slug": "spain",
+      "adoption_scores": {
+        "government": 11,
+        "enterprise": 12,
+        "talent_demand": 11,
+        "consumer": 12,
+        "pipeline": 12
+      },
+      "adoption_total": 58,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "Growing fintech and tourism-tech sectors drive moderate enterprise AI adoption with supportive EU-aligned policy.",
+      "adoption_gap": -5
+    },
+    {
+      "slug": "belgium",
+      "adoption_scores": {
+        "government": 11,
+        "enterprise": 12,
+        "talent_demand": 11,
+        "consumer": 12,
+        "pipeline": 12
+      },
+      "adoption_total": 58,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "EU institutional presence and strong pharmaceutical sector drive moderate AI adoption in a highly connected economy.",
+      "adoption_gap": -6
+    },
+    {
+      "slug": "austria",
+      "adoption_scores": {
+        "government": 10,
+        "enterprise": 12,
+        "talent_demand": 10,
+        "consumer": 11,
+        "pipeline": 11
+      },
+      "adoption_total": 54,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "Engineering and manufacturing SMEs drive incremental AI adoption with Vienna emerging as a regional startup hub.",
+      "adoption_gap": -6
+    },
+    {
+      "slug": "denmark",
+      "adoption_scores": {
+        "government": 12,
+        "enterprise": 14,
+        "talent_demand": 12,
+        "consumer": 13,
+        "pipeline": 13
+      },
+      "adoption_total": 64,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "World-class digitalized public services and life-sciences sector drive balanced AI adoption across government and enterprise.",
+      "adoption_gap": -6
+    },
+    {
+      "slug": "finland",
+      "adoption_scores": {
+        "government": 13,
+        "enterprise": 13,
+        "talent_demand": 12,
+        "consumer": 13,
+        "pipeline": 12
+      },
+      "adoption_total": 63,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "Government-led AI programs and Nokia legacy drive strong enterprise and public-sector AI adoption.",
+      "adoption_gap": -5
+    },
+    {
+      "slug": "norway",
+      "adoption_scores": {
+        "government": 12,
+        "enterprise": 13,
+        "talent_demand": 12,
+        "consumer": 13,
+        "pipeline": 13
+      },
+      "adoption_total": 63,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "Oil-sector digitalization and sovereign wealth fund investments underpin growing AI adoption in enterprise and public services.",
+      "adoption_gap": -2
+    },
+    {
+      "slug": "portugal",
+      "adoption_scores": {
+        "government": 9,
+        "enterprise": 11,
+        "talent_demand": 10,
+        "consumer": 11,
+        "pipeline": 10
+      },
+      "adoption_total": 51,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "Lisbon's growing tech startup scene and Web Summit hosting create rising AI awareness and adoption momentum.",
+      "adoption_gap": -3
+    },
+    {
+      "slug": "greece",
+      "adoption_scores": {
+        "government": 9,
+        "enterprise": 10,
+        "talent_demand": 9,
+        "consumer": 10,
+        "pipeline": 10
+      },
+      "adoption_total": 48,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Tourism-tech and shipping-logistics digitalization are early AI adoption drivers despite economic constraints.",
+      "adoption_gap": -2
+    },
+    {
+      "slug": "czech-republic",
+      "adoption_scores": {
+        "government": 10,
+        "enterprise": 11,
+        "talent_demand": 11,
+        "consumer": 11,
+        "pipeline": 10
+      },
+      "adoption_total": 53,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "Strong manufacturing base and IT services sector drive moderate AI adoption in Central Europe's most advanced economy.",
+      "adoption_gap": -5
+    },
+    {
+      "slug": "hungary",
+      "adoption_scores": {
+        "government": 9,
+        "enterprise": 10,
+        "talent_demand": 9,
+        "consumer": 10,
+        "pipeline": 9
+      },
+      "adoption_total": 47,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Automotive manufacturing and IT outsourcing provide a base for growing enterprise AI adoption.",
+      "adoption_gap": -3
+    },
+    {
+      "slug": "romania",
+      "adoption_scores": {
+        "government": 8,
+        "enterprise": 10,
+        "talent_demand": 9,
+        "consumer": 10,
+        "pipeline": 9
+      },
+      "adoption_total": 46,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "IT outsourcing growth and a young tech workforce create emerging AI adoption momentum despite infrastructure gaps.",
+      "adoption_gap": -2
+    },
+    {
+      "slug": "estonia",
+      "adoption_scores": {
+        "government": 18,
+        "enterprise": 15,
+        "talent_demand": 14,
+        "consumer": 15,
+        "pipeline": 14
+      },
+      "adoption_total": 76,
+      "adoption_tier": "High Adoption",
+      "top_adoption_driver": "World's most digitalized government and e-Residency program give Estonia outsized AI adoption relative to its population.",
+      "adoption_gap": 13
+    },
+    {
+      "slug": "latvia",
+      "adoption_scores": {
+        "government": 8,
+        "enterprise": 9,
+        "talent_demand": 8,
+        "consumer": 9,
+        "pipeline": 8
+      },
+      "adoption_total": 42,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "IT services export growth and EU digital single market access drive gradual AI adoption.",
+      "adoption_gap": -4
+    },
+    {
+      "slug": "lithuania",
+      "adoption_scores": {
+        "government": 9,
+        "enterprise": 10,
+        "talent_demand": 9,
+        "consumer": 10,
+        "pipeline": 9
+      },
+      "adoption_total": 47,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Fintech hub status and Estonian digital government influence drive growing AI adoption in the Baltic region.",
+      "adoption_gap": -3
+    },
+    {
+      "slug": "ukraine",
+      "adoption_scores": {
+        "government": 8,
+        "enterprise": 9,
+        "talent_demand": 9,
+        "consumer": 10,
+        "pipeline": 9
+      },
+      "adoption_total": 45,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Large IT outsourcing talent pool drives enterprise AI adoption despite wartime disruptions.",
+      "adoption_gap": -1
+    },
+    {
+      "slug": "russia",
+      "adoption_scores": {
+        "government": 14,
+        "enterprise": 13,
+        "talent_demand": 12,
+        "consumer": 14,
+        "pipeline": 12
+      },
+      "adoption_total": 65,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "State-backed AI programs and Yandex ecosystem drive significant domestic AI adoption despite Western sanctions.",
+      "adoption_gap": 1
+    },
+    {
+      "slug": "turkey",
+      "adoption_scores": {
+        "government": 10,
+        "enterprise": 10,
+        "talent_demand": 9,
+        "consumer": 11,
+        "pipeline": 10
+      },
+      "adoption_total": 50,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "Young digital population and growing e-commerce sector drive consumer AI adoption in a large emerging market.",
+      "adoption_gap": -3
+    },
+    {
+      "slug": "slovakia",
+      "adoption_scores": {
+        "government": 8,
+        "enterprise": 9,
+        "talent_demand": 8,
+        "consumer": 8,
+        "pipeline": 8
+      },
+      "adoption_total": 41,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Automotive manufacturing digitalization and EU integration drive moderate AI adoption growth.",
+      "adoption_gap": -3
+    },
+    {
+      "slug": "slovenia",
+      "adoption_scores": {
+        "government": 9,
+        "enterprise": 9,
+        "talent_demand": 8,
+        "consumer": 9,
+        "pipeline": 8
+      },
+      "adoption_total": 43,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "High EU integration and manufacturing base support moderate enterprise AI adoption.",
+      "adoption_gap": -5
+    },
+    {
+      "slug": "croatia",
+      "adoption_scores": {
+        "government": 8,
+        "enterprise": 8,
+        "talent_demand": 7,
+        "consumer": 9,
+        "pipeline": 8
+      },
+      "adoption_total": 40,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Tourism digitalization and IT outsourcing growth drive nascent AI adoption.",
+      "adoption_gap": -4
+    },
+    {
+      "slug": "serbia",
+      "adoption_scores": {
+        "government": 8,
+        "enterprise": 9,
+        "talent_demand": 9,
+        "consumer": 9,
+        "pipeline": 9
+      },
+      "adoption_total": 44,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Growing IT export sector and improving digital infrastructure support early AI adoption.",
+      "adoption_gap": -2
+    },
+    {
+      "slug": "bulgaria",
+      "adoption_scores": {
+        "government": 7,
+        "enterprise": 8,
+        "talent_demand": 8,
+        "consumer": 8,
+        "pipeline": 7
+      },
+      "adoption_total": 38,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "IT outsourcing industry and EU structural funds drive gradual AI adoption.",
+      "adoption_gap": -4
+    },
+    {
+      "slug": "belarus",
+      "adoption_scores": {
+        "government": 6,
+        "enterprise": 7,
+        "talent_demand": 6,
+        "consumer": 7,
+        "pipeline": 6
+      },
+      "adoption_total": 32,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "IT park zone attracts tech companies and supports limited enterprise AI adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "moldova",
+      "adoption_scores": {
+        "government": 5,
+        "enterprise": 5,
+        "talent_demand": 5,
+        "consumer": 6,
+        "pipeline": 5
+      },
+      "adoption_total": 26,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Diaspora remittance-driven mobile banking adoption creates a base for consumer AI services.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "albania",
+      "adoption_scores": {
+        "government": 5,
+        "enterprise": 6,
+        "talent_demand": 5,
+        "consumer": 6,
+        "pipeline": 5
+      },
+      "adoption_total": 27,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "EU accession aspirations and diaspora technology connections stimulate nascent AI awareness.",
+      "adoption_gap": -1
+    },
+    {
+      "slug": "north-macedonia",
+      "adoption_scores": {
+        "government": 5,
+        "enterprise": 5,
+        "talent_demand": 5,
+        "consumer": 6,
+        "pipeline": 4
+      },
+      "adoption_total": 25,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "IT outsourcing growth and EU integration drive early AI awareness.",
+      "adoption_gap": -1
+    },
+    {
+      "slug": "bosnia-herzegovina",
+      "adoption_scores": {
+        "government": 5,
+        "enterprise": 5,
+        "talent_demand": 5,
+        "consumer": 6,
+        "pipeline": 5
+      },
+      "adoption_total": 26,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Growing IT services exports and young educated workforce support nascent AI adoption.",
+      "adoption_gap": -1
+    },
+    {
+      "slug": "kosovo",
+      "adoption_scores": {
+        "government": 4,
+        "enterprise": 5,
+        "talent_demand": 5,
+        "consumer": 5,
+        "pipeline": 4
+      },
+      "adoption_total": 23,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Young population and growing tech diaspora connections support nascent digital adoption.",
+      "adoption_gap": -1
+    },
+    {
+      "slug": "montenegro",
+      "adoption_scores": {
+        "government": 5,
+        "enterprise": 6,
+        "talent_demand": 5,
+        "consumer": 6,
+        "pipeline": 6
+      },
+      "adoption_total": 28,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Tourism digitalization and EU accession candidate status drive gradual technology adoption.",
+      "adoption_gap": -1
+    },
+    {
+      "slug": "luxembourg",
+      "adoption_scores": {
+        "government": 11,
+        "enterprise": 13,
+        "talent_demand": 11,
+        "consumer": 12,
+        "pipeline": 12
+      },
+      "adoption_total": 59,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "Financial sector and EU institutions drive significant enterprise AI adoption in this high-income micro-economy.",
+      "adoption_gap": -3
+    },
+    {
+      "slug": "malta",
+      "adoption_scores": {
+        "government": 8,
+        "enterprise": 9,
+        "talent_demand": 8,
+        "consumer": 9,
+        "pipeline": 8
+      },
+      "adoption_total": 42,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Gaming, fintech, and iGaming industries drive disproportionate digital and AI adoption.",
+      "adoption_gap": -4
+    },
+    {
+      "slug": "cyprus",
+      "adoption_scores": {
+        "government": 8,
+        "enterprise": 9,
+        "talent_demand": 8,
+        "consumer": 9,
+        "pipeline": 8
+      },
+      "adoption_total": 42,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Financial services and tourism tech drive AI adoption in this EU island economy.",
+      "adoption_gap": -2
+    },
+    {
+      "slug": "iceland",
+      "adoption_scores": {
+        "government": 10,
+        "enterprise": 10,
+        "talent_demand": 9,
+        "consumer": 10,
+        "pipeline": 9
+      },
+      "adoption_total": 48,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "High digital literacy and energy-sector AI applications drive proportionate adoption in this small Nordic economy.",
+      "adoption_gap": -4
+    },
+    {
+      "slug": "andorra",
+      "adoption_scores": {
+        "government": 4,
+        "enterprise": 5,
+        "talent_demand": 4,
+        "consumer": 5,
+        "pipeline": 4
+      },
+      "adoption_total": 22,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Tourism and retail digitalization drive limited AI adoption in this micro-state.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "san-marino",
+      "adoption_scores": {
+        "government": 4,
+        "enterprise": 4,
+        "talent_demand": 3,
+        "consumer": 4,
+        "pipeline": 4
+      },
+      "adoption_total": 19,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Financial services and tourism provide limited but growing digital technology adoption.",
+      "adoption_gap": -1
+    },
+    {
+      "slug": "liechtenstein",
+      "adoption_scores": {
+        "government": 5,
+        "enterprise": 5,
+        "talent_demand": 4,
+        "consumer": 5,
+        "pipeline": 4
+      },
+      "adoption_total": 23,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Financial and manufacturing sectors drive proportionate AI adoption relative to this micro-state's size.",
+      "adoption_gap": -1
+    },
+    {
+      "slug": "monaco",
+      "adoption_scores": {
+        "government": 4,
+        "enterprise": 5,
+        "talent_demand": 4,
+        "consumer": 5,
+        "pipeline": 4
+      },
+      "adoption_total": 22,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Luxury tech and fintech adoption in one of the world's wealthiest per-capita micro-states.",
+      "adoption_gap": 1
+    },
+    {
+      "slug": "mexico",
+      "adoption_scores": {
+        "government": 9,
+        "enterprise": 10,
+        "talent_demand": 10,
+        "consumer": 12,
+        "pipeline": 10
+      },
+      "adoption_total": 51,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "Large mobile-first population and nearshoring tech boom drive growing consumer and enterprise AI adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "argentina",
+      "adoption_scores": {
+        "government": 8,
+        "enterprise": 9,
+        "talent_demand": 10,
+        "consumer": 10,
+        "pipeline": 9
+      },
+      "adoption_total": 46,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Strong software engineering talent and fintech innovation drive AI adoption above infrastructure levels.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "chile",
+      "adoption_scores": {
+        "government": 9,
+        "enterprise": 10,
+        "talent_demand": 9,
+        "consumer": 11,
+        "pipeline": 10
+      },
+      "adoption_total": 49,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Latin America's most stable digital economy with mining-tech and fintech driving enterprise AI adoption.",
+      "adoption_gap": -1
+    },
+    {
+      "slug": "colombia",
+      "adoption_scores": {
+        "government": 7,
+        "enterprise": 8,
+        "talent_demand": 8,
+        "consumer": 10,
+        "pipeline": 9
+      },
+      "adoption_total": 42,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Growing tech startup ecosystem in Bogota and Medellín and expanding mobile internet adoption drive early AI uptake.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "peru",
+      "adoption_scores": {
+        "government": 7,
+        "enterprise": 7,
+        "talent_demand": 7,
+        "consumer": 9,
+        "pipeline": 7
+      },
+      "adoption_total": 37,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Mobile banking expansion and mining-sector digitalization drive early AI adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "venezuela",
+      "adoption_scores": {
+        "government": 4,
+        "enterprise": 4,
+        "talent_demand": 4,
+        "consumer": 6,
+        "pipeline": 4
+      },
+      "adoption_total": 22,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Despite economic collapse, cryptocurrency and digital finance adoption drive limited consumer AI use.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "ecuador",
+      "adoption_scores": {
+        "government": 6,
+        "enterprise": 7,
+        "talent_demand": 6,
+        "consumer": 8,
+        "pipeline": 7
+      },
+      "adoption_total": 34,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Digital banking growth and oil-sector technology adoption drive gradual AI uptake.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "bolivia",
+      "adoption_scores": {
+        "government": 5,
+        "enterprise": 5,
+        "talent_demand": 5,
+        "consumer": 7,
+        "pipeline": 5
+      },
+      "adoption_total": 27,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile banking adoption in underbanked population drives consumer digital service growth.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "paraguay",
+      "adoption_scores": {
+        "government": 5,
+        "enterprise": 5,
+        "talent_demand": 4,
+        "consumer": 6,
+        "pipeline": 5
+      },
+      "adoption_total": 25,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Emerging tech sector and hydropower cheap energy attract early AI-adjacent investments.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "uruguay",
+      "adoption_scores": {
+        "government": 8,
+        "enterprise": 8,
+        "talent_demand": 8,
+        "consumer": 9,
+        "pipeline": 8
+      },
+      "adoption_total": 41,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Highest digital governance maturity in Latin America and strong IT services sector drive proportionate AI adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "guatemala",
+      "adoption_scores": {
+        "government": 4,
+        "enterprise": 5,
+        "talent_demand": 4,
+        "consumer": 6,
+        "pipeline": 4
+      },
+      "adoption_total": 23,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile money adoption and remittance digitalization drive early consumer technology uptake.",
+      "adoption_gap": -1
+    },
+    {
+      "slug": "honduras",
+      "adoption_scores": {
+        "government": 3,
+        "enterprise": 4,
+        "talent_demand": 4,
+        "consumer": 5,
+        "pipeline": 4
+      },
+      "adoption_total": 20,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile banking growth and nearshoring IT services create early digital technology exposure.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "el-salvador",
+      "adoption_scores": {
+        "government": 5,
+        "enterprise": 5,
+        "talent_demand": 4,
+        "consumer": 6,
+        "pipeline": 4
+      },
+      "adoption_total": 24,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Bitcoin legal tender adoption signals openness to digital financial innovation and early AI services.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "nicaragua",
+      "adoption_scores": {
+        "government": 3,
+        "enterprise": 4,
+        "talent_demand": 3,
+        "consumer": 5,
+        "pipeline": 4
+      },
+      "adoption_total": 19,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Limited but growing mobile internet penetration enables nascent consumer AI exposure.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "costa-rica",
+      "adoption_scores": {
+        "government": 7,
+        "enterprise": 8,
+        "talent_demand": 8,
+        "consumer": 9,
+        "pipeline": 7
+      },
+      "adoption_total": 39,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Tech outsourcing hub for US companies and high digital literacy drive above-average AI adoption for Central America.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "panama",
+      "adoption_scores": {
+        "government": 6,
+        "enterprise": 7,
+        "talent_demand": 6,
+        "consumer": 8,
+        "pipeline": 6
+      },
+      "adoption_total": 33,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Canal logistics digitalization and financial hub status drive enterprise AI adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "cuba",
+      "adoption_scores": {
+        "government": 4,
+        "enterprise": 4,
+        "talent_demand": 4,
+        "consumer": 5,
+        "pipeline": 4
+      },
+      "adoption_total": 21,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Limited internet access constrains AI adoption despite a highly educated population.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "jamaica",
+      "adoption_scores": {
+        "government": 5,
+        "enterprise": 5,
+        "talent_demand": 5,
+        "consumer": 6,
+        "pipeline": 5
+      },
+      "adoption_total": 26,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Growing fintech and BPO sectors drive early AI awareness in the English-speaking Caribbean.",
+      "adoption_gap": -1
+    },
+    {
+      "slug": "haiti",
+      "adoption_scores": {
+        "government": 2,
+        "enterprise": 2,
+        "talent_demand": 2,
+        "consumer": 4,
+        "pipeline": 3
+      },
+      "adoption_total": 13,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile money adoption for remittances provides the only meaningful AI-adjacent digital footprint.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "dominican-republic",
+      "adoption_scores": {
+        "government": 5,
+        "enterprise": 6,
+        "talent_demand": 5,
+        "consumer": 7,
+        "pipeline": 6
+      },
+      "adoption_total": 29,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Tourism tech and growing BPO industry drive emerging digital and AI services adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "trinidad-tobago",
+      "adoption_scores": {
+        "government": 6,
+        "enterprise": 6,
+        "talent_demand": 6,
+        "consumer": 7,
+        "pipeline": 7
+      },
+      "adoption_total": 32,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Energy sector digitalization and Caribbean technology leadership drive AI adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "barbados",
+      "adoption_scores": {
+        "government": 5,
+        "enterprise": 6,
+        "talent_demand": 5,
+        "consumer": 6,
+        "pipeline": 6
+      },
+      "adoption_total": 28,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Fintech ambitions and offshore financial services drive technology adoption in this small island economy.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "guyana",
+      "adoption_scores": {
+        "government": 5,
+        "enterprise": 5,
+        "talent_demand": 4,
+        "consumer": 5,
+        "pipeline": 5
+      },
+      "adoption_total": 24,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Oil boom-driven economic modernization creates early opportunity for enterprise technology adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "suriname",
+      "adoption_scores": {
+        "government": 4,
+        "enterprise": 4,
+        "talent_demand": 4,
+        "consumer": 5,
+        "pipeline": 5
+      },
+      "adoption_total": 22,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile internet growth enables early digital service adoption in this small South American economy.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "bahamas",
+      "adoption_scores": {
+        "government": 5,
+        "enterprise": 5,
+        "talent_demand": 4,
+        "consumer": 6,
+        "pipeline": 5
+      },
+      "adoption_total": 25,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Tourism and financial services digitalization drive modest AI adoption.",
+      "adoption_gap": -1
+    },
+    {
+      "slug": "belize",
+      "adoption_scores": {
+        "government": 4,
+        "enterprise": 4,
+        "talent_demand": 3,
+        "consumer": 5,
+        "pipeline": 4
+      },
+      "adoption_total": 20,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Tourism digitalization and growing internet penetration drive early digital technology adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "taiwan",
+      "adoption_scores": {
+        "government": 16,
+        "enterprise": 17,
+        "talent_demand": 16,
+        "consumer": 17,
+        "pipeline": 17
+      },
+      "adoption_total": 83,
+      "adoption_tier": "High Adoption",
+      "top_adoption_driver": "TSMC semiconductor dominance and dense electronics manufacturing ecosystem make Taiwan a global AI hardware production leader.",
+      "adoption_gap": 5
+    },
+    {
+      "slug": "indonesia",
+      "adoption_scores": {
+        "government": 12,
+        "enterprise": 12,
+        "talent_demand": 10,
+        "consumer": 15,
+        "pipeline": 9
+      },
+      "adoption_total": 58,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "World's fourth-largest population with booming digital economy and super-apps drives strong consumer AI adoption.",
+      "adoption_gap": 8
+    },
+    {
+      "slug": "malaysia",
+      "adoption_scores": {
+        "government": 11,
+        "enterprise": 12,
+        "talent_demand": 10,
+        "consumer": 12,
+        "pipeline": 12
+      },
+      "adoption_total": 57,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "Government digital economy blueprint and semiconductor manufacturing expertise support growing AI adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "thailand",
+      "adoption_scores": {
+        "government": 9,
+        "enterprise": 11,
+        "talent_demand": 9,
+        "consumer": 12,
+        "pipeline": 9
+      },
+      "adoption_total": 50,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "Tourism tech and e-commerce growth drive consumer AI adoption among Thailand's digitally active population.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "philippines",
+      "adoption_scores": {
+        "government": 11,
+        "enterprise": 10,
+        "talent_demand": 10,
+        "consumer": 16,
+        "pipeline": 9
+      },
+      "adoption_total": 56,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "GCash mobile payments adoption and BPO digital workforce drive strong consumer AI use in a mobile-first economy.",
+      "adoption_gap": 10
+    },
+    {
+      "slug": "new-zealand",
+      "adoption_scores": {
+        "government": 11,
+        "enterprise": 12,
+        "talent_demand": 11,
+        "consumer": 12,
+        "pipeline": 12
+      },
+      "adoption_total": 58,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "Strong digital infrastructure and agritech AI applications drive proportionate adoption in this advanced small economy.",
+      "adoption_gap": -2
+    },
+    {
+      "slug": "pakistan",
+      "adoption_scores": {
+        "government": 7,
+        "enterprise": 7,
+        "talent_demand": 7,
+        "consumer": 11,
+        "pipeline": 8
+      },
+      "adoption_total": 40,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Large young population, freelance tech workforce, and mobile payment expansion drive consumer AI adoption.",
+      "adoption_gap": 3
+    },
+    {
+      "slug": "bangladesh",
+      "adoption_scores": {
+        "government": 9,
+        "enterprise": 8,
+        "talent_demand": 7,
+        "consumer": 13,
+        "pipeline": 6
+      },
+      "adoption_total": 43,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "bKash mobile money with 50 million users drives financial AI leapfrogging in one of the world's most densely populated nations.",
+      "adoption_gap": 9
+    },
+    {
+      "slug": "sri-lanka",
+      "adoption_scores": {
+        "government": 7,
+        "enterprise": 8,
+        "talent_demand": 7,
+        "consumer": 10,
+        "pipeline": 8
+      },
+      "adoption_total": 40,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "IT services export growth and growing mobile internet penetration drive early AI adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "myanmar",
+      "adoption_scores": {
+        "government": 4,
+        "enterprise": 4,
+        "talent_demand": 4,
+        "consumer": 7,
+        "pipeline": 5
+      },
+      "adoption_total": 24,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile-first internet adoption before the coup created consumer digital footprint now constrained by political instability.",
+      "adoption_gap": 2
+    },
+    {
+      "slug": "cambodia",
+      "adoption_scores": {
+        "government": 5,
+        "enterprise": 5,
+        "talent_demand": 4,
+        "consumer": 7,
+        "pipeline": 5
+      },
+      "adoption_total": 26,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile banking leapfrogging and young digital population drive consumer AI awareness above infrastructure levels.",
+      "adoption_gap": 1
+    },
+    {
+      "slug": "laos",
+      "adoption_scores": {
+        "government": 3,
+        "enterprise": 4,
+        "talent_demand": 3,
+        "consumer": 5,
+        "pipeline": 4
+      },
+      "adoption_total": 19,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile internet expansion creates early digital services adoption in this landlocked developing economy.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "mongolia",
+      "adoption_scores": {
+        "government": 5,
+        "enterprise": 5,
+        "talent_demand": 5,
+        "consumer": 7,
+        "pipeline": 5
+      },
+      "adoption_total": 27,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mining sector tech adoption and high mobile penetration drive early digital and AI services use.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "nepal",
+      "adoption_scores": {
+        "government": 4,
+        "enterprise": 5,
+        "talent_demand": 4,
+        "consumer": 7,
+        "pipeline": 5
+      },
+      "adoption_total": 25,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Remittance mobile money growth and diaspora tech connections drive consumer digital service adoption.",
+      "adoption_gap": 1
+    },
+    {
+      "slug": "bhutan",
+      "adoption_scores": {
+        "government": 4,
+        "enterprise": 4,
+        "talent_demand": 3,
+        "consumer": 5,
+        "pipeline": 5
+      },
+      "adoption_total": 21,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Government digital transformation plans and crypto mining activities signal early technology ambition.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "maldives",
+      "adoption_scores": {
+        "government": 4,
+        "enterprise": 4,
+        "talent_demand": 3,
+        "consumer": 5,
+        "pipeline": 4
+      },
+      "adoption_total": 20,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Tourism digitalization and high mobile connectivity drive modest AI-adjacent technology adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "afghanistan",
+      "adoption_scores": {
+        "government": 2,
+        "enterprise": 3,
+        "talent_demand": 2,
+        "consumer": 5,
+        "pipeline": 2
+      },
+      "adoption_total": 14,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile money and telecommunications remain the only meaningful digital technology entry points.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "kazakhstan",
+      "adoption_scores": {
+        "government": 9,
+        "enterprise": 9,
+        "talent_demand": 8,
+        "consumer": 10,
+        "pipeline": 9
+      },
+      "adoption_total": 45,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Government digital Kazakhstan program and energy-sector tech drive growing AI adoption in Central Asia's largest economy.",
+      "adoption_gap": -1
+    },
+    {
+      "slug": "uzbekistan",
+      "adoption_scores": {
+        "government": 7,
+        "enterprise": 7,
+        "talent_demand": 6,
+        "consumer": 9,
+        "pipeline": 7
+      },
+      "adoption_total": 36,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Government digitalization reforms and young population drive rapid but early-stage AI adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "turkmenistan",
+      "adoption_scores": {
+        "government": 3,
+        "enterprise": 4,
+        "talent_demand": 3,
+        "consumer": 4,
+        "pipeline": 4
+      },
+      "adoption_total": 18,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "State-controlled economy limits AI adoption despite gas revenue availability for technology investment.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "kyrgyzstan",
+      "adoption_scores": {
+        "government": 5,
+        "enterprise": 5,
+        "talent_demand": 4,
+        "consumer": 6,
+        "pipeline": 4
+      },
+      "adoption_total": 24,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile banking adoption and remittance digitalization drive consumer digital service growth.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "tajikistan",
+      "adoption_scores": {
+        "government": 3,
+        "enterprise": 4,
+        "talent_demand": 3,
+        "consumer": 5,
+        "pipeline": 4
+      },
+      "adoption_total": 19,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile money for diaspora remittances drives limited consumer digital adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "azerbaijan",
+      "adoption_scores": {
+        "government": 8,
+        "enterprise": 8,
+        "talent_demand": 7,
+        "consumer": 10,
+        "pipeline": 8
+      },
+      "adoption_total": 41,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Oil revenue-funded digitalization and SOCAR tech investments drive growing enterprise AI adoption.",
+      "adoption_gap": -1
+    },
+    {
+      "slug": "armenia",
+      "adoption_scores": {
+        "government": 8,
+        "enterprise": 9,
+        "talent_demand": 9,
+        "consumer": 9,
+        "pipeline": 9
+      },
+      "adoption_total": 44,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Tech diaspora investment and growing IT export sector drive proportionate AI adoption.",
+      "adoption_gap": 1
+    },
+    {
+      "slug": "georgia",
+      "adoption_scores": {
+        "government": 8,
+        "enterprise": 8,
+        "talent_demand": 7,
+        "consumer": 9,
+        "pipeline": 8
+      },
+      "adoption_total": 40,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Growing IT hub attracting regional tech talent and digital nomads drives early AI adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "papua-new-guinea",
+      "adoption_scores": {
+        "government": 3,
+        "enterprise": 3,
+        "talent_demand": 2,
+        "consumer": 5,
+        "pipeline": 3
+      },
+      "adoption_total": 16,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile money adoption for unbanked population drives early digital services access.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "fiji",
+      "adoption_scores": {
+        "government": 4,
+        "enterprise": 4,
+        "talent_demand": 3,
+        "consumer": 5,
+        "pipeline": 5
+      },
+      "adoption_total": 21,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Tourism digitalization and Pacific hub ambitions drive modest technology adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "brunei",
+      "adoption_scores": {
+        "government": 7,
+        "enterprise": 8,
+        "talent_demand": 7,
+        "consumer": 8,
+        "pipeline": 8
+      },
+      "adoption_total": 38,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Oil wealth-funded digital diversification strategy drives moderate government and enterprise AI adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "north-korea",
+      "adoption_scores": {
+        "government": 4,
+        "enterprise": 3,
+        "talent_demand": 3,
+        "consumer": 2,
+        "pipeline": 4
+      },
+      "adoption_total": 16,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "State-controlled AI development focused on military and cyber applications with no civilian consumer adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "solomon-islands",
+      "adoption_scores": {
+        "government": 2,
+        "enterprise": 2,
+        "talent_demand": 2,
+        "consumer": 3,
+        "pipeline": 2
+      },
+      "adoption_total": 11,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Nascent mobile internet expansion creates first digital technology exposure.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "vanuatu",
+      "adoption_scores": {
+        "government": 2,
+        "enterprise": 2,
+        "talent_demand": 2,
+        "consumer": 3,
+        "pipeline": 2
+      },
+      "adoption_total": 11,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Tourism digitalization and mobile banking drive limited early technology adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "samoa",
+      "adoption_scores": {
+        "government": 2,
+        "enterprise": 3,
+        "talent_demand": 2,
+        "consumer": 4,
+        "pipeline": 2
+      },
+      "adoption_total": 13,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Diaspora remittance digitalization drives limited mobile technology adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "tonga",
+      "adoption_scores": {
+        "government": 2,
+        "enterprise": 2,
+        "talent_demand": 2,
+        "consumer": 3,
+        "pipeline": 2
+      },
+      "adoption_total": 11,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile money and diaspora connections drive modest digital technology access.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "kiribati",
+      "adoption_scores": {
+        "government": 2,
+        "enterprise": 2,
+        "talent_demand": 1,
+        "consumer": 2,
+        "pipeline": 2
+      },
+      "adoption_total": 9,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Extremely limited digital infrastructure constrains any meaningful AI adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "marshall-islands",
+      "adoption_scores": {
+        "government": 2,
+        "enterprise": 2,
+        "talent_demand": 1,
+        "consumer": 2,
+        "pipeline": 2
+      },
+      "adoption_total": 9,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Blockchain sovereign currency adoption signals openness to digital innovation despite minimal infrastructure.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "palau",
+      "adoption_scores": {
+        "government": 2,
+        "enterprise": 2,
+        "talent_demand": 2,
+        "consumer": 3,
+        "pipeline": 2
+      },
+      "adoption_total": 11,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Tourism digitalization and US compact relationship enable limited technology adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "nauru",
+      "adoption_scores": {
+        "government": 1,
+        "enterprise": 2,
+        "talent_demand": 1,
+        "consumer": 2,
+        "pipeline": 2
+      },
+      "adoption_total": 8,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Minimal digital infrastructure limits technology adoption in this micro-island state.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "tuvalu",
+      "adoption_scores": {
+        "government": 1,
+        "enterprise": 2,
+        "talent_demand": 1,
+        "consumer": 2,
+        "pipeline": 2
+      },
+      "adoption_total": 8,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Domain name (.tv) revenues fund minimal digital development in the world's second-smallest economy.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "timor-leste",
+      "adoption_scores": {
+        "government": 3,
+        "enterprise": 3,
+        "talent_demand": 2,
+        "consumer": 4,
+        "pipeline": 3
+      },
+      "adoption_total": 15,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile banking and government digitalization efforts drive early technology access.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "saudi-arabia",
+      "adoption_scores": {
+        "government": 16,
+        "enterprise": 14,
+        "talent_demand": 12,
+        "consumer": 15,
+        "pipeline": 13
+      },
+      "adoption_total": 70,
+      "adoption_tier": "High Adoption",
+      "top_adoption_driver": "Vision 2030 AI investments and NEOM smart city development drive ambitious state-led AI adoption.",
+      "adoption_gap": 4
+    },
+    {
+      "slug": "qatar",
+      "adoption_scores": {
+        "government": 13,
+        "enterprise": 12,
+        "talent_demand": 10,
+        "consumer": 13,
+        "pipeline": 12
+      },
+      "adoption_total": 60,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "World Cup legacy infrastructure and Qatar Foundation research drive growing AI adoption in this high-income Gulf state.",
+      "adoption_gap": -2
+    },
+    {
+      "slug": "kuwait",
+      "adoption_scores": {
+        "government": 10,
+        "enterprise": 10,
+        "talent_demand": 8,
+        "consumer": 11,
+        "pipeline": 9
+      },
+      "adoption_total": 48,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Oil wealth and high smartphone penetration drive consumer AI adoption despite limited diversification.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "bahrain",
+      "adoption_scores": {
+        "government": 11,
+        "enterprise": 11,
+        "talent_demand": 9,
+        "consumer": 11,
+        "pipeline": 10
+      },
+      "adoption_total": 52,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "Fintech hub ambitions and cloud infrastructure investments drive strong enterprise AI adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "oman",
+      "adoption_scores": {
+        "government": 9,
+        "enterprise": 9,
+        "talent_demand": 7,
+        "consumer": 10,
+        "pipeline": 9
+      },
+      "adoption_total": 44,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Oman Vision 2040 digital transformation agenda drives moderate government and enterprise AI adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "jordan",
+      "adoption_scores": {
+        "government": 9,
+        "enterprise": 9,
+        "talent_demand": 8,
+        "consumer": 11,
+        "pipeline": 9
+      },
+      "adoption_total": 46,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Regional tech hub with high educated workforce and diaspora connections drive early AI adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "lebanon",
+      "adoption_scores": {
+        "government": 5,
+        "enterprise": 6,
+        "talent_demand": 7,
+        "consumer": 8,
+        "pipeline": 5
+      },
+      "adoption_total": 31,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Strong tech talent and diaspora connections drive enterprise AI capability despite economic and political crises.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "iraq",
+      "adoption_scores": {
+        "government": 5,
+        "enterprise": 5,
+        "talent_demand": 5,
+        "consumer": 7,
+        "pipeline": 4
+      },
+      "adoption_total": 26,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile banking growth and oil revenue-funded infrastructure drive nascent AI adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "iran",
+      "adoption_scores": {
+        "government": 9,
+        "enterprise": 9,
+        "talent_demand": 8,
+        "consumer": 10,
+        "pipeline": 9
+      },
+      "adoption_total": 45,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Strong domestic tech ecosystem and sanctions-driven self-reliance push local AI development and adoption.",
+      "adoption_gap": 1
+    },
+    {
+      "slug": "syria",
+      "adoption_scores": {
+        "government": 2,
+        "enterprise": 3,
+        "talent_demand": 3,
+        "consumer": 4,
+        "pipeline": 2
+      },
+      "adoption_total": 14,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "War and sanctions severely limit technology adoption despite a historically educated population.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "yemen",
+      "adoption_scores": {
+        "government": 2,
+        "enterprise": 2,
+        "talent_demand": 2,
+        "consumer": 4,
+        "pipeline": 2
+      },
+      "adoption_total": 12,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Ongoing conflict restricts all technology adoption to minimal mobile communications.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "palestine",
+      "adoption_scores": {
+        "government": 4,
+        "enterprise": 4,
+        "talent_demand": 5,
+        "consumer": 5,
+        "pipeline": 4
+      },
+      "adoption_total": 22,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Tech talent and diaspora investment support a small but active startup scene despite political constraints.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "egypt",
+      "adoption_scores": {
+        "government": 9,
+        "enterprise": 9,
+        "talent_demand": 8,
+        "consumer": 12,
+        "pipeline": 8
+      },
+      "adoption_total": 46,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Large youth population, growing fintech, and government digital transformation drive AI adoption in Africa's second-largest economy.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "morocco",
+      "adoption_scores": {
+        "government": 9,
+        "enterprise": 9,
+        "talent_demand": 7,
+        "consumer": 11,
+        "pipeline": 8
+      },
+      "adoption_total": 44,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Africa tech hub ambitions and European BPO connections drive growing AI adoption in North Africa's second digital economy.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "tunisia",
+      "adoption_scores": {
+        "government": 7,
+        "enterprise": 8,
+        "talent_demand": 7,
+        "consumer": 10,
+        "pipeline": 8
+      },
+      "adoption_total": 40,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Strong tech education system and European market proximity drive IT and AI services adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "algeria",
+      "adoption_scores": {
+        "government": 6,
+        "enterprise": 7,
+        "talent_demand": 6,
+        "consumer": 9,
+        "pipeline": 7
+      },
+      "adoption_total": 35,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Large youth population and growing mobile internet penetration drive consumer digital adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "libya",
+      "adoption_scores": {
+        "government": 3,
+        "enterprise": 4,
+        "talent_demand": 3,
+        "consumer": 5,
+        "pipeline": 3
+      },
+      "adoption_total": 18,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Post-conflict digital recovery with mobile money driving limited consumer technology adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "ethiopia",
+      "adoption_scores": {
+        "government": 7,
+        "enterprise": 6,
+        "talent_demand": 5,
+        "consumer": 9,
+        "pipeline": 6
+      },
+      "adoption_total": 33,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Telebirr mobile money with 30 million users and government AI strategy drive leapfrog digital adoption.",
+      "adoption_gap": 1
+    },
+    {
+      "slug": "ghana",
+      "adoption_scores": {
+        "government": 10,
+        "enterprise": 9,
+        "talent_demand": 8,
+        "consumer": 14,
+        "pipeline": 7
+      },
+      "adoption_total": 48,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Mobile money dominance and Accra tech hub position make Ghana West Africa's most digitally active AI adopter.",
+      "adoption_gap": 10
+    },
+    {
+      "slug": "rwanda",
+      "adoption_scores": {
+        "government": 13,
+        "enterprise": 9,
+        "talent_demand": 8,
+        "consumer": 13,
+        "pipeline": 8
+      },
+      "adoption_total": 51,
+      "adoption_tier": "Growing Adoption",
+      "top_adoption_driver": "Rwanda's Vision 2050 and Kigali as Africa's smart city testbed drive government AI adoption above infrastructure levels.",
+      "adoption_gap": 9
+    },
+    {
+      "slug": "tanzania",
+      "adoption_scores": {
+        "government": 9,
+        "enterprise": 7,
+        "talent_demand": 6,
+        "consumer": 12,
+        "pipeline": 5
+      },
+      "adoption_total": 39,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "M-Pesa and mobile money leadership drive consumer digital adoption well above infrastructure in East Africa.",
+      "adoption_gap": 9
+    },
+    {
+      "slug": "uganda",
+      "adoption_scores": {
+        "government": 8,
+        "enterprise": 7,
+        "talent_demand": 6,
+        "consumer": 12,
+        "pipeline": 5
+      },
+      "adoption_total": 38,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Mobile money dominance and young Kampala tech scene drive consumer AI leapfrogging above infrastructure.",
+      "adoption_gap": 10
+    },
+    {
+      "slug": "cameroon",
+      "adoption_scores": {
+        "government": 5,
+        "enterprise": 6,
+        "talent_demand": 5,
+        "consumer": 8,
+        "pipeline": 6
+      },
+      "adoption_total": 30,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Mobile money adoption and Douala startup scene drive early digital technology growth.",
+      "adoption_gap": 2
+    },
+    {
+      "slug": "senegal",
+      "adoption_scores": {
+        "government": 9,
+        "enterprise": 7,
+        "talent_demand": 6,
+        "consumer": 12,
+        "pipeline": 5
+      },
+      "adoption_total": 39,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Wave mobile money and Dakar tech hub drive consumer AI adoption as West Africa's digital gateway.",
+      "adoption_gap": 5
+    },
+    {
+      "slug": "ivory-coast",
+      "adoption_scores": {
+        "government": 6,
+        "enterprise": 6,
+        "talent_demand": 6,
+        "consumer": 9,
+        "pipeline": 6
+      },
+      "adoption_total": 33,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Mobile money leadership and Abidjan's regional finance hub drive consumer digital adoption.",
+      "adoption_gap": 1
+    },
+    {
+      "slug": "angola",
+      "adoption_scores": {
+        "government": 5,
+        "enterprise": 5,
+        "talent_demand": 4,
+        "consumer": 7,
+        "pipeline": 5
+      },
+      "adoption_total": 26,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Oil revenue-funded mobile banking growth drives limited consumer digital technology adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "zimbabwe",
+      "adoption_scores": {
+        "government": 5,
+        "enterprise": 5,
+        "talent_demand": 4,
+        "consumer": 7,
+        "pipeline": 5
+      },
+      "adoption_total": 26,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "EcoCash mobile money dominance and currency crisis-driven fintech innovation drive consumer digital adoption.",
+      "adoption_gap": 1
+    },
+    {
+      "slug": "zambia",
+      "adoption_scores": {
+        "government": 5,
+        "enterprise": 5,
+        "talent_demand": 5,
+        "consumer": 7,
+        "pipeline": 4
+      },
+      "adoption_total": 26,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile money and copper mining digitalization drive early technology adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "namibia",
+      "adoption_scores": {
+        "government": 6,
+        "enterprise": 6,
+        "talent_demand": 5,
+        "consumer": 7,
+        "pipeline": 6
+      },
+      "adoption_total": 30,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Mobile banking penetration and mining sector digitalization drive proportionate AI adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "botswana",
+      "adoption_scores": {
+        "government": 6,
+        "enterprise": 7,
+        "talent_demand": 6,
+        "consumer": 7,
+        "pipeline": 6
+      },
+      "adoption_total": 32,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Diamond industry digitalization and high income levels for Africa drive proportionate technology adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "mauritius",
+      "adoption_scores": {
+        "government": 8,
+        "enterprise": 8,
+        "talent_demand": 7,
+        "consumer": 9,
+        "pipeline": 8
+      },
+      "adoption_total": 40,
+      "adoption_tier": "Early Adoption",
+      "top_adoption_driver": "Africa's highest digital readiness country with fintech and smart island ambitions driving AI adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "seychelles",
+      "adoption_scores": {
+        "government": 5,
+        "enterprise": 6,
+        "talent_demand": 5,
+        "consumer": 6,
+        "pipeline": 6
+      },
+      "adoption_total": 28,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Tourism and financial services digitalization drive modest technology adoption in this high-income island state.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "cape-verde",
+      "adoption_scores": {
+        "government": 5,
+        "enterprise": 5,
+        "talent_demand": 4,
+        "consumer": 7,
+        "pipeline": 5
+      },
+      "adoption_total": 26,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Diaspora digital economy connections and mobile money drive consumer adoption above regional average.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "benin",
+      "adoption_scores": {
+        "government": 4,
+        "enterprise": 4,
+        "talent_demand": 3,
+        "consumer": 5,
+        "pipeline": 4
+      },
+      "adoption_total": 20,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile money growth and regional digital gateway position drive nascent technology adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "togo",
+      "adoption_scores": {
+        "government": 4,
+        "enterprise": 4,
+        "talent_demand": 3,
+        "consumer": 5,
+        "pipeline": 4
+      },
+      "adoption_total": 20,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile money expansion and port digitalization drive early technology adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "sierra-leone",
+      "adoption_scores": {
+        "government": 3,
+        "enterprise": 3,
+        "talent_demand": 3,
+        "consumer": 4,
+        "pipeline": 3
+      },
+      "adoption_total": 16,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile money and blockchain land registry pilot drive limited but forward-looking digital adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "liberia",
+      "adoption_scores": {
+        "government": 2,
+        "enterprise": 3,
+        "talent_demand": 2,
+        "consumer": 4,
+        "pipeline": 3
+      },
+      "adoption_total": 14,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile money and diaspora remittance digitalization drive limited consumer technology access.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "gambia",
+      "adoption_scores": {
+        "government": 3,
+        "enterprise": 3,
+        "talent_demand": 2,
+        "consumer": 5,
+        "pipeline": 3
+      },
+      "adoption_total": 16,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile money and diaspora connections drive modest consumer digital technology access.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "guinea",
+      "adoption_scores": {
+        "government": 3,
+        "enterprise": 3,
+        "talent_demand": 2,
+        "consumer": 4,
+        "pipeline": 3
+      },
+      "adoption_total": 15,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile money growth in mining communities drives limited digital services adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "guinea-bissau",
+      "adoption_scores": {
+        "government": 2,
+        "enterprise": 3,
+        "talent_demand": 2,
+        "consumer": 4,
+        "pipeline": 2
+      },
+      "adoption_total": 13,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile banking nascent growth provides the only meaningful digital technology footprint.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "gabon",
+      "adoption_scores": {
+        "government": 5,
+        "enterprise": 5,
+        "talent_demand": 4,
+        "consumer": 6,
+        "pipeline": 4
+      },
+      "adoption_total": 24,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Oil-funded digital infrastructure and urbanization drive modest consumer technology adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "drc",
+      "adoption_scores": {
+        "government": 3,
+        "enterprise": 3,
+        "talent_demand": 2,
+        "consumer": 5,
+        "pipeline": 2
+      },
+      "adoption_total": 15,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile money in mining and urban areas provides the primary digital technology entry point.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "chad",
+      "adoption_scores": {
+        "government": 2,
+        "enterprise": 3,
+        "talent_demand": 2,
+        "consumer": 4,
+        "pipeline": 2
+      },
+      "adoption_total": 13,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Limited mobile banking growth provides minimal digital technology access.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "sudan",
+      "adoption_scores": {
+        "government": 3,
+        "enterprise": 4,
+        "talent_demand": 4,
+        "consumer": 5,
+        "pipeline": 4
+      },
+      "adoption_total": 20,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Tech-savvy youth diaspora and mobile money drive nascent digital adoption despite conflict.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "south-sudan",
+      "adoption_scores": {
+        "government": 2,
+        "enterprise": 2,
+        "talent_demand": 1,
+        "consumer": 3,
+        "pipeline": 2
+      },
+      "adoption_total": 10,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile communications provide the only meaningful digital technology access amid ongoing conflict.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "somalia",
+      "adoption_scores": {
+        "government": 2,
+        "enterprise": 2,
+        "talent_demand": 2,
+        "consumer": 4,
+        "pipeline": 1
+      },
+      "adoption_total": 11,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Surprisingly active mobile money ecosystem driven by diaspora remittances despite state fragility.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "eritrea",
+      "adoption_scores": {
+        "government": 2,
+        "enterprise": 2,
+        "talent_demand": 2,
+        "consumer": 4,
+        "pipeline": 2
+      },
+      "adoption_total": 12,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Minimal digital access with isolated economy severely constraining all technology adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "djibouti",
+      "adoption_scores": {
+        "government": 4,
+        "enterprise": 4,
+        "talent_demand": 4,
+        "consumer": 6,
+        "pipeline": 4
+      },
+      "adoption_total": 22,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Strategic port and data center hub position drives modest technology adoption above regional baseline.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "comoros",
+      "adoption_scores": {
+        "government": 2,
+        "enterprise": 2,
+        "talent_demand": 2,
+        "consumer": 4,
+        "pipeline": 2
+      },
+      "adoption_total": 12,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Diaspora remittance mobile money drives limited consumer digital adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "madagascar",
+      "adoption_scores": {
+        "government": 3,
+        "enterprise": 4,
+        "talent_demand": 3,
+        "consumer": 5,
+        "pipeline": 4
+      },
+      "adoption_total": 19,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile money and BPO industry growth drive early digital technology adoption.",
+      "adoption_gap": 1
+    },
+    {
+      "slug": "malawi",
+      "adoption_scores": {
+        "government": 3,
+        "enterprise": 3,
+        "talent_demand": 3,
+        "consumer": 5,
+        "pipeline": 2
+      },
+      "adoption_total": 16,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile money and agricultural tech drive limited but growing digital services adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "mali",
+      "adoption_scores": {
+        "government": 3,
+        "enterprise": 3,
+        "talent_demand": 3,
+        "consumer": 5,
+        "pipeline": 2
+      },
+      "adoption_total": 16,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile money and gold mining digitalization drive nascent technology adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "niger",
+      "adoption_scores": {
+        "government": 2,
+        "enterprise": 3,
+        "talent_demand": 2,
+        "consumer": 4,
+        "pipeline": 3
+      },
+      "adoption_total": 14,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile money growth provides the primary digital technology access point.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "burkina-faso",
+      "adoption_scores": {
+        "government": 3,
+        "enterprise": 3,
+        "talent_demand": 3,
+        "consumer": 5,
+        "pipeline": 2
+      },
+      "adoption_total": 16,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile money adoption drives limited consumer digital technology access.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "lesotho",
+      "adoption_scores": {
+        "government": 3,
+        "enterprise": 3,
+        "talent_demand": 2,
+        "consumer": 4,
+        "pipeline": 3
+      },
+      "adoption_total": 15,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile banking and South Africa economic linkages drive nascent digital adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "eswatini",
+      "adoption_scores": {
+        "government": 3,
+        "enterprise": 4,
+        "talent_demand": 3,
+        "consumer": 5,
+        "pipeline": 3
+      },
+      "adoption_total": 18,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile money and South Africa tech spillover drive modest digital technology adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "mauritania",
+      "adoption_scores": {
+        "government": 3,
+        "enterprise": 3,
+        "talent_demand": 3,
+        "consumer": 5,
+        "pipeline": 2
+      },
+      "adoption_total": 16,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile money and mineral sector digitalization drive limited digital services adoption.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "burundi",
+      "adoption_scores": {
+        "government": 2,
+        "enterprise": 2,
+        "talent_demand": 2,
+        "consumer": 4,
+        "pipeline": 2
+      },
+      "adoption_total": 12,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Mobile money in one of the world's poorest economies provides minimal digital technology access.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "central-african-republic",
+      "adoption_scores": {
+        "government": 2,
+        "enterprise": 2,
+        "talent_demand": 1,
+        "consumer": 3,
+        "pipeline": 2
+      },
+      "adoption_total": 10,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Minimal digital infrastructure with Bitcoin legal tender adoption as sole technology signal.",
+      "adoption_gap": 0
+    },
+    {
+      "slug": "equatorial-guinea",
+      "adoption_scores": {
+        "government": 3,
+        "enterprise": 3,
+        "talent_demand": 3,
+        "consumer": 5,
+        "pipeline": 2
+      },
+      "adoption_total": 16,
+      "adoption_tier": "Nascent Adoption",
+      "top_adoption_driver": "Oil wealth provides resources but governance challenges limit technology adoption.",
+      "adoption_gap": 0
+    }
+  ]
+}
