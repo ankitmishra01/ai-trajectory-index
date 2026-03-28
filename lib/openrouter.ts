@@ -67,13 +67,28 @@ async function callOpenRouter(
     { role: "user", content: userMessage },
   ];
 
+  const PER_MODEL_TIMEOUT_MS = 15_000; // 15s per model attempt
+
   let lastError = "";
   for (const model of MODELS) {
-    const res = await fetch(OPENROUTER_URL, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ model, messages }),
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), PER_MODEL_TIMEOUT_MS);
+
+    let res: Response;
+    try {
+      res = await fetch(OPENROUTER_URL, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ model, messages }),
+        signal: controller.signal,
+      });
+    } catch (err: unknown) {
+      clearTimeout(timeoutId);
+      const msg = err instanceof Error ? err.message : String(err);
+      lastError = `${model} timed out or network error: ${msg}`;
+      continue;
+    }
+    clearTimeout(timeoutId);
 
     if (res.status === 429 || res.status === 503) {
       lastError = `${model} rate-limited (${res.status})`;
