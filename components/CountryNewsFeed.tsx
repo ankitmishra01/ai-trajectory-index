@@ -77,7 +77,7 @@ export default function CountryNewsFeed({ slug, countryName }: Props) {
             Live AI News Feed
           </h2>
           <p className="text-xs mt-0.5" style={{ color: "var(--text-3)" }}>
-            AI headlines from The Guardian · Updated hourly
+            The Guardian · Google News · Updated hourly
           </p>
         </div>
         {/* AI Signal button */}
@@ -176,7 +176,7 @@ export default function CountryNewsFeed({ slug, countryName }: Props) {
               No recent AI headlines found for {countryName}
             </p>
             <p className="text-xs" style={{ color: "var(--text-3)", opacity: 0.6 }}>
-              The Guardian is searched for recent AI coverage · Try again later
+              The Guardian and Google News are searched for AI coverage · Try again later
             </p>
           </div>
         )}
