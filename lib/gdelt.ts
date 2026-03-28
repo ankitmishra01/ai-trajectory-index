@@ -101,17 +101,17 @@ export async function fetchCountryNews(
 }
 
 // Global AI news — no country filter, broad query
-export async function fetchGlobalAINews(maxRecords = 10): Promise<NewsArticle[]> {
+export async function fetchGlobalAINews(maxRecords = 20): Promise<NewsArticle[]> {
   const cacheKey = "__global__";
   const hit = articleCache.get(cacheKey);
   if (hit && Date.now() - hit.ts < ARTICLE_TTL_MS) return hit.articles;
 
   const params = new URLSearchParams({
-    query:      '"AI policy" OR "artificial intelligence strategy" OR "AI regulation" OR "AI investment" announcement',
+    query:      '"AI policy" OR "artificial intelligence strategy" OR "AI regulation" OR "AI investment" OR "AI governance" OR "national AI" announcement',
     mode:       "artlist",
     maxrecords: String(maxRecords),
     format:     "json",
-    timespan:   "3d",
+    timespan:   "7d",
     sort:       "datedesc",
     sourcelang: "english",
   });

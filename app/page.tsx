@@ -11,6 +11,7 @@ import ComparisonPanel from "@/components/ComparisonPanel";
 import KeyInsights from "@/components/KeyInsights";
 import FastestMovers from "@/components/FastestMovers";
 import LastVisitBanner from "@/components/LastVisitBanner";
+import NewsTicker from "@/components/NewsTicker";
 import staticData from "@/data/countries.json";
 import type { ScoredCountry, ScoresResponse } from "@/lib/types";
 
@@ -172,6 +173,9 @@ export default function Home() {
   return (
     <main className="min-h-screen" style={{ background: "var(--bg)" }}>
       <div className="page-glow" />
+
+      {/* ── Global news ticker ── */}
+      <NewsTicker />
 
       {/* ── Header ── */}
       <header className="sticky top-0 z-50 backdrop-blur-sm"

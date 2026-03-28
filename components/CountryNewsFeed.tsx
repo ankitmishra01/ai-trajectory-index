@@ -166,9 +166,14 @@ export default function CountryNewsFeed({ slug, countryName }: Props) {
         )}
 
         {articles !== null && articles.length === 0 && (
-          <p className="text-sm text-center py-4" style={{ color: "var(--text-3)" }}>
-            No recent AI news found for {countryName} in the last 14 days.
-          </p>
+          <div className="text-center py-6">
+            <p className="text-sm mb-1" style={{ color: "var(--text-3)" }}>
+              No recent AI headlines found for {countryName}
+            </p>
+            <p className="text-xs" style={{ color: "var(--text-3)", opacity: 0.6 }}>
+              GDELT searches the last 14 days · Try again later or check global news above
+            </p>
+          </div>
         )}
 
         {articles !== null && articles.length > 0 && (

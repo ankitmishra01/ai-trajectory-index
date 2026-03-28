@@ -76,6 +76,29 @@ body {
 .rankings-table tr:last-child td { border-bottom: none; }
 .rankings-table tr:hover td { background: var(--raised); }
 
+/* ── News ticker ── */
+.ticker-scroll {
+  animation: ticker-scroll 90s linear infinite;
+}
+@keyframes ticker-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Pulsing live dot */
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ef4444;
+  flex-shrink: 0;
+  animation: live-dot-pulse 1.8s ease-in-out infinite;
+}
+@keyframes live-dot-pulse {
+  0%, 100% { opacity: 1;   box-shadow: 0 0 0 0 rgba(239,68,68,.5); }
+  50%       { opacity: .7; box-shadow: 0 0 0 4px rgba(239,68,68,.0); }
+}
+
 /* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
