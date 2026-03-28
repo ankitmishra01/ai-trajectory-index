@@ -117,37 +117,31 @@ export default function Home() {
 
       {/* ── Header ── */}
       <header className="sticky top-0 z-50 backdrop-blur-sm"
-        style={{ borderBottom: "1px solid var(--border)", background: "rgba(6,11,20,.94)" }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
+        style={{ borderBottom: "1px solid var(--border)", background: "rgba(6,11,20,.96)" }}>
+
+        {/* Row 1: branding + utilities */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
             <div>
-              <h1 className="text-sm font-black tracking-tight font-display" style={{ color: "var(--text-1)" }}>
+              <h1 className="text-sm font-black tracking-tight font-display leading-none" style={{ color: "var(--text-1)" }}>
                 AI Trajectory Index
               </h1>
-              <p className="text-[11px] mt-0.5" style={{ color: "var(--text-3)" }}>
+              <p className="text-[11px] mt-1" style={{ color: "var(--text-3)" }}>
                 {countries.length} economies · 5 pillars · {new Date().getFullYear()} edition
               </p>
             </div>
-            <div className="hidden sm:block h-8 w-px" style={{ background: "var(--border)" }} />
-            <div className="hidden sm:flex items-center gap-1.5">
-              <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded"
-                style={{ background: "rgba(59,130,246,.10)", color: "var(--accent)", border: "1px solid rgba(59,130,246,.20)" }}>
-                Phase 3
-              </span>
-              <span className="text-[10px]" style={{ color: "var(--text-3)" }}>AI Narratives enabled</span>
-            </div>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="hidden sm:flex items-center gap-1.5">
-              <Link href="/americas" className="btn-secondary flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-xl">🌎 Americas</Link>
-              <Link href="/europe" className="btn-secondary flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-xl">🌍 Europe</Link>
-              <Link href="/africa" className="btn-secondary flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-xl">🌍 Africa</Link>
-              <Link href="/middle-east" className="btn-secondary flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-xl">🕌 Middle East</Link>
-              <Link href="/asia-pacific" className="btn-secondary flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-xl">🌏 Asia-Pacific</Link>
-            </div>
-            <Link href="/methodology"
-              className="btn-secondary hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl">
+          <div className="flex items-center gap-3">
+            {fmtDate && (
+              <div className="hidden sm:flex items-center gap-1.5 text-[11px]" style={{ color: "var(--text-3)" }}>
+                {usingLive
+                  ? <><span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" /><span>Live · {fmtDate}</span></>
+                  : <span>Cached · {fmtDate}</span>}
+              </div>
+            )}
+            <div className="hidden sm:block h-4 w-px" style={{ background: "var(--border)" }} />
+            <Link href="/methodology" className="hidden sm:block text-[11px] transition-colors hover:text-blue-400" style={{ color: "var(--text-3)" }}>
               Methodology
             </Link>
             <Link href="/map" className="btn-secondary flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl">
@@ -155,24 +149,34 @@ export default function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
               </svg>
-              Map
+              <span className="hidden sm:inline">Map</span>
             </Link>
-            <div className="text-right">
-              <p className="text-xs hidden sm:block" style={{ color: "var(--text-3)" }}>
-                <a href="https://ankitmishra.ca" target="_blank" rel="noopener noreferrer"
-                  className="hover:text-blue-400 transition-colors" style={{ color: "var(--accent)" }}>
-                  Ankit Mishra
-                </a>
-              </p>
-              {fmtDate && (
-                <p className="text-[11px] mt-0.5 hidden sm:block" style={{ color: "var(--text-3)" }}>
-                  {usingLive
-                    ? <span className="flex items-center justify-end gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />Live · {fmtDate}</span>
-                    : <span>Cached · {fmtDate}</span>}
-                </p>
-              )}
-            </div>
+            <a href="https://ankitmishra.ca" target="_blank" rel="noopener noreferrer"
+              className="hidden sm:block text-[11px] font-medium transition-colors hover:text-blue-400" style={{ color: "var(--accent)" }}>
+              Ankit Mishra
+            </a>
           </div>
+        </div>
+
+        {/* Row 2: continent nav strip */}
+        <div style={{ borderTop: "1px solid var(--border)" }}>
+          <nav className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center gap-0 overflow-x-auto"
+            style={{ scrollbarWidth: "none" }}>
+            {[
+              { href: "/americas",    emoji: "🌎", label: "Americas" },
+              { href: "/europe",      emoji: "🌍", label: "Europe" },
+              { href: "/africa",      emoji: "🌍", label: "Africa" },
+              { href: "/middle-east", emoji: "🕌", label: "Middle East" },
+              { href: "/asia-pacific",emoji: "🌏", label: "Asia-Pacific" },
+            ].map(({ href, emoji, label }) => (
+              <Link key={href} href={href}
+                className="flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium whitespace-nowrap transition-colors hover:text-blue-400"
+                style={{ color: "var(--text-2)", borderBottom: "2px solid transparent" }}>
+                <span>{emoji}</span>
+                <span>{label}</span>
+              </Link>
+            ))}
+          </nav>
         </div>
       </header>
 
