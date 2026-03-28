@@ -3,7 +3,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Design tokens (mirrors the shared system from Scoothero / Switch / Holocene) ── */
+/* ── Design tokens ── */
 :root {
   --bg:           #060b14;
   --surface:      #0c1322;

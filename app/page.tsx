@@ -335,7 +335,7 @@ export default function Home() {
             AI Trajectory Index · Built by{" "}
             <a href="https://ankitmishra.ca" target="_blank" rel="noopener noreferrer"
               className="hover:text-blue-400 transition-colors">Ankit Mishra</a>
-            {" "}— Commercial Portfolio Director at Holocene · Forbes contributor · SRI AI & Trust Working Group
+            {" "}— Commercial Portfolio Director · African climatetech VC · Forbes contributor · Schwartz Reisman Institute AI & Trust Working Group
           </p>
           <div className="flex items-center justify-center gap-4 pt-1 flex-wrap">
             <Link href="/americas" className="text-xs hover:text-blue-400 transition-colors" style={{ color: "var(--text-3)" }}>Americas</Link>

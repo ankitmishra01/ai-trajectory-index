@@ -524,13 +524,47 @@ export default function MethodologyPage() {
         </div>
       </div>
 
+      {/* About the Builder */}
+      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 mt-8">
+        <div className="card rounded-2xl p-6 sm:p-8">
+          <h2 className="text-xs font-bold uppercase tracking-wider mb-4" style={{ color: "var(--accent)" }}>
+            About the Builder
+          </h2>
+          <p className="text-sm leading-relaxed" style={{ color: "var(--text-2)" }}>
+            This index was built by{" "}
+            <a href="https://ankitmishra.ca" target="_blank" rel="noopener noreferrer"
+              className="font-semibold hover:text-blue-300 transition-colors" style={{ color: "var(--text-1)" }}>
+              Ankit Mishra
+            </a>
+            {" "}as an independent research tool to support work at the intersection of AI governance,
+            emerging markets, and technology policy. Ankit is Commercial Portfolio Director at a leading
+            African climatetech venture fund, a member of the{" "}
+            <span style={{ color: "var(--text-1)" }}>Schwartz Reisman Institute AI &amp; Trust Working Group</span>
+            {" "}at the University of Toronto, and a Forbes contributor with 50+ articles reaching
+            200,000+ readers.
+          </p>
+          <div className="flex items-center gap-4 mt-4">
+            <a href="https://ankitmishra.ca" target="_blank" rel="noopener noreferrer"
+              className="text-xs font-semibold transition-colors hover:text-blue-300"
+              style={{ color: "var(--accent)" }}>
+              ankitmishra.ca ↗
+            </a>
+            <a href="https://linkedin.com/in/ankitmishra01" target="_blank" rel="noopener noreferrer"
+              className="text-xs font-semibold transition-colors hover:text-blue-300"
+              style={{ color: "var(--accent)" }}>
+              LinkedIn ↗
+            </a>
+          </div>
+        </div>
+      </div>
+
       <footer className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-8 mt-4 text-center space-y-1"
         style={{ borderTop: "1px solid var(--border)" }}>
         <p className="text-xs" style={{ color: "var(--text-3)" }}>
           AI Trajectory Index · Built by{" "}
           <a href="https://ankitmishra.ca" target="_blank" rel="noopener noreferrer"
             className="hover:text-blue-400 transition-colors">Ankit Mishra</a>
-          {" "}— Commercial Portfolio Director at Holocene · Forbes contributor
+          {" "}— Commercial Portfolio Director · African climatetech VC · Forbes contributor · Schwartz Reisman Institute AI & Trust Working Group
         </p>
       </footer>
     </main>

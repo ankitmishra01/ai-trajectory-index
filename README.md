@@ -16,7 +16,7 @@ Next.js 14 · Tailwind CSS · OpenRouter API (Gemini 2.0 Flash) · World Bank AP
 https://ai-trajectory-index.vercel.app
 
 ## Built by
-[Ankit Mishra](https://ankitmishra.ca) — Commercial Portfolio Director at Holocene, Forbes contributor, SRI AI & Trust Working Group
+[Ankit Mishra](https://ankitmishra.ca) — Commercial Portfolio Director at a leading African climatetech venture fund · Forbes contributor (50+ articles, 200,000+ readers) · Schwartz Reisman Institute AI & Trust Working Group, University of Toronto
 
 ## Setup
 1. Clone the repo
