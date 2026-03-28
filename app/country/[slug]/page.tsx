@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import ScoreGauge from "@/components/ScoreGauge";
 import DimensionBar from "@/components/DimensionBar";
@@ -30,8 +30,8 @@ interface NarrativeState {
   error?: string;
 }
 
-export default function CountryPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = use(params);
+export default function CountryPage({ params }: { params: { slug: string } }) {
+  const { slug } = params;
   const [openDim, setOpenDim] = useState<string | null>(null);
 
   const staticCountry = staticData.countries.find((c) => c.slug === slug);
