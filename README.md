@@ -1,23 +1,40 @@
 # AI Trajectory Index
 
-**Live tool:** [ai-trajectory-index.vercel.app](https://ai-trajectory-index.vercel.app)
+**Live:** [ai-index.ankitmishra.ca](https://ai-index.ankitmishra.ca)
 
-A live, interactive index scoring **186 countries** on their current AI readiness and 3–5 year trajectory — built for investors, policymakers, and researchers who need to understand which nations are winning the AI race and why.
+An interactive index scoring **186 countries** on their current AI readiness and 3–5 year trajectory — built for investors, policymakers, and researchers who need to understand which nations are winning the AI race and why.
 
 ---
 
-## What it does
+## Key Findings (2026 Edition)
 
-- Scores 186 economies across **5 pillars**: Infrastructure, Talent, Governance, Investment, and Economic Readiness (each 0–20, total 0–100)
-- Shows **forward trajectory** — which countries are accelerating, plateauing, or falling behind, with a projected 2028 score
+| Finding | Detail |
+|---------|--------|
+| 🇺🇸 **US leads overall** | 91/100 — highest score across all 186 economies |
+| 🇮🇳 **India has the strongest trajectory** | Current score 65 → projected 73 by 2028 (trajectory +8) |
+| 🇦🇪 **UAE fastest-rising advanced economy** | 73 → 79 projected by 2028 (trajectory +6) |
+| 🇷🇺 **Russia: biggest governance gap** | Average pillar 12.8 — governance score 8/20, gap of 4.8 pts |
+| 🌍 **Africa trailing in infrastructure** | Median infrastructure score 6.2/20 vs global median 11.4 |
+| 🇪🇺 **Europe leads on governance** | EU avg 10.2/20 governance vs 9.2/20 investment — policy ahead of capital |
+
+---
+
+## What It Does
+
+- Scores 186 economies across **5 pillars**: Infrastructure, Talent, Governance, Investment, Economic Readiness (each 0–20, total 0–100)
+- Shows **forward trajectory** — which countries are accelerating, plateauing, or falling behind, with projected 2028 scores
 - Generates **AI-powered country narratives** explaining the drivers behind each score (via OpenRouter, free tier)
-- **Interactive world map** with country selection and AI-powered country comparison chat
-- **Country comparison tool** — side-by-side radar charts and pillar breakdowns
+- **Interactive world map** with country selection and AI-powered comparison chat
+- **Country comparison tool** — side-by-side radar charts and pillar breakdowns (up to 4 countries)
 - **Region deep-dives** — Americas, Europe, Asia-Pacific, Middle East, Africa with sub-regional analysis
 - **Live news feeds** per country via GDELT, with AI signal analysis
-- **Shareable filtered URLs** — all filter state encoded in query params
-- **Export** to CSV or JSON
-- Live data from 17 World Bank indicators, updated every 24 hours
+- **What-If simulator** — adjust any pillar score and see rank impact
+- **Policy gap analyser** — shows which pillars fall below regional average, with governance flags
+- **Shareable URLs** — all filter state and pillar weights encoded in query params
+- **Embeddable widget** — `<iframe src="/widget/[country]">` for any site
+- **Export** to CSV or JSON (with custom weighted scores when weights are non-default)
+
+---
 
 ## Screenshots
 
@@ -38,7 +55,7 @@ A live, interactive index scoring **186 countries** on their current AI readines
 |-------|-----------|
 | Framework | Next.js 14 (App Router) + TypeScript |
 | Styling | Tailwind CSS + CSS custom properties |
-| Charts | Recharts (radar, bar) + react-simple-maps |
+| Charts | Recharts (radar, bar, scatter) + react-simple-maps |
 | AI Narratives | OpenRouter API (Gemini 2.0 Flash — free tier) |
 | Live News | GDELT 2.0 Document API (free, no key) |
 | World Data | World Bank Open Data API (17 indicators, free) |
@@ -106,15 +123,15 @@ Five equally-weighted pillars, each scored 0–20:
 | **Investment** | Capital environment | R&D spend % GDP (GB.XPD.RSDV.GD.ZS), FDI net inflows (BX.KLT.DINV.WD.GD.ZS) |
 | **Economic Readiness** | Market conditions | GDP per capita PPP (NY.GDP.PCAP.PP.KD), private credit % GDP, trade openness, services share |
 
-Full methodology: [ai-trajectory-index.vercel.app/methodology](https://ai-trajectory-index.vercel.app/methodology)
+Full methodology: [ai-index.ankitmishra.ca/methodology](https://ai-index.ankitmishra.ca/methodology)
 
 ### Design Principles
 
 - **No double-counting**: R&D spend only in Investment; GDP only in Economic Readiness; electricity/internet only in Infrastructure
-- **Continuous > binary**: Governance replaced binary flags (has_strategy, oecd_member) with continuous WGI z-scores, normalised as `((estimate + 2.5) / 5.0) × maxPts`
-- **PPP-adjusted**: Economic Readiness uses constant 2017 PPP$ GDP rather than nominal USD to remove currency/price-level bias
+- **Continuous > binary**: Governance uses continuous WGI z-scores, normalised as `((estimate + 2.5) / 5.0) × maxPts`
+- **PPP-adjusted**: Economic Readiness uses constant 2017 PPP$ GDP to remove currency/price-level bias
 - **Quality over access**: Infrastructure weights fixed broadband (quality signal) over internet user % (saturated for OECD)
-- **Forward signals in trajectory**: AI strategy weight cut from 25% → 10% (categorical event); replaced with high-tech exports trend (innovation output) and broadband growth
+- **Forward signals in trajectory**: High-tech exports trend (20%) and broadband growth (10%) replace binary AI strategy flag
 
 ### Tiers
 
@@ -161,7 +178,10 @@ World Bank indicators typically lag 1–2 years — most recent data is from 202
   /map/page.tsx             — Interactive world map + AI chat
   /africa|americas|europe|asia-pacific|middle-east/page.tsx — Region deep-dives
   /country/[slug]/page.tsx  — Individual country profiles
+  /compare/[a]/page.tsx     — Side-by-side country comparison
+  /explore/page.tsx         — Scatter plot explorer
   /methodology/page.tsx     — Full scoring methodology
+  /widget/[slug]/page.tsx   — Embeddable iframe widget (no client JS)
   /api/
     scores/route.ts         — Live scoring endpoint (24h cache)
     narrative/[country]/    — OpenRouter narrative generation (7d cache)
@@ -177,12 +197,15 @@ World Bank indicators typically lag 1–2 years — most recent data is from 202
   FilterBar.tsx             — Search + consolidated filter + sort (slide-out panel)
   FastestMovers.tsx         — Top 5 trajectory countries (compact tiles)
   KeyInsights.tsx           — Auto-generated insights from live data
-  LastVisitBanner.tsx       — localStorage delta: shows changes since last visit
+  GovernanceGapPanel.tsx    — Top 10 countries where capabilities outpace governance
+  PolicyGapAnalyser.tsx     — Pillar gaps vs regional average + governance flags
+  WhatIfSimulator.tsx       — Interactive pillar adjustment + rank impact
   RegionDeepDive.tsx        — Shared region deep-dive layout (bar charts)
   WorldMap.tsx              — react-simple-maps SVG world map
   ScoreGauge.tsx            — SVG semicircle gauge
   RankingsTable.tsx         — Sortable tabular view
-  ExportButton.tsx          — CSV/JSON export
+  ExportButton.tsx          — CSV/JSON export (includes weighted score column)
+  PillarWeights.tsx         — Custom pillar weight sliders with URL encoding
 
 /lib
   worldbank.ts              — WB API client (17 indicators, parallel fetch, 24h cache)
@@ -217,7 +240,7 @@ Areas where contributions are especially welcome:
 
 If you reference this tool in research or journalism:
 
-> Mishra, A. (2026). *AI Trajectory Index: Scoring 186 Economies on AI Readiness and 3–5 Year Trajectory*. Retrieved from https://ai-trajectory-index.vercel.app
+> Mishra, A. (2026). *AI Trajectory Index: Scoring 186 Economies on AI Readiness and 3–5 Year Trajectory*. Retrieved from https://ai-index.ankitmishra.ca
 
 ---
 
