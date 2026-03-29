@@ -1,12 +1,16 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
 import ScoreGauge from "@/components/ScoreGauge";
 import DimensionBar from "@/components/DimensionBar";
 import TrajectoryArrow from "@/components/TrajectoryArrow";
 import CountryNewsFeed from "@/components/CountryNewsFeed";
 import CountryRoadmap from "@/components/CountryRoadmap";
+import ScoreSparkline from "@/components/ScoreSparkline";
+import WhatIfSimulator from "@/components/WhatIfSimulator";
+import CountryChat from "@/components/CountryChat";
+import PolicyGapAnalyser from "@/components/PolicyGapAnalyser";
 import DualRadar from "@/components/DualRadar";
 import staticData from "@/data/countries.json";
 import adoptionData from "@/data/adoption.json";
@@ -51,10 +55,11 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
 
   const adoption = (adoptionData.countries as AdoptionEntry[]).find((a) => a.slug === slug) ?? null;
   const [allCountries, setAllCountries] = useState<ScoredCountry[]>(
-    staticData.countries.map((c) => ({ ...c, data_source: "fallback" as const }))
+    staticData.countries.map((c) => ({ ...c, data_source: "fallback" as const, wb_data_year: null }))
   );
   const [narrative, setNarrative] = useState<NarrativeState>({ status: "idle", paragraphs: [] });
   const [copied, setCopied]       = useState(false);
+  const [embedOpen, setEmbedOpen] = useState(false);
 
   // Read tab from URL on mount
   useEffect(() => {
@@ -104,15 +109,25 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
     });
   };
 
-  const comparables = country.comparable_countries
-    .map((s) => allCountries.find((c) => c.slug === s))
-    .filter(Boolean) as ScoredCountry[];
+  // Dynamic comparable countries by 5-dimension Euclidean distance
+  const comparables = useMemo(() => {
+    const keys = ["infrastructure", "talent", "governance", "investment", "economic_readiness"] as const;
+    function dist(a: ScoredCountry, b: ScoredCountry) {
+      return Math.sqrt(keys.reduce((sum, k) => sum + (a.scores[k].score - b.scores[k].score) ** 2, 0));
+    }
+    return [...allCountries]
+      .filter((c) => c.slug !== slug)
+      .sort((a, b) => dist(country, a) - dist(country, b))
+      .slice(0, 4);
+  }, [allCountries, country, slug]);
 
   const ranked       = [...allCountries].sort((a, b) => b.total_score - a.total_score);
   const globalRank   = ranked.findIndex((c) => c.slug === slug) + 1;
   const regionPeers  = ranked.filter((c) => c.region === country.region);
   const regionRank   = regionPeers.findIndex((c) => c.slug === slug) + 1;
   const delta        = country.projected_score_2028 - country.total_score;
+  const liveScoreDelta = country.data_source === "live" ? country.total_score - initialCountry.total_score : 0;
+  const liveChanged    = country.data_source === "live" && liveScoreDelta !== 0;
 
   return (
     <main className="min-h-screen" style={{ background: "var(--bg)" }}>
@@ -137,9 +152,33 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
                 Live data
               </span>
             )}
+            <Link href={`/compare/${slug}/usa`}
+              className="no-print hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+              style={{ background: "var(--raised)", color: "var(--text-2)", border: "1px solid var(--border)" }}>
+              ⚔ Compare
+            </Link>
+            <button
+              onClick={() => window.print()}
+              className="no-print hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+              style={{ background: "var(--raised)", color: "var(--text-2)", border: "1px solid var(--border)" }}
+              title="Print / Export PDF"
+            >
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+              </svg>
+              Print
+            </button>
+            <button
+              onClick={() => setEmbedOpen((o) => !o)}
+              className="no-print hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+              style={{ background: "var(--raised)", color: "var(--text-2)", border: "1px solid var(--border)" }}
+            >
+              {"</>"}  Embed
+            </button>
             <button
               onClick={handleCopyLink}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+              className="no-print flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
               style={
                 copied
                   ? { background: "rgba(34,197,94,.12)", color: "#4ade80", border: "1px solid rgba(34,197,94,.25)" }
@@ -155,6 +194,45 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
           </div>
         </div>
       </header>
+
+      {/* Embed modal */}
+      {embedOpen && (
+        <div className="no-print fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: "rgba(0,0,0,.7)" }}
+          onClick={(e) => { if (e.target === e.currentTarget) setEmbedOpen(false); }}>
+          <div className="w-full max-w-lg rounded-2xl p-6 shadow-2xl"
+            style={{ background: "var(--surface)", border: "1px solid var(--border-mid)" }}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-bold" style={{ color: "var(--text-1)" }}>Embed Widget</h3>
+              <button onClick={() => setEmbedOpen(false)} className="text-sm transition-colors hover:text-white"
+                style={{ color: "var(--text-3)" }}>×</button>
+            </div>
+            <p className="text-xs mb-3" style={{ color: "var(--text-3)" }}>
+              Copy this code to embed the {country.name} live scorecard on any webpage.
+            </p>
+            <div className="rounded-xl p-3 mb-4 font-mono text-xs overflow-x-auto"
+              style={{ background: "var(--raised)", border: "1px solid var(--border)", color: "#93c5fd", whiteSpace: "pre-wrap" }}>
+              {`<iframe\n  src="https://ai-index.ankitmishra.ca/widget/${slug}"\n  width="320"\n  height="280"\n  frameborder="0"\n  style="border-radius:12px;"\n  title="${country.name} — AI Trajectory Index"\n></iframe>`}
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(`<iframe\n  src="https://ai-index.ankitmishra.ca/widget/${slug}"\n  width="320"\n  height="280"\n  frameborder="0"\n  style="border-radius:12px;"\n  title="${country.name} — AI Trajectory Index"\n></iframe>`);
+                  setEmbedOpen(false);
+                }}
+                className="flex-1 py-2 rounded-xl text-xs font-semibold transition-all"
+                style={{ background: "var(--accent)", color: "#fff" }}>
+                Copy code
+              </button>
+              <a href={`/widget/${slug}`} target="_blank" rel="noopener noreferrer"
+                className="px-4 py-2 rounded-xl text-xs font-semibold transition-all"
+                style={{ background: "var(--raised)", color: "var(--text-2)", border: "1px solid var(--border)" }}>
+                Preview ↗
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-10 space-y-5">
 
@@ -200,6 +278,28 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
             </div>
           </div>
         </div>
+
+        {/* What changed banner */}
+        {liveChanged && (
+          <div className="rounded-2xl px-4 py-3 flex items-center gap-3 text-sm fade-up"
+            style={{
+              background: liveScoreDelta > 0 ? "rgba(34,197,94,.06)" : "rgba(245,158,11,.06)",
+              border: `1px solid ${liveScoreDelta > 0 ? "rgba(34,197,94,.22)" : "rgba(245,158,11,.22)"}`,
+            }}>
+            <span className="text-base flex-shrink-0" style={{ color: liveScoreDelta > 0 ? "#4ade80" : "#f59e0b" }}>
+              {liveScoreDelta > 0 ? "▲" : "▼"}
+            </span>
+            <span style={{ color: "var(--text-2)" }}>
+              Live World Bank data refreshed this score:{" "}
+              <span className="font-semibold" style={{ color: "var(--text-1)" }}>
+                {initialCountry.total_score} → {country.total_score}
+              </span>{" "}
+              <span className="font-bold" style={{ color: liveScoreDelta > 0 ? "#4ade80" : "#f59e0b" }}>
+                ({liveScoreDelta > 0 ? "+" : ""}{liveScoreDelta} pts)
+              </span>
+            </span>
+          </div>
+        )}
 
         {/* Tab toggle */}
         {adoption && (
@@ -287,9 +387,17 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
         {/* Score Breakdown — hidden on pure adoption tab */}
         {(!adoption || activeTab !== "adoption") && (
           <div className="card rounded-2xl p-6 sm:p-8">
-            <h2 className="text-xs font-bold uppercase tracking-wider mb-6" style={{ color: "var(--text-3)" }}>
-              Pillar Scores
-            </h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-3)" }}>
+                Pillar Scores
+              </h2>
+              {country.wb_data_year && (
+                <span className="text-[10px] px-2 py-0.5 rounded-full"
+                  style={{ background: "var(--raised)", color: "var(--text-3)", border: "1px solid var(--border)" }}>
+                  WB data through {country.wb_data_year}
+                </span>
+              )}
+            </div>
             <div className="space-y-5">
               {Object.entries(country.scores).map(([key, val]) => (
                 <DimensionBar key={key} label={DIM_LABELS[key]} score={val.score} height={12} showScore />
@@ -352,9 +460,12 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
         {/* Trajectory + Accelerator/Risk — hidden on pure adoption tab */}
         {(!adoption || activeTab !== "adoption") && <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="card rounded-2xl p-6">
-            <h2 className="text-xs font-bold uppercase tracking-wider mb-4" style={{ color: "var(--text-3)" }}>
-              Trajectory Outlook
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-3)" }}>
+                Trajectory Outlook
+              </h2>
+              <ScoreSparkline score={country.total_score} trajectory={country.trajectory_score} width={72} height={24} />
+            </div>
             <div className="flex items-baseline gap-2 mb-3">
               <span className="text-5xl font-black leading-none" style={{ color: "var(--accent)" }}>
                 {country.projected_score_2028}
@@ -457,6 +568,16 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
             })}
           </div>
         </div>}
+
+        {/* What-If Simulator — hidden on adoption tab */}
+        {(!adoption || activeTab !== "adoption") && (
+          <WhatIfSimulator country={country} allCountries={allCountries} />
+        )}
+
+        {/* Policy Gap Analyser — hidden on adoption tab */}
+        {(!adoption || activeTab !== "adoption") && (
+          <PolicyGapAnalyser country={country} allCountries={allCountries} />
+        )}
 
         {/* AI Narrative — hidden on adoption tab */}
         {(!adoption || activeTab !== "adoption") &&
@@ -561,14 +682,17 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
         {/* Live News Feed */}
         <CountryNewsFeed slug={slug} countryName={country.name} />
 
+        {/* AI Q&A Chat */}
+        <CountryChat country={country} />
+
         {/* Comparable Countries */}
         {comparables.length > 0 && (
           <div className="card rounded-2xl p-6 sm:p-8">
             <h2 className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: "var(--text-3)" }}>
-              Similar Trajectory
+              Most Similar Countries
             </h2>
             <p className="text-xs mb-5" style={{ color: "var(--text-3)" }}>
-              Countries on a comparable AI development path
+              Nearest neighbours by 5-pillar Euclidean distance
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {comparables.map((comp) => (

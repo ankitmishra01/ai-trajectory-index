@@ -1,5 +1,7 @@
 "use client";
 
+import { useCountUp } from "@/hooks/useCountUp";
+
 interface ScoreGaugeProps {
   score: number;
   size?: number;
@@ -24,13 +26,14 @@ function colors(score: number) {
 }
 
 export default function ScoreGauge({ score, size = 200 }: ScoreGaugeProps) {
+  const animated = useCountUp(score, 900);
   const cx = size / 2;
   const cy = size / 2 + 10;
   const r  = size * 0.38;
   const sw = size * 0.075;
   const a1 = -210, a2 = 30;
-  const filled = a1 + (score / 100) * (a2 - a1);
-  const { stroke, glow, text } = colors(score);
+  const filled = a1 + (animated / 100) * (a2 - a1);
+  const { stroke, glow, text } = colors(animated);
 
   return (
     <div className="flex flex-col items-center">
@@ -55,7 +58,7 @@ export default function ScoreGauge({ score, size = 200 }: ScoreGaugeProps) {
           fill={text} fontSize={size * 0.22} fontWeight="900"
           fontFamily="Inter, system-ui, sans-serif"
           style={{ filter: `drop-shadow(0 0 8px ${glow})` }}>
-          {score}
+          {animated}
         </text>
         <text x={cx} y={cy + size * 0.17} textAnchor="middle" dominantBaseline="middle"
           fill="var(--text-3)" fontSize={size * 0.08} fontFamily="Inter, system-ui, sans-serif">

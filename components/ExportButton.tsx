@@ -2,10 +2,13 @@
 
 import { useState } from "react";
 import type { ScoredCountry } from "@/lib/types";
+import { weightedScore } from "@/components/PillarWeights";
+import type { Weights } from "@/components/PillarWeights";
 
 interface Props {
   countries: ScoredCountry[];
   globalRanks: Record<string, number>;
+  pillarWeights?: Weights;
 }
 
 function scoreBandLabel(score: number): string {
@@ -15,10 +18,16 @@ function scoreBandLabel(score: number): string {
   return "Nascent";
 }
 
-function buildCSV(countries: ScoredCountry[], globalRanks: Record<string, number>): string {
+function isDefaultWeights(w: Weights) {
+  return Object.values(w).every((v) => v === 20);
+}
+
+function buildCSV(countries: ScoredCountry[], globalRanks: Record<string, number>, weights?: Weights): string {
+  const useWeights = weights && !isDefaultWeights(weights);
   const headers = [
     "Rank", "Country", "Flag", "Region",
     "Score", "Infrastructure", "Talent", "Governance", "Investment", "Economic_Readiness",
+    ...(useWeights ? ["Weighted_Score"] : []),
     "Tier", "Trajectory", "Trajectory_Score",
     "Projected_2028", "Point_Change",
   ];
@@ -36,6 +45,7 @@ function buildCSV(countries: ScoredCountry[], globalRanks: Record<string, number
       c.scores.governance.score,
       c.scores.investment.score,
       c.scores.economic_readiness.score,
+      ...(useWeights ? [weightedScore(c.scores, weights!)] : []),
       scoreBandLabel(c.total_score),
       `"${c.trajectory_label}"`,
       c.trajectory_score,
@@ -92,11 +102,11 @@ function triggerDownload(content: string, filename: string, type: string) {
   URL.revokeObjectURL(url);
 }
 
-export default function ExportButton({ countries, globalRanks }: Props) {
+export default function ExportButton({ countries, globalRanks, pillarWeights }: Props) {
   const [open, setOpen] = useState(false);
 
   function downloadCSV() {
-    triggerDownload(buildCSV(countries, globalRanks), "ai_trajectory_index_2026_data.csv", "text/csv");
+    triggerDownload(buildCSV(countries, globalRanks, pillarWeights), "ai_trajectory_index_2026_data.csv", "text/csv");
     setOpen(false);
   }
 

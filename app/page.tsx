@@ -11,7 +11,11 @@ import ComparisonPanel from "@/components/ComparisonPanel";
 import KeyInsights from "@/components/KeyInsights";
 import FastestMovers from "@/components/FastestMovers";
 import LastVisitBanner from "@/components/LastVisitBanner";
+import ScoreAlertBanner from "@/components/ScoreAlertBanner";
 import NewsTicker from "@/components/NewsTicker";
+import PillarWeights, { DEFAULT_WEIGHTS, weightedScore } from "@/components/PillarWeights";
+import type { Weights } from "@/components/PillarWeights";
+import GovernanceGapPanel from "@/components/GovernanceGapPanel";
 import staticData from "@/data/countries.json";
 import type { ScoredCountry, ScoresResponse } from "@/lib/types";
 
@@ -44,6 +48,18 @@ function decodeRegion(s: string): Region {
   return map[s] ?? "All";
 }
 
+function levenshtein(a: string, b: string): number {
+  const m = a.length, n = b.length;
+  const dp: number[][] = Array.from({ length: m + 1 }, (_, i) => Array(n + 1).fill(0).map((_, j) => j === 0 ? i : 0));
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      dp[i][j] = a[i - 1] === b[j - 1] ? dp[i - 1][j - 1] : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+    }
+  }
+  return dp[m][n];
+}
+
 export default function Home() {
   const [search, setSearch]               = useState("");
   const [region, setRegion]               = useState<Region>("All");
@@ -54,9 +70,11 @@ export default function Home() {
   const [compareList, setCompareList]     = useState<string[]>([]);
   const [shareToast, setShareToast]       = useState(false);
   const [compareToast, setCompareToast]   = useState(false);
+  const [watchlist, setWatchlist]         = useState<string[]>([]);
+  const [pillarWeights, setPillarWeights] = useState<Weights>(DEFAULT_WEIGHTS);
 
   const [countries, setCountries] = useState<ScoredCountry[]>(() =>
-    staticData.countries.map((c) => ({ ...c, data_source: "fallback" as const }))
+    staticData.countries.map((c) => ({ ...c, data_source: "fallback" as const, wb_data_year: null }))
   );
   const [loading, setLoading]         = useState(true);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
@@ -77,6 +95,14 @@ export default function Home() {
     const s = p.get("sort");       if (s) setSort(s as SortKey);
     const v = p.get("view");       if (v === "table") setView("table");
     const q = p.get("q");          if (q) setSearch(q);
+    const w = p.get("w");
+    if (w) {
+      const parts = w.split("-").map(Number);
+      if (parts.length === 5 && parts.every((n) => !isNaN(n) && n >= 0 && n <= 100)) {
+        const [infrastructure, talent, governance, investment, economic_readiness] = parts;
+        setPillarWeights({ infrastructure, talent, governance, investment, economic_readiness });
+      }
+    }
   }, []);
 
   // ── Sync filters → URL ───────────────────────────────────────────────────
@@ -90,9 +116,31 @@ export default function Home() {
     if (sort !== "total_score")    p.set("sort", sort);
     if (view !== "grid")           p.set("view", view);
     if (search)                    p.set("q", encodeURIComponent(search));
+    const { infrastructure, talent, governance, investment, economic_readiness } = pillarWeights;
+    if (infrastructure !== 20 || talent !== 20 || governance !== 20 || investment !== 20 || economic_readiness !== 20) {
+      p.set("w", [infrastructure, talent, governance, investment, economic_readiness].join("-"));
+    }
     const qs = p.toString();
     window.history.replaceState({}, "", qs ? `?${qs}` : window.location.pathname);
-  }, [region, tier, trajectoryFilter, sort, view, search]);
+  }, [region, tier, trajectoryFilter, sort, view, search, pillarWeights]);
+
+  // ── Watchlist (localStorage) ──────────────────────────────────────────────
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("ati_watchlist");
+      if (raw) setWatchlist(JSON.parse(raw));
+    } catch { /* ignore */ }
+  }, []);
+
+  const toggleWatchlist = useCallback((slug: string) => {
+    setWatchlist((prev) => {
+      const next = prev.includes(slug)
+        ? prev.filter((s) => s !== slug)
+        : prev.length >= 10 ? prev : [...prev, slug];
+      try { localStorage.setItem("ati_watchlist", JSON.stringify(next)); } catch { /* ignore */ }
+      return next;
+    });
+  }, []);
 
   // ── Fetch live data ───────────────────────────────────────────────────────
   useEffect(() => {
@@ -121,9 +169,14 @@ export default function Home() {
     });
   }, []);
 
+  // Effective score: weighted if custom weights active, otherwise total_score
+  const effectiveScore = useCallback((c: ScoredCountry) =>
+    weightedScore(c.scores, pillarWeights),
+  [pillarWeights]);
+
   const ranked = useMemo(
-    () => [...countries].sort((a, b) => b.total_score - a.total_score),
-    [countries]
+    () => [...countries].sort((a, b) => effectiveScore(b) - effectiveScore(a)),
+    [countries, effectiveScore]
   );
   const globalRanks = useMemo(
     () => Object.fromEntries(ranked.map((c, i) => [c.slug, i + 1])),
@@ -135,7 +188,7 @@ export default function Home() {
       .filter((c) => {
         const ms  = c.name.toLowerCase().includes(search.toLowerCase());
         const mr  = region === "All" || c.region === region;
-        const mt  = tier === "All" || scoreBandLabel(c.total_score) === tier;
+        const mt  = tier === "All" || scoreBandLabel(effectiveScore(c)) === tier;
         const mtr = trajectoryFilter === "All" || c.trajectory_label === trajectoryFilter;
         return ms && mr && mt && mtr;
       })
@@ -143,10 +196,21 @@ export default function Home() {
         if (sort === "alphabetical")    return a.name.localeCompare(b.name);
         if (sort === "trajectory_gain") return (b.projected_score_2028 - b.total_score) - (a.projected_score_2028 - a.total_score);
         if (sort === "governance_gap")  return (b.total_score / 5 - b.scores.governance.score) - (a.total_score / 5 - a.scores.governance.score);
+        if (sort === "total_score")     return effectiveScore(b) - effectiveScore(a);
         return (b[sort] as number) - (a[sort] as number);
       }),
-    [countries, search, region, sort, tier, trajectoryFilter]
+    [countries, search, region, sort, tier, trajectoryFilter, effectiveScore]
   );
+
+  // Fuzzy "Did you mean?" — only computed when search returns no results
+  const fuzzySuggestion = useMemo(() => {
+    if (filtered.length > 0 || !search.trim()) return null;
+    const q = search.trim().toLowerCase();
+    const best = countries
+      .map((c) => ({ c, score: levenshtein(q, c.name.toLowerCase().slice(0, q.length + 3)) }))
+      .sort((a, b) => a.score - b.score)[0];
+    return best && best.score <= Math.max(2, Math.floor(q.length / 2)) ? best.c : null;
+  }, [filtered.length, search, countries]);
 
   const topCountry     = ranked[0];
   const avgScore       = Math.round(countries.reduce((s, c) => s + c.total_score, 0) / (countries.length || 1));
@@ -208,6 +272,13 @@ export default function Home() {
               <span>🚀</span>
               <span className="hidden sm:inline">Adoption</span>
             </Link>
+            <Link href="/explore" className="btn-secondary hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              Explore
+            </Link>
             <Link href="/map" className="btn-secondary flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl">
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -245,6 +316,8 @@ export default function Home() {
 
         {/* ── Last visit banner ── */}
         <LastVisitBanner countries={countries} />
+        {/* ── Score change alerts ── */}
+        {!loading && <ScoreAlertBanner countries={countries} />}
 
         {staleWarn && (
           <div className="mb-6 px-4 py-3 rounded-xl text-sm flex items-center gap-2 fade-up"
@@ -417,13 +490,25 @@ export default function Home() {
           />
         </div>
 
+        {/* ── Governance Gap Leaderboard ── */}
+        {!loading && (
+          <div className="mb-6">
+            <GovernanceGapPanel countries={countries} />
+          </div>
+        )}
+
         {/* ── Filter bar + controls ── */}
         <div ref={gridRef} className="flex flex-col gap-3 mb-6 scroll-mt-32">
-          <FilterBar
-            search={search} region={region} sort={sort} tier={tier} trajectoryFilter={trajectoryFilter}
-            onSearch={setSearch} onRegion={setRegion} onSort={setSort} onTier={setTier} onTrajectoryFilter={setTrajectory}
-            total={countries.length} filtered={filtered.length}
-          />
+          <div className="flex items-center gap-2">
+            <div className="flex-1">
+              <FilterBar
+                search={search} region={region} sort={sort} tier={tier} trajectoryFilter={trajectoryFilter}
+                onSearch={setSearch} onRegion={setRegion} onSort={setSort} onTier={setTier} onTrajectoryFilter={setTrajectory}
+                total={countries.length} filtered={filtered.length}
+              />
+            </div>
+            <PillarWeights weights={pillarWeights} onChange={setPillarWeights} />
+          </div>
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs" style={{ color: "var(--text-3)" }}>View as</span>
             {(["grid", "table"] as ViewMode[]).map((v) => (
@@ -469,10 +554,40 @@ export default function Home() {
                 </svg>
                 <span className="hidden sm:inline">Share view</span>
               </button>
-              <ExportButton countries={filtered} globalRanks={globalRanks} />
+              <ExportButton countries={filtered} globalRanks={globalRanks} pillarWeights={pillarWeights} />
             </div>
           </div>
         </div>
+
+        {/* ── Watchlist pinned strip ── */}
+        {watchlist.length > 0 && !loading && (() => {
+          const pinned = watchlist
+            .map((slug) => countries.find((c) => c.slug === slug))
+            .filter(Boolean) as ScoredCountry[];
+          if (!pinned.length) return null;
+          return (
+            <div className="mb-6">
+              <div className="flex items-center gap-2 mb-3">
+                <svg className="w-3.5 h-3.5" fill="#fbbf24" viewBox="0 0 24 24">
+                  <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                </svg>
+                <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "#fbbf24" }}>
+                  Watchlist — {pinned.length} pinned
+                </p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                {pinned.map((c) => (
+                  <CountryCard
+                    key={c.slug} country={c} rank={globalRanks[c.slug] ?? 0}
+                    isWatchlisted onWatchlistToggle={toggleWatchlist}
+                    isComparing={compareList.includes(c.slug)} onCompareToggle={toggleCompare}
+                  />
+                ))}
+              </div>
+              <div className="mt-4 border-b" style={{ borderColor: "var(--border)" }} />
+            </div>
+          );
+        })()}
 
         {/* ── Content ── */}
         {loading ? (
@@ -485,7 +600,21 @@ export default function Home() {
           <div className="text-center py-20 fade-up">
             <p className="text-4xl mb-4">🌐</p>
             <p className="text-lg font-semibold" style={{ color: "var(--text-2)" }}>No countries found</p>
-            <p className="text-sm mt-2" style={{ color: "var(--text-3)" }}>Try adjusting your search or filters</p>
+            {fuzzySuggestion ? (
+              <p className="text-sm mt-2" style={{ color: "var(--text-3)" }}>
+                Did you mean{" "}
+                <button
+                  onClick={() => setSearch(fuzzySuggestion.name)}
+                  className="font-semibold transition-colors hover:text-white underline"
+                  style={{ color: "var(--accent)" }}
+                >
+                  {fuzzySuggestion.flag} {fuzzySuggestion.name}
+                </button>
+                ?
+              </p>
+            ) : (
+              <p className="text-sm mt-2" style={{ color: "var(--text-3)" }}>Try adjusting your search or filters</p>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"
@@ -494,6 +623,7 @@ export default function Home() {
               <CountryCard
                 key={c.slug} country={c} rank={globalRanks[c.slug] ?? 0}
                 isComparing={compareList.includes(c.slug)} onCompareToggle={toggleCompare}
+                isWatchlisted={watchlist.includes(c.slug)} onWatchlistToggle={toggleWatchlist}
               />
             ))}
           </div>

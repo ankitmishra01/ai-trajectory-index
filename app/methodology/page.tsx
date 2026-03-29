@@ -522,6 +522,80 @@ export default function MethodologyPage() {
             ))}
           </div>
         </div>
+        {/* Changelog */}
+        <div className="card rounded-2xl p-6 sm:p-8">
+          <h2 className="text-xs font-bold uppercase tracking-wider mb-5" style={{ color: "var(--text-3)" }}>
+            Methodology Changelog
+          </h2>
+          <div className="space-y-5">
+            {[
+              {
+                version: "v3",
+                date: "March 2026",
+                tag: "Current",
+                tagColor: "#4ade80",
+                changes: [
+                  "Removed R&D expenditure from Talent pillar — was double-counted with Investment.",
+                  "Removed GDP per capita from Investment pillar — was double-counted with Economic Readiness.",
+                  "Removed electricity/internet/mobile from Economic Readiness — was triple-counted with Infrastructure.",
+                  "Switched GDP per capita to PPP-adjusted values (NY.GDP.PCAP.PP.KD) for fairer cross-country comparisons.",
+                  "Added WGI estimates (Rule of Law, Govt Effectiveness, Regulatory Quality) to Governance pillar.",
+                  "Added high-tech exports trend and labor productivity trend to Trajectory calculation.",
+                  "Total live World Bank indicators expanded from 6 to 17.",
+                ],
+              },
+              {
+                version: "v2",
+                date: "February 2026",
+                tag: "Previous",
+                tagColor: "#93c5fd",
+                changes: [
+                  "Replaced fully static scoring with live World Bank API integration (6 indicators, 24h cache).",
+                  "Added trajectory score (–10 to +10) based on year-over-year WB indicator deltas.",
+                  "Introduced projected_score_2028 = clamp(total + trajectory × 1.5, 0, 100).",
+                  "Added static fallback for countries with missing World Bank data.",
+                  "Launched /map page with Readiness and Adoption heat-map lenses.",
+                ],
+              },
+              {
+                version: "v1",
+                date: "January 2026",
+                tag: "Initial",
+                tagColor: "#fcd34d",
+                changes: [
+                  "Static baseline scores for 186 countries across 5 pillars (0–20 each).",
+                  "Scores cross-validated against IMF AIPI (174 countries) and Oxford Insights (195 countries).",
+                  "Policy flags (AI strategy, regulation, OECD membership) from OECD.AI Observatory.",
+                  "Qualitative evidence strings per pillar sourced from Stanford HAI, Tortoise, WIPO GII.",
+                ],
+              },
+            ].map((entry) => (
+              <div key={entry.version} className="flex gap-4">
+                <div className="flex flex-col items-center flex-shrink-0" style={{ width: 48 }}>
+                  <span className="text-xs font-black" style={{ color: entry.tagColor }}>{entry.version}</span>
+                  <div className="w-px flex-1 mt-1" style={{ background: "var(--border)" }} />
+                </div>
+                <div className="pb-2 flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-sm font-bold" style={{ color: "var(--text-1)" }}>{entry.date}</span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                      style={{ background: `${entry.tagColor}14`, color: entry.tagColor, border: `1px solid ${entry.tagColor}30` }}>
+                      {entry.tag}
+                    </span>
+                  </div>
+                  <ul className="space-y-1.5">
+                    {entry.changes.map((c, i) => (
+                      <li key={i} className="flex gap-2.5 items-start text-sm" style={{ color: "var(--text-2)" }}>
+                        <span className="mt-1.5 flex-shrink-0 w-1 h-1 rounded-full" style={{ background: entry.tagColor }} />
+                        {c}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* About the Builder */}

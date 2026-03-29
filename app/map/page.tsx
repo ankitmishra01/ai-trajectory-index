@@ -31,6 +31,7 @@ const DIMS = [
   "investment",
   "economic_readiness",
 ] as const;
+const PILLAR_KEYS = DIMS;
 const DIM_LABELS: Record<string, string> = {
   infrastructure: "Infra",
   talent: "Talent",
@@ -44,14 +45,17 @@ export default function MapPage() {
     staticData.countries.map((c) => ({
       ...c,
       data_source: "fallback" as const,
+      wb_data_year: null,
     }))
   );
   const [selectedSlugs, setSelectedSlugs] = useState<Set<string>>(new Set());
   const [mode, setMode] = useState<MapMode>("view");
-  const [mapLens, setMapLens] = useState<"readiness" | "adoption">("readiness");
+  type MapLens = "readiness" | "adoption" | "infrastructure" | "talent" | "governance" | "investment" | "economic_readiness";
+  const [mapLens, setMapLens] = useState<MapLens>("readiness");
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [thinking, setThinking] = useState(false);
+  const [mobilePanelOpen, setMobilePanelOpen] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   // Adoption score lookup
@@ -68,7 +72,22 @@ export default function MapPage() {
     () => Object.fromEntries(countries.map((c) => [c.slug, c.total_score])) as Record<string, number>,
     [countries]
   );
-  const scores = mapLens === "adoption" ? adoptionScores : readinessScores;
+
+  type PillarKey = typeof PILLAR_KEYS[number];
+
+  const pillarScores = useMemo(() => {
+    const result: Record<PillarKey, Record<string, number>> = {} as Record<PillarKey, Record<string, number>>;
+    for (const key of PILLAR_KEYS) {
+      result[key] = Object.fromEntries(
+        countries.map((c) => [c.slug, Math.round((c.scores[key].score / 20) * 100)])
+      );
+    }
+    return result;
+  }, [countries]);
+
+  const scores = mapLens === "adoption" ? adoptionScores
+    : PILLAR_KEYS.includes(mapLens as PillarKey) ? pillarScores[mapLens as PillarKey]
+    : readinessScores;
   const countryNames = useMemo(
     () =>
       Object.fromEntries(countries.map((c) => [c.slug, c.name])) as Record<
@@ -194,18 +213,26 @@ export default function MapPage() {
           </h1>
           <div className="ml-auto flex items-center gap-2">
             {/* Lens toggle */}
-            <div className="flex rounded-lg overflow-hidden border border-[#1c2847]">
-              {(["readiness", "adoption"] as const).map((lens) => (
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {([
+                { key: "readiness",         label: "Readiness",    color: "#3b82f6" },
+                { key: "adoption",          label: "Adoption",     color: "#22c55e" },
+                { key: "infrastructure",    label: "Infra",        color: "#3b82f6" },
+                { key: "talent",            label: "Talent",       color: "#8b5cf6" },
+                { key: "governance",        label: "Gov",          color: "#06b6d4" },
+                { key: "investment",        label: "Invest",       color: "#f59e0b" },
+                { key: "economic_readiness",label: "Econ",         color: "#22c55e" },
+              ] as const).map(({ key, label, color }) => (
                 <button
-                  key={lens}
-                  onClick={() => setMapLens(lens)}
-                  className="px-3 py-1.5 text-xs font-semibold transition-all"
-                  style={mapLens === lens
-                    ? { background: lens === "adoption" ? "#22c55e" : "#3b82f6", color: "#fff" }
-                    : { background: "#0f1628", color: "#64748b" }
+                  key={key}
+                  onClick={() => setMapLens(key)}
+                  className="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition-all border"
+                  style={mapLens === key
+                    ? { background: color, color: "#fff", borderColor: color }
+                    : { background: "#0f1628", color: "#64748b", borderColor: "#1c2847" }
                   }
                 >
-                  {lens === "readiness" ? "Readiness" : "Adoption"}
+                  {label}
                 </button>
               ))}
             </div>
@@ -249,6 +276,23 @@ export default function MapPage() {
         </div>
       </header>
 
+      {/* Mobile panel toggle (floating button) */}
+      <button
+        className="fixed bottom-4 right-4 z-50 lg:hidden flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold shadow-xl transition-all"
+        style={{
+          background: mobilePanelOpen ? "#3b82f6" : "#0f1628",
+          border: "1px solid " + (mobilePanelOpen ? "#3b82f6" : "#1c2847"),
+          color: mobilePanelOpen ? "#fff" : "#94a3b8",
+        }}
+        onClick={() => setMobilePanelOpen((o) => !o)}
+      >
+        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+            d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-3 3-3-3z" />
+        </svg>
+        {mobilePanelOpen ? "Close" : `Chat${selectedSlugs.size > 0 ? ` · ${selectedSlugs.size}` : ""}`}
+      </button>
+
       <div className="flex flex-col lg:flex-row flex-1 max-w-[1600px] mx-auto w-full">
         {/* Left: Map */}
         <div className="flex-1 p-4">
@@ -261,9 +305,19 @@ export default function MapPage() {
           ) : (
             <div className="mb-3 px-4 py-2 rounded-lg bg-[#0f1628] border border-[#1c2847] text-slate-500 text-xs flex items-center gap-2">
               <span>
-                Showing <span style={{ color: mapLens === "adoption" ? "#4ade80" : "#60a5fa", fontWeight: 600 }}>
-                  {mapLens === "adoption" ? "Adoption Scores" : "Readiness Scores"}
-                </span> · Click a country to select · hover for details
+                Showing{" "}
+                <span style={{ fontWeight: 600, color:
+                  mapLens === "adoption" ? "#4ade80" :
+                  mapLens === "talent" ? "#8b5cf6" :
+                  mapLens === "governance" ? "#06b6d4" :
+                  mapLens === "investment" ? "#f59e0b" :
+                  mapLens === "economic_readiness" ? "#22c55e" :
+                  mapLens === "infrastructure" ? "#3b82f6" : "#60a5fa" }}>
+                  {mapLens === "readiness" ? "Readiness Scores"
+                   : mapLens === "adoption" ? "Adoption Scores"
+                   : mapLens.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase()) + " Scores"}
+                </span>{" "}
+                · Click a country to select · hover for details
               </span>
             </div>
           )}
@@ -280,7 +334,13 @@ export default function MapPage() {
         </div>
 
         {/* Right: Selection + Chat */}
-        <div className="lg:w-96 xl:w-[420px] flex flex-col border-t lg:border-t-0 lg:border-l border-[#1c2847]">
+        <div className={`
+          lg:w-96 xl:w-[420px] flex flex-col border-[#1c2847]
+          lg:border-t-0 lg:border-l
+          ${mobilePanelOpen
+            ? "fixed inset-x-0 bottom-0 z-40 max-h-[75vh] border-t rounded-t-2xl overflow-hidden"
+            : "hidden lg:flex border-t"}
+        `} style={{ background: "#0a0f1e" }}>
           {/* Selected countries panel */}
           <div className="flex-1 overflow-y-auto max-h-[50vh] lg:max-h-none">
             <div className="sticky top-0 bg-[#0a0f1e] border-b border-[#1c2847] px-4 py-3 flex items-center justify-between">

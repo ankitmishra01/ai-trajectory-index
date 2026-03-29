@@ -584,6 +584,14 @@ export function calculateScores(
     100
   );
 
+  // Derive the most recent calendar year of WB data used for this country
+  const wbDataYear: number | null = wb
+    ? (Object.values(wb)
+        .map((v) => v.year)
+        .filter((y): y is number => y !== null)
+        .reduce<number | null>((max, y) => (max === null || y > max ? y : max), null))
+    : null;
+
   return {
     ...country,
     scores: {
@@ -601,5 +609,6 @@ export function calculateScores(
     trajectory_label: trajectoryLabel(trajectoryScore),
     projected_score_2028: projectedScore2028,
     data_source: hasLiveData ? "live" : "fallback",
+    wb_data_year: wbDataYear,
   };
 }

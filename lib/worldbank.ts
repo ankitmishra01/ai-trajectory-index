@@ -45,6 +45,7 @@ export type IndicatorKey = keyof typeof INDICATORS;
 export interface IndicatorValues {
   current: number | null;
   previous: number | null;
+  year: number | null;   // calendar year of the most recent data point
 }
 
 export type WorldBankData = Record<
@@ -94,18 +95,19 @@ async function fetchIndicator(
   const dataArray: WBDataPoint[] = Array.isArray(json[1]) ? json[1] : [];
 
   // Group by country ISO code; WB returns newest first when mrv=2
-  const byCountry: Record<string, (number | null)[]> = {};
+  const byCountry: Record<string, { value: number | null; date: string }[]> = {};
   for (const point of dataArray) {
     const iso = point.country.id;
     if (!byCountry[iso]) byCountry[iso] = [];
-    byCountry[iso].push(point.value);
+    byCountry[iso].push({ value: point.value, date: point.date });
   }
 
   const result: Record<string, IndicatorValues> = {};
-  for (const [iso, values] of Object.entries(byCountry)) {
+  for (const [iso, pts] of Object.entries(byCountry)) {
     result[iso] = {
-      current: values[0] ?? null,
-      previous: values[1] ?? null,
+      current:  pts[0]?.value ?? null,
+      previous: pts[1]?.value ?? null,
+      year:     pts[0]?.date ? parseInt(pts[0].date.slice(0, 4), 10) : null,
     };
   }
   return result;
@@ -162,7 +164,7 @@ export async function fetchWorldBankIndicators(): Promise<WorldBankData> {
     ])
   );
 
-  const empty: IndicatorValues = { current: null, previous: null };
+  const empty: IndicatorValues = { current: null, previous: null, year: null };
   const merged: WorldBankData = {};
 
   for (const iso of allIsos) {

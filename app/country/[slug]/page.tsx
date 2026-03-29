@@ -67,7 +67,29 @@ export default function CountryPage({ params }: { params: { slug: string } }) {
   const staticCountry = staticData.countries.find((c) => c.slug === params.slug);
   if (!staticCountry) notFound();
 
-  const initialCountry: ScoredCountry = { ...staticCountry, data_source: "fallback" as const };
+  const initialCountry: ScoredCountry = { ...staticCountry, data_source: "fallback" as const, wb_data_year: null };
 
-  return <CountryPageClient slug={params.slug} initialCountry={initialCountry} />;
+  const ranked = [...staticData.countries].sort((a, b) => b.total_score - a.total_score);
+  const rank   = ranked.findIndex((c) => c.slug === params.slug) + 1;
+  const url    = `${SITE_URL}/country/${params.slug}`;
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Dataset",
+    name: `${staticCountry.name} — AI Readiness Score`,
+    description: `AI Readiness Score: ${staticCountry.total_score}/100. Ranked #${rank} globally across 186 economies.`,
+    url,
+    creator: { "@type": "Person", name: "Ankit Mishra", url: "https://ankitmishra.ca" },
+    keywords: ["artificial intelligence", "AI readiness", staticCountry.name, staticCountry.region],
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <CountryPageClient slug={params.slug} initialCountry={initialCountry} />
+    </>
+  );
 }

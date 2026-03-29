@@ -43,7 +43,7 @@ const ADOPT_DIM_SHORT: Record<string, string> = { government: "Gov", enterprise:
 
 export default function RegionDeepDive({ config }: Props) {
   const [countries, setCountries] = useState<ScoredCountry[]>(() =>
-    staticData.countries.map((c) => ({ ...c, data_source: "fallback" as const }))
+    staticData.countries.map((c) => ({ ...c, data_source: "fallback" as const, wb_data_year: null }))
   );
   const [loading, setLoading] = useState(true);
   const [lens, setLens] = useState<"readiness" | "adoption">("readiness");
@@ -170,6 +170,34 @@ export default function RegionDeepDive({ config }: Props) {
             style={{ background: `rgba(${config.accentRgb},.10)`, color: config.accentColor, border: `1px solid rgba(${config.accentRgb},.22)` }}>
             {regional.length} economies
           </span>
+          {/* Download */}
+          <button
+            onClick={() => {
+              const headers = ["Rank","Country","Flag","Sub-region","Score","Infrastructure","Talent","Governance","Investment","Economic_Readiness","Trajectory","Projected_2028"];
+              const ranked = [...regional].sort((a, b) => b.total_score - a.total_score);
+              const rows = ranked.map((c, i) => [
+                i + 1, `"${c.name}"`, c.flag, `"${config.subregions[c.slug] ?? ""}"`,
+                c.total_score, c.scores.infrastructure.score, c.scores.talent.score,
+                c.scores.governance.score, c.scores.investment.score, c.scores.economic_readiness.score,
+                `"${c.trajectory_label}"`, c.projected_score_2028,
+              ]);
+              const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+              const blob = new Blob([csv], { type: "text/csv" });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a"); a.href = url;
+              a.download = `ati_${config.id}_2026.csv`; a.click();
+              URL.revokeObjectURL(url);
+            }}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all"
+            style={{ background: "var(--raised)", color: "var(--text-2)", border: "1px solid var(--border)" }}
+          >
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            CSV
+          </button>
+
           {/* Lens toggle */}
           <div className="flex rounded-xl overflow-hidden" style={{ border: "1px solid var(--border)" }}>
             {(["readiness", "adoption"] as const).map((l) => (
