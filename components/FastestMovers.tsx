@@ -8,161 +8,86 @@ interface FastestMoversProps {
   onSortClick: () => void;
 }
 
-const RANK_COLORS   = ["#f59e0b", "#94a3b8", "#cd7c3a", "#7a96b8", "#7a96b8"];
-const RANK_BG       = ["rgba(245,158,11,.08)", "rgba(148,163,184,.06)", "rgba(205,124,58,.07)", "rgba(122,150,184,.05)", "rgba(122,150,184,.05)"];
-const RANK_LABELS   = ["🥇", "🥈", "🥉", "#4", "#5"];
+function MiniSparkline({ from, to, width = 120, height = 28 }: { from: number; to: number; width?: number; height?: number }) {
+  const trend = to - from;
+  const color = trend > 0 ? "var(--positive)" : trend < 0 ? "var(--negative)" : "var(--dt-text-3)";
+  const pts = Array.from({ length: 12 }, (_, i) => {
+    const t = i / 11;
+    const noise = Math.sin(i * 1.7) * Math.abs(trend) * 0.15;
+    return from + trend * t + noise;
+  });
+  const min = Math.min(...pts) - 1;
+  const max = Math.max(...pts) + 1;
+  const range = max - min || 1;
+  const pathD = pts.map((p, i) => {
+    const x = (i / 11) * width;
+    const y = height - ((p - min) / range) * height;
+    return `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(" ");
+  const lastY = height - ((pts[11] - min) / range) * height;
+  return (
+    <svg width={width} height={height} style={{ display: "block" }}>
+      <path d={pathD} stroke={color} strokeWidth={1.25} fill="none" />
+      <circle cx={width} cy={lastY.toFixed(2)} r={2} fill={color} />
+    </svg>
+  );
+}
 
 export default function FastestMovers({ countries, onSortClick }: FastestMoversProps) {
-  const top5 =
-    countries.length > 0
-      ? [...countries]
-          .sort(
-            (a, b) =>
-              (b.projected_score_2028 - b.total_score) -
-              (a.projected_score_2028 - a.total_score)
-          )
-          .slice(0, 5)
-      : null;
+  const top5 = countries.length > 0
+    ? [...countries]
+        .sort((a, b) => (b.projected_score_2028 - b.total_score) - (a.projected_score_2028 - a.total_score))
+        .slice(0, 5)
+    : null;
 
   return (
-    <div>
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+    <section style={{ background: "var(--dt-bg)", padding: "40px 48px" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 20 }}>
         <div>
-          <p
-            className="text-[11px] font-bold uppercase tracking-widest"
-            style={{ color: "var(--accent)" }}
-          >
-            Countries to Watch in 2026
-          </p>
-          <p className="text-xs mt-0.5" style={{ color: "var(--text-3)" }}>
-            Ranked by projected 2028 score gain
-          </p>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--signal)", letterSpacing: "0.16em", fontWeight: 700, marginBottom: 4 }}>↑ TRAJECTORY</div>
+          <h4 style={{ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 400, color: "var(--dt-text-0)", margin: 0, letterSpacing: "-0.015em" }}>
+            Fastest movers · projected 2028
+          </h4>
         </div>
         <button
           onClick={onSortClick}
-          className="text-xs transition-opacity hover:opacity-70 whitespace-nowrap"
-          style={{ color: "var(--accent)" }}
+          style={{ fontFamily: "var(--font-sans)", fontSize: 12, color: "var(--dt-text-2)", fontWeight: 600, background: "none", border: "none", cursor: "pointer" }}
         >
-          See all →
+          Sort grid by trajectory →
         </button>
       </div>
 
-      {/* Card row */}
-      <div
-        className="flex gap-3 pb-1"
-        style={{ overflowX: "auto", scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
-      >
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 1, background: "var(--dt-border)", border: "1px solid var(--dt-border)" }}>
         {top5 === null
           ? Array.from({ length: 5 }).map((_, i) => (
-              <div
-                key={i}
-                className="skeleton rounded-2xl flex-shrink-0"
-                style={{ width: 164, height: 196 }}
-              />
+              <div key={i} className="skeleton" style={{ height: 160, background: "var(--dt-surface)" }} />
             ))
           : top5.map((c, i) => {
-              const delta    = Math.round(c.projected_score_2028 - c.total_score);
-              const pct      = Math.round((c.total_score / 100) * 100);
-              const pctProj  = Math.round((c.projected_score_2028 / 100) * 100);
-
+              const gain = Math.round(c.projected_score_2028 - c.total_score);
               return (
                 <Link
                   key={c.slug}
                   href={`/country/${c.slug}`}
-                  className="flex-shrink-0 rounded-2xl flex flex-col transition-all duration-200 overflow-hidden"
-                  style={{
-                    width: 164,
-                    background: "var(--surface)",
-                    border: "1px solid var(--border)",
-                    textDecoration: "none",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = "rgba(59,130,246,.4)";
-                    e.currentTarget.style.transform = "translateY(-2px)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = "var(--border)";
-                    e.currentTarget.style.transform = "translateY(0)";
-                  }}
+                  style={{ background: "var(--dt-surface)", padding: "20px 18px", textDecoration: "none", display: "block", transition: "background .15s" }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "var(--dt-raised)"; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "var(--dt-surface)"; }}
                 >
-                  {/* Rank colour accent bar */}
-                  <div style={{ height: 3, background: RANK_COLORS[i], flexShrink: 0 }} />
-
-                  <div className="p-4 flex flex-col flex-1">
-                    {/* Rank + region row */}
-                    <div className="flex items-center justify-between mb-3">
-                      <span
-                        className="text-[11px] font-black"
-                        style={{ color: RANK_COLORS[i] }}
-                      >
-                        {i < 3 ? RANK_LABELS[i] : `#${i + 1}`}
-                      </span>
-                      <span
-                        className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full truncate max-w-[80px]"
-                        style={{
-                          background: RANK_BG[i],
-                          color: "var(--text-3)",
-                        }}
-                      >
-                        {c.region}
-                      </span>
-                    </div>
-
-                    {/* Flag + name */}
-                    <span className="text-[38px] leading-none mb-2">{c.flag}</span>
-                    <p
-                      className="text-xs font-bold leading-snug mb-3"
-                      style={{ color: "var(--text-1)", minHeight: "2.4em" }}
-                    >
-                      {c.name}
-                    </p>
-
-                    {/* Score progress bar */}
-                    <div className="mb-3">
-                      <div
-                        className="w-full rounded-full overflow-hidden"
-                        style={{ height: 4, background: "var(--raised)" }}
-                      >
-                        {/* base score fill */}
-                        <div
-                          className="h-full rounded-full relative"
-                          style={{
-                            width: `${pctProj}%`,
-                            background: `linear-gradient(90deg, rgba(59,130,246,.35) ${Math.round((pct / pctProj) * 100)}%, #4ade80 ${Math.round((pct / pctProj) * 100)}%)`,
-                          }}
-                        />
-                      </div>
-                      <div className="flex justify-between mt-1">
-                        <span className="text-[9px]" style={{ color: "var(--text-3)" }}>
-                          {c.total_score}
-                        </span>
-                        <span className="text-[9px]" style={{ color: "#4ade80" }}>
-                          {c.projected_score_2028}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Delta — hero number */}
-                    <div
-                      className="mt-auto flex items-baseline gap-1.5 rounded-xl px-2.5 py-1.5"
-                      style={{ background: "rgba(34,197,94,.08)", border: "1px solid rgba(34,197,94,.15)" }}
-                    >
-                      <span
-                        className="text-lg font-black leading-none"
-                        style={{ color: "#4ade80" }}
-                      >
-                        +{delta}
-                      </span>
-                      <span className="text-[10px]" style={{ color: "#86efac" }}>
-                        pts by 2028
-                      </span>
-                    </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 12 }}>
+                    <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--dt-text-3)", fontWeight: 600 }}>#{i + 1}</span>
+                    <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--positive)", fontWeight: 600 }}>+{gain} pts</span>
+                  </div>
+                  <div style={{ fontSize: 28, marginBottom: 4 }}>{c.flag}</div>
+                  <div style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 500, color: "var(--dt-text-0)", lineHeight: 1.1, marginBottom: 10 }}>{c.name}</div>
+                  <MiniSparkline from={c.total_score} to={c.projected_score_2028} width={120} height={28} />
+                  <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--dt-text-2)" }}>
+                    <span>{c.total_score}</span>
+                    <span style={{ color: "var(--dt-text-3)" }}>→</span>
+                    <span style={{ color: "var(--dt-text-0)", fontWeight: 600 }}>{c.projected_score_2028}</span>
                   </div>
                 </Link>
               );
             })}
       </div>
-    </div>
+    </section>
   );
 }

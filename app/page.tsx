@@ -10,12 +10,6 @@ import ExportButton from "@/components/ExportButton";
 import ComparisonPanel from "@/components/ComparisonPanel";
 import KeyInsights from "@/components/KeyInsights";
 import FastestMovers from "@/components/FastestMovers";
-import LastVisitBanner from "@/components/LastVisitBanner";
-import ScoreAlertBanner from "@/components/ScoreAlertBanner";
-import NewsTicker from "@/components/NewsTicker";
-import PillarWeights, { DEFAULT_WEIGHTS, weightedScore } from "@/components/PillarWeights";
-import type { Weights } from "@/components/PillarWeights";
-import GovernanceGapPanel from "@/components/GovernanceGapPanel";
 import staticData from "@/data/countries.json";
 import type { ScoredCountry, ScoresResponse } from "@/lib/types";
 
@@ -28,15 +22,6 @@ function scoreBandLabel(score: number): TierFilter {
   return "Nascent";
 }
 
-function regionalAvg(countries: ScoredCountry[], region: string) {
-  const rc = countries.filter((c) => c.region === region);
-  if (!rc.length) return 0;
-  return Math.round(rc.reduce((s, c) => s + c.total_score, 0) / rc.length);
-}
-
-const REGIONS_DISPLAY = ["Americas", "Europe", "Asia-Pacific", "Middle East & Africa"] as const;
-
-// ── URL helpers ───────────────────────────────────────────────────────────────
 function encodeRegion(r: Region) {
   return r === "All" ? "" : r.toLowerCase().replace(/\s+&\s+/g, "-").replace(/\s+/g, "-");
 }
@@ -50,14 +35,47 @@ function decodeRegion(s: string): Region {
 
 function levenshtein(a: string, b: string): number {
   const m = a.length, n = b.length;
-  const dp: number[][] = Array.from({ length: m + 1 }, (_, i) => Array(n + 1).fill(0).map((_, j) => j === 0 ? i : 0));
+  const dp: number[][] = Array.from({ length: m + 1 }, (_, i) =>
+    Array(n + 1).fill(0).map((_, j) => j === 0 ? i : 0)
+  );
   for (let j = 0; j <= n; j++) dp[0][j] = j;
-  for (let i = 1; i <= m; i++) {
-    for (let j = 1; j <= n; j++) {
+  for (let i = 1; i <= m; i++)
+    for (let j = 1; j <= n; j++)
       dp[i][j] = a[i - 1] === b[j - 1] ? dp[i - 1][j - 1] : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
-    }
-  }
   return dp[m][n];
+}
+
+// ── Tiny sparkline (editorial hero leaderboard) ─────────────────────────────
+function HeroSparkline({ from, to }: { from: number; to: number }) {
+  const trend = to - from;
+  const color = trend > 0 ? "var(--positive)" : trend < 0 ? "var(--negative)" : "var(--ed-muted)";
+  const width = 48, height = 20;
+  const pts = Array.from({ length: 10 }, (_, i) => {
+    const t = i / 9;
+    const noise = Math.sin(i * 1.7) * Math.abs(trend) * 0.12;
+    return from + trend * t + noise;
+  });
+  const min = Math.min(...pts) - 1;
+  const max = Math.max(...pts) + 1;
+  const range = max - min || 1;
+  const pathD = pts.map((p, i) => {
+    const x = (i / 9) * width;
+    const y = height - ((p - min) / range) * height;
+    return `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(" ");
+  return (
+    <svg width={width} height={height} style={{ display: "block", flexShrink: 0 }}>
+      <path d={pathD} stroke={color} strokeWidth={1.25} fill="none" />
+    </svg>
+  );
+}
+
+const REGIONS_DISPLAY = ["Americas", "Europe", "Asia-Pacific", "Middle East & Africa"] as const;
+
+function regionalAvg(countries: ScoredCountry[], region: string) {
+  const rc = countries.filter((c) => c.region === region);
+  if (!rc.length) return 0;
+  return Math.round(rc.reduce((s, c) => s + c.total_score, 0) / rc.length);
 }
 
 export default function Home() {
@@ -68,63 +86,46 @@ export default function Home() {
   const [trajectoryFilter, setTrajectory] = useState<TrajectoryFilter>("All");
   const [view, setView]                   = useState<ViewMode>("grid");
   const [compareList, setCompareList]     = useState<string[]>([]);
+  const [watchlist, setWatchlist]         = useState<string[]>([]);
   const [shareToast, setShareToast]       = useState(false);
   const [compareToast, setCompareToast]   = useState(false);
-  const [watchlist, setWatchlist]         = useState<string[]>([]);
-  const [pillarWeights, setPillarWeights] = useState<Weights>(DEFAULT_WEIGHTS);
 
   const [countries, setCountries] = useState<ScoredCountry[]>(() =>
     staticData.countries.map((c) => ({ ...c, data_source: "fallback" as const, wb_data_year: null }))
   );
-  const [loading, setLoading]         = useState(true);
+  const [loading, setLoading]     = useState(true);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
-  const [usingLive, setUsingLive]     = useState(false);
-  const [staleWarn, setStaleWarn]     = useState(false);
+  const [usingLive, setUsingLive] = useState(false);
 
-  const urlInitialisedRef = useRef(false);
-  const gridRef = useRef<HTMLDivElement>(null);
+  const urlInitRef = useRef(false);
+  const gridRef    = useRef<HTMLDivElement>(null);
 
-  // ── Read URL params on mount ──────────────────────────────────────────────
   useEffect(() => {
-    if (typeof window === "undefined" || urlInitialisedRef.current) return;
-    urlInitialisedRef.current = true;
+    if (typeof window === "undefined" || urlInitRef.current) return;
+    urlInitRef.current = true;
     const p = new URLSearchParams(window.location.search);
-    const r = p.get("region");     if (r) setRegion(decodeRegion(r));
-    const t = p.get("tier");       if (t) setTier(t as TierFilter);
-    const tr = p.get("trajectory");if (tr) setTrajectory(tr.replace(/-/g, " ") as TrajectoryFilter);
-    const s = p.get("sort");       if (s) setSort(s as SortKey);
-    const v = p.get("view");       if (v === "table") setView("table");
-    const q = p.get("q");          if (q) setSearch(q);
-    const w = p.get("w");
-    if (w) {
-      const parts = w.split("-").map(Number);
-      if (parts.length === 5 && parts.every((n) => !isNaN(n) && n >= 0 && n <= 100)) {
-        const [infrastructure, talent, governance, investment, economic_readiness] = parts;
-        setPillarWeights({ infrastructure, talent, governance, investment, economic_readiness });
-      }
-    }
+    const r = p.get("region"); if (r) setRegion(decodeRegion(r));
+    const t = p.get("tier");   if (t) setTier(t as TierFilter);
+    const tr = p.get("trajectory"); if (tr) setTrajectory(tr.replace(/-/g, " ") as TrajectoryFilter);
+    const s = p.get("sort");   if (s) setSort(s as SortKey);
+    const v = p.get("view");   if (v === "table") setView("table");
+    const q = p.get("q");      if (q) setSearch(q);
   }, []);
 
-  // ── Sync filters → URL ───────────────────────────────────────────────────
   useEffect(() => {
-    if (!urlInitialisedRef.current) return;
+    if (!urlInitRef.current) return;
     const p = new URLSearchParams();
     const er = encodeRegion(region);
-    if (er)                        p.set("region", er);
-    if (tier !== "All")            p.set("tier", tier.toLowerCase());
-    if (trajectoryFilter !== "All") p.set("trajectory", trajectoryFilter.toLowerCase().replace(/\s+/g, "-"));
-    if (sort !== "total_score")    p.set("sort", sort);
-    if (view !== "grid")           p.set("view", view);
-    if (search)                    p.set("q", encodeURIComponent(search));
-    const { infrastructure, talent, governance, investment, economic_readiness } = pillarWeights;
-    if (infrastructure !== 20 || talent !== 20 || governance !== 20 || investment !== 20 || economic_readiness !== 20) {
-      p.set("w", [infrastructure, talent, governance, investment, economic_readiness].join("-"));
-    }
+    if (er)                          p.set("region", er);
+    if (tier !== "All")              p.set("tier", tier.toLowerCase());
+    if (trajectoryFilter !== "All")  p.set("trajectory", trajectoryFilter.toLowerCase().replace(/\s+/g, "-"));
+    if (sort !== "total_score")      p.set("sort", sort);
+    if (view !== "grid")             p.set("view", view);
+    if (search)                      p.set("q", encodeURIComponent(search));
     const qs = p.toString();
     window.history.replaceState({}, "", qs ? `?${qs}` : window.location.pathname);
-  }, [region, tier, trajectoryFilter, sort, view, search, pillarWeights]);
+  }, [region, tier, trajectoryFilter, sort, view, search]);
 
-  // ── Watchlist (localStorage) ──────────────────────────────────────────────
   useEffect(() => {
     try {
       const raw = localStorage.getItem("ati_watchlist");
@@ -142,7 +143,6 @@ export default function Home() {
     });
   }, []);
 
-  // ── Fetch live data ───────────────────────────────────────────────────────
   useEffect(() => {
     fetch("/api/scores")
       .then((r) => r.json())
@@ -150,8 +150,6 @@ export default function Home() {
         setCountries(data.countries);
         setLastUpdated(data.last_updated);
         setUsingLive(data.using_live_data);
-        if (new Date(data.last_updated).getTime() < Date.now() - 7 * 24 * 60 * 60 * 1000)
-          setStaleWarn(true);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -160,23 +158,14 @@ export default function Home() {
   const toggleCompare = useCallback((slug: string) => {
     setCompareList((prev) => {
       if (prev.includes(slug)) return prev.filter((s) => s !== slug);
-      if (prev.length >= 3) {
-        setCompareToast(true);
-        setTimeout(() => setCompareToast(false), 2500);
-        return prev;
-      }
+      if (prev.length >= 3) { setCompareToast(true); setTimeout(() => setCompareToast(false), 2500); return prev; }
       return [...prev, slug];
     });
   }, []);
 
-  // Effective score: weighted if custom weights active, otherwise total_score
-  const effectiveScore = useCallback((c: ScoredCountry) =>
-    weightedScore(c.scores, pillarWeights),
-  [pillarWeights]);
-
   const ranked = useMemo(
-    () => [...countries].sort((a, b) => effectiveScore(b) - effectiveScore(a)),
-    [countries, effectiveScore]
+    () => [...countries].sort((a, b) => b.total_score - a.total_score),
+    [countries]
   );
   const globalRanks = useMemo(
     () => Object.fromEntries(ranked.map((c, i) => [c.slug, i + 1])),
@@ -188,7 +177,7 @@ export default function Home() {
       .filter((c) => {
         const ms  = c.name.toLowerCase().includes(search.toLowerCase());
         const mr  = region === "All" || c.region === region;
-        const mt  = tier === "All" || scoreBandLabel(effectiveScore(c)) === tier;
+        const mt  = tier === "All" || scoreBandLabel(c.total_score) === tier;
         const mtr = trajectoryFilter === "All" || c.trajectory_label === trajectoryFilter;
         return ms && mr && mt && mtr;
       })
@@ -196,13 +185,11 @@ export default function Home() {
         if (sort === "alphabetical")    return a.name.localeCompare(b.name);
         if (sort === "trajectory_gain") return (b.projected_score_2028 - b.total_score) - (a.projected_score_2028 - a.total_score);
         if (sort === "governance_gap")  return (b.total_score / 5 - b.scores.governance.score) - (a.total_score / 5 - a.scores.governance.score);
-        if (sort === "total_score")     return effectiveScore(b) - effectiveScore(a);
-        return (b[sort] as number) - (a[sort] as number);
+        return b.total_score - a.total_score;
       }),
-    [countries, search, region, sort, tier, trajectoryFilter, effectiveScore]
+    [countries, search, region, sort, tier, trajectoryFilter]
   );
 
-  // Fuzzy "Did you mean?" — only computed when search returns no results
   const fuzzySuggestion = useMemo(() => {
     if (filtered.length > 0 || !search.trim()) return null;
     const q = search.trim().toLowerCase();
@@ -213,518 +200,444 @@ export default function Home() {
   }, [filtered.length, search, countries]);
 
   const topCountry     = ranked[0];
-  const avgScore       = Math.round(countries.reduce((s, c) => s + c.total_score, 0) / (countries.length || 1));
   const topTrajCountry = [...countries].sort((a, b) => (b.projected_score_2028 - b.total_score) - (a.projected_score_2028 - a.total_score))[0];
-  const fmtDate = lastUpdated
-    ? new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(new Date(lastUpdated))
-    : null;
+  const avgScore       = Math.round(countries.reduce((s, c) => s + c.total_score, 0) / (countries.length || 1));
   const compareCountries = useMemo(
     () => compareList.map((slug) => countries.find((c) => c.slug === slug)).filter(Boolean) as ScoredCountry[],
     [compareList, countries]
   );
 
-  function scrollToGrid() {
-    gridRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
+  const fmtDate = lastUpdated
+    ? new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(new Date(lastUpdated))
+    : null;
 
+  const now = new Date();
+  const dateStr = now.toLocaleDateString("en-US", { weekday: "long", day: "2-digit", month: "short", year: "numeric" }).toUpperCase();
+
+  function scrollToGrid() { gridRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }); }
   function shareView() {
     navigator.clipboard.writeText(window.location.href).then(() => {
-      setShareToast(true);
-      setTimeout(() => setShareToast(false), 2500);
+      setShareToast(true); setTimeout(() => setShareToast(false), 2500);
     });
   }
 
+  const liveCount = countries.filter((c) => c.data_source === "live").length;
+
+  // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <main className="min-h-screen" style={{ background: "var(--bg)" }}>
-      <div className="page-glow" />
+    <main style={{ minHeight: "100vh" }}>
 
-      {/* ── Global news ticker ── */}
-      <NewsTicker />
-
-      {/* ── Header ── */}
-      <header className="sticky top-0 z-50 backdrop-blur-sm"
-        style={{ borderBottom: "1px solid var(--border)", background: "rgba(6,11,20,.96)" }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div>
-              <h1 className="text-sm font-black tracking-tight font-display leading-none" style={{ color: "var(--text-1)" }}>
-                AI Trajectory Index
-              </h1>
-              <p className="text-[11px] mt-1" style={{ color: "var(--text-3)" }}>
-                {countries.length} economies · 5 pillars · {new Date().getFullYear()} edition
-              </p>
-            </div>
+      {/* ══════════════════════════════════════════════════════════════════════
+          EDITORIAL HEADER
+      ══════════════════════════════════════════════════════════════════════ */}
+      <header style={{ background: "var(--ed-bg)", borderBottom: "1px solid var(--ed-border)" }}>
+        {/* Date strip */}
+        <div style={{ borderBottom: "1px solid var(--ed-border)", padding: "8px 48px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--ed-text-2)", letterSpacing: "0.04em" }}>
+            <span>{dateStr}</span>
+            <span style={{ color: "var(--ed-border-strong)" }}>·</span>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+              <span style={{ width: 6, height: 6, borderRadius: 3, background: usingLive ? "var(--positive)" : "var(--ed-muted)" }} />
+              {usingLive ? `LIVE · WORLD BANK · 17 INDICATORS` : fmtDate ? `CACHED · ${fmtDate}` : "LOADING DATA…"}
+            </span>
           </div>
-          <div className="flex items-center gap-3">
-            {fmtDate && (
-              <div className="hidden sm:flex items-center gap-1.5 text-[11px]" style={{ color: "var(--text-3)" }}>
-                {usingLive
-                  ? <><span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" /><span>Live · {fmtDate}</span></>
-                  : <span>Cached · {fmtDate}</span>}
-              </div>
-            )}
-            <div className="hidden sm:block h-4 w-px" style={{ background: "var(--border)" }} />
-            <Link href="/methodology" className="hidden sm:block text-[11px] transition-colors hover:text-blue-400" style={{ color: "var(--text-3)" }}>
-              Methodology
-            </Link>
-            <Link href="/adoption" className="btn-secondary flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl"
-              style={{ color: "#4ade80", borderColor: "rgba(74,222,128,.3)" }}>
-              <span>🚀</span>
-              <span className="hidden sm:inline">Adoption</span>
-            </Link>
-            <Link href="/explore" className="btn-secondary hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-              Explore
-            </Link>
-            <Link href="/map" className="btn-secondary flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                  d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-              </svg>
-              <span className="hidden sm:inline">Map</span>
-            </Link>
-            <a href="https://ankitmishra.ca" target="_blank" rel="noopener noreferrer"
-              className="hidden sm:block text-[11px] font-medium transition-colors hover:text-blue-400" style={{ color: "var(--accent)" }}>
-              Ankit Mishra
-            </a>
+          <div style={{ display: "flex", gap: 20, fontFamily: "var(--font-sans)", fontSize: 12, color: "var(--ed-text-2)" }}>
+            <Link href="/methodology" style={{ color: "inherit", textDecoration: "none" }}>Methodology</Link>
+            <a href="https://ankitmishra.ca" target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "none" }}>Cite</a>
+            <Link href="/map" style={{ color: "inherit", textDecoration: "none" }}>Map</Link>
           </div>
         </div>
-        <div style={{ borderTop: "1px solid var(--border)" }}>
-          <nav className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center gap-0 overflow-x-auto"
-            style={{ scrollbarWidth: "none" }}>
+        {/* Masthead */}
+        <div style={{ padding: "20px 48px", display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
+          <div>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--signal)", fontWeight: 600, letterSpacing: "0.12em", marginBottom: 4 }}>VOL. III · 2026 EDITION</div>
+            <h1 style={{ fontFamily: "var(--font-display)", fontSize: 38, fontWeight: 400, fontStyle: "italic", letterSpacing: "-0.02em", color: "var(--ed-text-0)", lineHeight: 1, margin: 0 }}>
+              The AI Trajectory Index
+            </h1>
+          </div>
+          <nav style={{ display: "flex", gap: 28, fontFamily: "var(--font-sans)", fontSize: 13, fontWeight: 500, color: "var(--ed-text-1)" }}>
             {[
-              { href: "/americas",     emoji: "🌎", label: "Americas"     },
-              { href: "/europe",       emoji: "🌍", label: "Europe"       },
-              { href: "/africa",       emoji: "🌍", label: "Africa"       },
-              { href: "/middle-east",  emoji: "🕌", label: "Middle East"  },
-              { href: "/asia-pacific", emoji: "🌏", label: "Asia-Pacific" },
-            ].map(({ href, emoji, label }) => (
-              <Link key={href} href={href}
-                className="flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium whitespace-nowrap transition-colors hover:text-blue-400"
-                style={{ color: "var(--text-2)", borderBottom: "2px solid transparent" }}>
-                <span>{emoji}</span><span>{label}</span>
+              { label: "Index",       href: "/" },
+              { label: "Map",         href: "/map" },
+              { label: "Compare",     href: "/compare" },
+              { label: "Adoption",    href: "/adoption" },
+              { label: "Methodology", href: "/methodology" },
+            ].map((l, i) => (
+              <Link key={l.href} href={l.href}
+                style={{
+                  color: i === 0 ? "var(--ed-text-0)" : "var(--ed-text-1)",
+                  borderBottom: i === 0 ? "2px solid var(--signal)" : "2px solid transparent",
+                  paddingBottom: 4, textDecoration: "none",
+                }}>
+                {l.label}
               </Link>
             ))}
           </nav>
         </div>
       </header>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-8">
-
-        {/* ── Last visit banner ── */}
-        <LastVisitBanner countries={countries} />
-        {/* ── Score change alerts ── */}
-        {!loading && <ScoreAlertBanner countries={countries} />}
-
-        {staleWarn && (
-          <div className="mb-6 px-4 py-3 rounded-xl text-sm flex items-center gap-2 fade-up"
-            style={{ background: "rgba(245,158,11,.07)", border: "1px solid rgba(245,158,11,.22)", color: "var(--amber)" }}>
-            ⚠ Data may be outdated — live World Bank feed unavailable. Showing cached scores.
-          </div>
-        )}
-
-        {/* ── Hero ── */}
-        <div className="relative card shine-on-hover rounded-3xl overflow-hidden mb-6">
-          <div className="absolute inset-x-0 top-0 h-px"
-            style={{ background: "linear-gradient(90deg, transparent, rgba(59,130,246,.35), transparent)" }} />
-          <div className="absolute inset-0 pointer-events-none"
-            style={{ background: "radial-gradient(ellipse 70% 60% at 50% 0%, rgba(59,130,246,.08) 0%, transparent 70%)" }} />
-
-          <div className="relative px-6 sm:px-12 pt-12 pb-6">
-            <p className="text-xs font-bold uppercase tracking-widest mb-3 fade-up"
-              style={{ color: "rgba(96,165,250,.7)" }}>
-              Global AI Competitiveness Report · {new Date().getFullYear()}
-            </p>
-            <h2 className="font-serif-display text-4xl sm:text-5xl mb-3 fade-up-1 leading-tight"
-              style={{ color: "var(--text-1)" }}>
-              Where is every nation in the{" "}
-              <em className="not-italic gradient-text">AI race?</em>
+      {/* ══════════════════════════════════════════════════════════════════════
+          HERO — editorial 2-col: headline + leaderboard preview
+      ══════════════════════════════════════════════════════════════════════ */}
+      <section style={{ background: "var(--ed-bg)", padding: "64px 48px 80px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 64, alignItems: "end" }}>
+          {/* Left: editorial headline */}
+          <div>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--ed-text-2)", letterSpacing: "0.12em", fontWeight: 600, marginBottom: 24, display: "flex", alignItems: "center", gap: 12 }}>
+              <span style={{ width: 24, height: 1, background: "var(--signal)", display: "inline-block" }} />
+              GLOBAL · {countries.length} ECONOMIES · FIVE PILLARS
+            </div>
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(48px, 6vw, 88px)", fontWeight: 400, lineHeight: 0.95, letterSpacing: "-0.03em", color: "var(--ed-text-0)", margin: 0 }}>
+              Who is winning the<br />
+              <em style={{ fontStyle: "italic", color: "var(--signal)" }}>AI race</em> — and who<br />
+              is being left behind?
             </h2>
-            <p className="text-base max-w-2xl mb-8 leading-relaxed fade-up-2" style={{ color: "var(--text-2)" }}>
-              Scoring {countries.length} economies across five pillars — Infrastructure, Talent,
-              Governance, Investment and Economic Readiness — drawing on World Bank, IMF, OECD,
-              Stanford HAI, Oxford Insights, and the Anthropic Economic Index.
+            <p style={{ fontFamily: "var(--font-display)", fontSize: 20, fontStyle: "italic", fontWeight: 400, color: "var(--ed-text-1)", lineHeight: 1.45, marginTop: 28, maxWidth: 560 }}>
+              A live index scoring {countries.length} economies on AI readiness today and trajectory through 2028 — built on World Bank, OECD and World Governance Indicator data.
             </p>
-
-            {/* ── Guided entry points ── */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8 fade-up-2">
-              {[
-                {
-                  icon: "📈",
-                  label: "For Investors",
-                  sub: "Sort by trajectory momentum",
-                  action: () => { setSort("trajectory_gain"); scrollToGrid(); },
-                  href: null,
-                },
-                {
-                  icon: "📊",
-                  label: "For Researchers",
-                  sub: "Rankings table + CSV export",
-                  action: () => { setView("table"); scrollToGrid(); },
-                  href: null,
-                },
-                {
-                  icon: "🗺️",
-                  label: "Explore the Map",
-                  sub: "Visual world map of scores",
-                  action: null,
-                  href: "/map",
-                },
-              ].map((cta) => {
-                const inner = (
-                  <>
-                    <span className="text-2xl mb-2 block">{cta.icon}</span>
-                    <span className="text-sm font-bold block" style={{ color: "var(--text-1)" }}>{cta.label}</span>
-                    <span className="text-xs mt-0.5 block" style={{ color: "var(--text-3)" }}>{cta.sub}</span>
-                  </>
-                );
-                const cls = "flex flex-col items-center text-center rounded-2xl py-4 px-3 transition-all duration-200 cursor-pointer hover:scale-[1.02]";
-                const sty = { background: "rgba(59,130,246,.06)", border: "1px solid rgba(59,130,246,.18)" };
-                return cta.href
-                  ? <Link key={cta.label} href={cta.href} className={cls} style={sty}>{inner}</Link>
-                  : <button key={cta.label} onClick={cta.action!} className={cls} style={sty}>{inner}</button>;
-              })}
-            </div>
-
-            {/* ── Stat cards ── */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 fade-up-3">
-              {[
-                { label: "Global Leader",    value: topCountry ? `${topCountry.flag} ${topCountry.name}` : "—",        sub: topCountry ? `${topCountry.total_score}/100` : "" },
-                { label: "Global Average",   value: `${avgScore}`,                                                       sub: "out of 100" },
-                { label: "Fastest Rising",   value: topTrajCountry ? `${topTrajCountry.flag} ${topTrajCountry.name.split(" ")[0]}` : "—", sub: topTrajCountry ? `+${topTrajCountry.projected_score_2028 - topTrajCountry.total_score} pts by 2028` : "" },
-                { label: "Economies Scored", value: `${countries.length}`,                                               sub: "4 regions" },
-              ].map((s) => (
-                <div key={s.label} className="rounded-2xl p-4"
-                  style={{ background: "rgba(6,11,20,.55)", border: "1px solid var(--border)", backdropFilter: "blur(8px)" }}>
-                  <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: "var(--text-3)" }}>{s.label}</p>
-                  <p className="text-lg font-black leading-none mb-1" style={{ color: "var(--accent)" }}>{s.value}</p>
-                  {s.sub && <p className="text-xs" style={{ color: "var(--text-3)" }}>{s.sub}</p>}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="px-6 sm:px-12 py-4 flex flex-wrap gap-6"
-            style={{ borderTop: "1px solid var(--border)", background: "rgba(6,11,20,.4)" }}>
-            <p className="text-[10px] font-bold uppercase tracking-widest self-center" style={{ color: "var(--text-3)" }}>
-              Regional averages
-            </p>
-            {REGIONS_DISPLAY.map((r) => {
-              const a = regionalAvg(countries, r);
-              return (
-                <div key={r} className="flex items-center gap-2">
-                  <span className="text-xs" style={{ color: "var(--text-3)" }}>{r}</span>
-                  <span className="text-xs font-bold" style={{ color: "var(--text-2)" }}>{a}/100</span>
-                  <div className="w-16 h-1 rounded-full overflow-hidden" style={{ background: "var(--raised)" }}>
-                    <div className="h-full rounded-full" style={{ width: `${a}%`, background: "var(--accent)" }} />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* ── Two Lenses ── */}
-        <div className="mb-6">
-          <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: "var(--text-3)" }}>
-            Two ways to look at the AI race
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Readiness lens — active */}
-            <div className="rounded-2xl p-5 flex flex-col gap-2"
-              style={{ background: "var(--surface)", border: "2px solid rgba(59,130,246,.35)" }}>
-              <div className="flex items-center gap-2">
-                <span className="text-lg">📊</span>
-                <p className="text-sm font-black" style={{ color: "var(--text-1)" }}>Readiness Index</p>
-                <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-lg"
-                  style={{ background: "rgba(59,130,246,.12)", color: "var(--accent)", border: "1px solid rgba(59,130,246,.25)" }}>You are here</span>
-              </div>
-              <p className="text-sm font-semibold" style={{ color: "var(--accent)" }}>Can this country build AI?</p>
-              <p className="text-xs leading-relaxed" style={{ color: "var(--text-3)" }}>
-                Measures the underlying capacity — infrastructure, talent pipelines, governance, investment, and economic strength. Think of it as the foundation: does the country have what it takes to develop and sustain AI?
-              </p>
-              <p className="text-[10px] mt-1" style={{ color: "var(--text-3)", opacity: 0.6 }}>
-                Infrastructure · Talent · Governance · Investment · Economic Readiness
-              </p>
-            </div>
-            {/* Adoption lens */}
-            <Link href="/adoption" style={{ textDecoration: "none" }}>
-              <div className="rounded-2xl p-5 flex flex-col gap-2 h-full cursor-pointer transition-all hover:scale-[1.01]"
-                style={{ background: "var(--surface)", border: "1px solid rgba(74,222,128,.25)" }}>
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">🚀</span>
-                  <p className="text-sm font-black" style={{ color: "var(--text-1)" }}>Adoption Scorecard</p>
-                  <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-lg"
-                    style={{ background: "rgba(74,222,128,.10)", color: "#4ade80", border: "1px solid rgba(74,222,128,.25)" }}>New</span>
-                </div>
-                <p className="text-sm font-semibold" style={{ color: "#4ade80" }}>Is this country using AI now?</p>
-                <p className="text-xs leading-relaxed" style={{ color: "var(--text-3)" }}>
-                  Measures active deployment — AI in government services, businesses, jobs markets, and daily consumer life. Readiness and adoption often diverge: some countries deploy AI well beyond their capacity, others sit on untapped potential.
-                </p>
-                <p className="text-[10px] mt-1" style={{ color: "var(--text-3)", opacity: 0.6 }}>
-                  Government Deployment · Enterprise · Consumer Usage · Talent Demand · R&D Pipeline
-                </p>
-              </div>
-            </Link>
-          </div>
-        </div>
-
-        {/* ── Key Insights strip ── */}
-        <div className="mb-6">
-          <KeyInsights
-            countries={countries}
-            onSortChange={(s) => { setSort(s); scrollToGrid(); }}
-            onRegionChange={(r) => { setRegion(r); scrollToGrid(); }}
-            onNavigate={() => {}}
-          />
-        </div>
-
-        {/* ── Fastest Movers ── */}
-        <div className="mb-6">
-          <FastestMovers
-            countries={countries}
-            onSortClick={() => { setSort("trajectory_gain"); scrollToGrid(); }}
-          />
-        </div>
-
-        {/* ── Governance Gap Leaderboard ── */}
-        {!loading && (
-          <div className="mb-6">
-            <GovernanceGapPanel countries={countries} />
-          </div>
-        )}
-
-        {/* ── Filter bar + controls ── */}
-        <div ref={gridRef} className="flex flex-col gap-3 mb-6 scroll-mt-32">
-          <div className="flex items-center gap-2">
-            <div className="flex-1">
-              <FilterBar
-                search={search} region={region} sort={sort} tier={tier} trajectoryFilter={trajectoryFilter}
-                onSearch={setSearch} onRegion={setRegion} onSort={setSort} onTier={setTier} onTrajectoryFilter={setTrajectory}
-                total={countries.length} filtered={filtered.length}
-              />
-            </div>
-            <PillarWeights weights={pillarWeights} onChange={setPillarWeights} />
-          </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs" style={{ color: "var(--text-3)" }}>View as</span>
-            {(["grid", "table"] as ViewMode[]).map((v) => (
+            <div style={{ display: "flex", gap: 12, marginTop: 32 }}>
               <button
-                key={v}
-                onClick={() => setView(v)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
-                style={view === v
-                  ? { background: "var(--accent)", color: "#fff", border: "1px solid var(--accent)" }
-                  : { background: "transparent", color: "var(--text-3)", border: "1px solid var(--border)" }
-                }
-              >
-                {v === "grid" ? (
-                  <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 16 16">
-                    <rect x="1" y="1" width="6" height="6" rx="1" /><rect x="9" y="1" width="6" height="6" rx="1" />
-                    <rect x="1" y="9" width="6" height="6" rx="1" /><rect x="9" y="9" width="6" height="6" rx="1" />
-                  </svg>
-                ) : (
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 16 16">
-                    <line x1="1" y1="4" x2="15" y2="4" strokeWidth="1.5" />
-                    <line x1="1" y1="8" x2="15" y2="8" strokeWidth="1.5" />
-                    <line x1="1" y1="12" x2="15" y2="12" strokeWidth="1.5" />
-                  </svg>
-                )}
-                <span className="hidden sm:inline">{v === "grid" ? "Cards" : "Rankings Table"}</span>
+                onClick={scrollToGrid}
+                style={{ background: "var(--signal)", color: "#fff", border: 0, padding: "12px 20px", fontFamily: "var(--font-sans)", fontSize: 13, fontWeight: 600, letterSpacing: "-0.005em", cursor: "pointer" }}>
+                Explore the data →
               </button>
+              <Link href="/methodology"
+                style={{ background: "transparent", color: "var(--ed-text-0)", border: "1px solid var(--ed-text-0)", padding: "12px 20px", fontFamily: "var(--font-sans)", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
+                Read methodology
+              </Link>
+            </div>
+          </div>
+
+          {/* Right: leaderboard preview (top 5) */}
+          <div style={{ borderLeft: "1px solid var(--ed-border-strong)", paddingLeft: 32 }}>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--ed-text-2)", letterSpacing: "0.16em", fontWeight: 700, marginBottom: 16 }}>TOP FIVE · OVERALL READINESS</div>
+            {ranked.slice(0, 5).map((c, i) => (
+              <Link key={c.slug} href={`/country/${c.slug}`}
+                style={{ display: "grid", gridTemplateColumns: "32px 1fr auto auto", alignItems: "center", gap: 12, padding: "12px 0", borderBottom: "1px solid var(--ed-border)", textDecoration: "none" }}>
+                <span style={{ fontFamily: "var(--font-display)", fontSize: 26, fontStyle: "italic", color: "var(--ed-muted)", lineHeight: 1 }}>
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <div>
+                  <div style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 500, color: "var(--ed-text-0)", lineHeight: 1.1 }}>{c.flag} {c.name}</div>
+                  <div style={{ fontFamily: "var(--font-sans)", fontSize: 11, color: "var(--ed-text-2)", marginTop: 2 }}>{c.region}</div>
+                </div>
+                <HeroSparkline from={c.total_score} to={c.projected_score_2028} />
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontFamily: "var(--font-mono)", fontSize: 20, fontWeight: 500, color: "var(--ed-text-0)", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{c.total_score}</div>
+                  <div style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "var(--ed-text-2)", marginTop: 2 }}>/100</div>
+                </div>
+              </Link>
             ))}
-            {view === "table" && (
-              <span className="text-[11px] ml-1 hidden sm:inline" style={{ color: "var(--text-3)" }}>
-                Click any column header to sort
-              </span>
-            )}
-            <div className="ml-auto flex items-center gap-2">
-              {/* Share view */}
-              <button
-                onClick={shareView}
-                className="btn-secondary flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl"
-                title="Copy link to this filtered view"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                </svg>
-                <span className="hidden sm:inline">Share view</span>
-              </button>
-              <ExportButton countries={filtered} globalRanks={globalRanks} pillarWeights={pillarWeights} />
-            </div>
+            <button onClick={scrollToGrid} style={{ display: "block", marginTop: 14, fontFamily: "var(--font-sans)", fontSize: 12, fontWeight: 600, color: "var(--signal)", background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+              See full ranking ↓
+            </button>
           </div>
         </div>
 
-        {/* ── Watchlist pinned strip ── */}
-        {watchlist.length > 0 && !loading && (() => {
-          const pinned = watchlist
-            .map((slug) => countries.find((c) => c.slug === slug))
-            .filter(Boolean) as ScoredCountry[];
-          if (!pinned.length) return null;
-          return (
-            <div className="mb-6">
-              <div className="flex items-center gap-2 mb-3">
-                <svg className="w-3.5 h-3.5" fill="#fbbf24" viewBox="0 0 24 24">
-                  <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                </svg>
-                <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "#fbbf24" }}>
-                  Watchlist — {pinned.length} pinned
-                </p>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                {pinned.map((c) => (
-                  <CountryCard
-                    key={c.slug} country={c} rank={globalRanks[c.slug] ?? 0}
-                    isWatchlisted onWatchlistToggle={toggleWatchlist}
-                    isComparing={compareList.includes(c.slug)} onCompareToggle={toggleCompare}
-                  />
-                ))}
-              </div>
-              <div className="mt-4 border-b" style={{ borderColor: "var(--border)" }} />
+        {/* KPI band */}
+        <div style={{ marginTop: 72, paddingTop: 32, borderTop: "1px solid var(--ed-border-strong)", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 0 }}>
+          {[
+            {
+              kicker: "Global Leader",
+              value:  topCountry ? `${topCountry.flag} ${topCountry.name}` : "—",
+              sub:    topCountry ? `${topCountry.total_score} / 100` : "",
+              note:   "Highest overall readiness score",
+            },
+            {
+              kicker: "Fastest Rising",
+              value:  topTrajCountry ? `${topTrajCountry.flag} ${topTrajCountry.name.split(" ")[0]}` : "—",
+              sub:    topTrajCountry ? `+${Math.round(topTrajCountry.projected_score_2028 - topTrajCountry.total_score)} pts` : "",
+              note:   "Largest projected gain by 2028",
+            },
+            {
+              kicker: "Median Score",
+              value:  String(avgScore),
+              sub:    "/ 100",
+              note:   `Global average across ${countries.length} economies`,
+            },
+            {
+              kicker: "Data Sources",
+              value:  "17",
+              sub:    "WB indicators",
+              note:   "Updated daily from live API feeds",
+            },
+          ].map((k, i) => (
+            <div key={i} style={{ paddingLeft: i ? 32 : 0, paddingRight: 32, borderLeft: i ? "1px solid var(--ed-border)" : "none" }}>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--ed-text-2)", letterSpacing: "0.14em", fontWeight: 700, marginBottom: 8 }}>{k.kicker.toUpperCase()}</div>
+              <div style={{ fontFamily: "var(--font-display)", fontSize: 28, fontWeight: 400, color: "var(--ed-text-0)", lineHeight: 1.05, marginBottom: 4 }}>{k.value}</div>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--signal)", fontWeight: 600, marginBottom: 6 }}>{k.sub}</div>
+              <div style={{ fontFamily: "var(--font-sans)", fontSize: 12, color: "var(--ed-text-1)", lineHeight: 1.4 }}>{k.note}</div>
             </div>
-          );
-        })()}
+          ))}
+        </div>
+      </section>
 
-        {/* ── Content ── */}
+      {/* ══════════════════════════════════════════════════════════════════════
+          KEY INSIGHTS (editorial)
+      ══════════════════════════════════════════════════════════════════════ */}
+      <KeyInsights
+        countries={countries}
+        onSortChange={(s) => { setSort(s); scrollToGrid(); }}
+        onRegionChange={(r) => { setRegion(r); scrollToGrid(); }}
+        onNavigate={() => {}}
+      />
+
+      {/* ══════════════════════════════════════════════════════════════════════
+          TWO LENSES
+      ══════════════════════════════════════════════════════════════════════ */}
+      <section style={{ background: "var(--ed-bg)", padding: "64px 48px", borderTop: "1px solid var(--ed-border)" }}>
+        <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--ed-text-2)", letterSpacing: "0.16em", fontWeight: 700, marginBottom: 12 }}>METHODOLOGY · TWO LENSES</div>
+        <h3 style={{ fontFamily: "var(--font-display)", fontSize: 32, fontWeight: 400, color: "var(--ed-text-0)", margin: "0 0 28px", letterSpacing: "-0.02em" }}>
+          Capacity to build AI, and capacity to <em style={{ fontStyle: "italic" }}>use it.</em>
+        </h3>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+          {[
+            {
+              kicker: "READINESS · YOU ARE HERE",
+              title: "Can this country build AI?",
+              body: "Underlying capacity — infrastructure, talent pipelines, governance, investment, and economic strength. Think of it as the foundation.",
+              pillars: ["Infrastructure", "Talent", "Governance", "Investment", "Economic Readiness"],
+              active: true,
+              href: null,
+            },
+            {
+              kicker: "ADOPTION · NEW",
+              title: "Is this country using AI now?",
+              body: "Active deployment — government services, enterprise integration, consumer usage, and demand signals from the real economy.",
+              pillars: ["Government", "Enterprise", "Consumer", "Talent Demand", "R&D Pipeline"],
+              active: false,
+              href: "/adoption",
+            },
+          ].map((lens, i) => {
+            const inner = (
+              <>
+                {lens.active && <div style={{ position: "absolute", top: -1, left: -1, right: -1, height: 3, background: "var(--signal)" }} />}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                  <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", color: lens.active ? "var(--signal)" : "var(--ed-text-2)" }}>{lens.kicker}</span>
+                  <span style={{ fontFamily: "var(--font-mono)", fontSize: 20, color: "var(--ed-muted)" }}>{String(i + 1).padStart(2, "0")} / 02</span>
+                </div>
+                <h4 style={{ fontFamily: "var(--font-display)", fontSize: 26, fontWeight: 400, color: "var(--ed-text-0)", lineHeight: 1.1, letterSpacing: "-0.02em", margin: "0 0 14px" }}>{lens.title}</h4>
+                <p style={{ fontFamily: "var(--font-sans)", fontSize: 14, color: "var(--ed-text-1)", lineHeight: 1.55, margin: "0 0 18px" }}>{lens.body}</p>
+                <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 6 }}>
+                  {lens.pillars.map((p) => (
+                    <span key={p} style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", padding: "4px 8px", background: lens.active ? "var(--ed-raised)" : "var(--ed-bg)", color: "var(--ed-text-1)", border: "1px solid var(--ed-border)" }}>{p.toUpperCase()}</span>
+                  ))}
+                </div>
+              </>
+            );
+            const baseStyle: React.CSSProperties = {
+              background: lens.active ? "var(--ed-bg)" : "var(--ed-raised)",
+              border: lens.active ? "1px solid var(--signal)" : "1px solid var(--ed-border-strong)",
+              padding: 28, position: "relative",
+              textDecoration: "none", display: "block",
+            };
+            return lens.href
+              ? <Link key={i} href={lens.href} style={baseStyle}>{inner}</Link>
+              : <div key={i} style={baseStyle}>{inner}</div>;
+          })}
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════════════════════
+          DATA TERMINAL — dark section begins here
+      ══════════════════════════════════════════════════════════════════════ */}
+      <div style={{ background: "var(--dt-bg)", borderTop: "8px solid var(--signal)", padding: "32px 48px 0" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", borderBottom: "1px solid var(--dt-border)", paddingBottom: 24 }}>
+          <div>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, letterSpacing: "0.16em", color: "var(--signal)", marginBottom: 8 }}>SECTION II · DATA TERMINAL</div>
+            <h3 style={{ fontFamily: "var(--font-display)", fontSize: 40, fontWeight: 400, letterSpacing: "-0.025em", color: "var(--dt-text-0)", margin: 0, lineHeight: 1 }}>
+              Explore <em style={{ fontStyle: "italic", color: "var(--signal)" }}>{countries.length} economies.</em>
+            </h3>
+          </div>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--dt-text-3)", letterSpacing: "0.06em", textAlign: "right" as const, lineHeight: 1.7 }}>
+            {fmtDate && <div>LAST FETCH · {fmtDate.toUpperCase()}</div>}
+            <div>NEXT REFRESH · 24H · WORLD BANK API</div>
+            <div style={{ color: usingLive ? "var(--positive)" : "var(--dt-text-3)" }}>
+              {usingLive ? "● LIVE" : "○ CACHED"} · 17 INDICATORS · 24H CACHE
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Fastest Movers ── */}
+      <FastestMovers
+        countries={countries}
+        onSortClick={() => { setSort("trajectory_gain"); scrollToGrid(); }}
+      />
+
+      {/* ── Filter bar ── */}
+      <section style={{ background: "var(--dt-bg)", padding: "0 48px 24px" }} ref={gridRef}>
+        <FilterBar
+          search={search} region={region} sort={sort} tier={tier} trajectoryFilter={trajectoryFilter}
+          onSearch={setSearch} onRegion={setRegion} onSort={setSort} onTier={setTier} onTrajectoryFilter={setTrajectory}
+          total={countries.length} filtered={filtered.length}
+          usingLive={usingLive} liveCount={liveCount}
+        />
+
+        {/* View + actions row */}
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 12, flexWrap: "wrap" as const }}>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--dt-text-3)", letterSpacing: "0.12em", fontWeight: 600 }}>VIEW</span>
+          {(["grid", "table"] as ViewMode[]).map((v) => (
+            <button key={v} onClick={() => setView(v)} style={{
+              background: view === v ? "var(--signal)" : "transparent",
+              color: view === v ? "#fff" : "var(--dt-text-2)",
+              border: `1px solid ${view === v ? "var(--signal)" : "var(--dt-border)"}`,
+              padding: "5px 12px",
+              fontFamily: "var(--font-sans)", fontSize: 12, fontWeight: 600,
+              cursor: "pointer",
+            }}>{v === "grid" ? "Cards" : "Table"}</button>
+          ))}
+          <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
+            <button onClick={shareView} style={{ background: "transparent", border: "1px solid var(--dt-border)", color: "var(--dt-text-2)", padding: "5px 12px", fontFamily: "var(--font-sans)", fontSize: 12, cursor: "pointer" }}>
+              Share view ↗
+            </button>
+            <ExportButton countries={filtered} globalRanks={globalRanks} pillarWeights={{ infrastructure: 20, talent: 20, governance: 20, investment: 20, economic_readiness: 20 }} />
+          </div>
+        </div>
+      </section>
+
+      {/* ── Country Grid ── */}
+      <section style={{ background: "var(--dt-bg)", padding: "0 48px 40px" }}>
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
             {Array.from({ length: 12 }).map((_, i) => <SkeletonCard key={i} />)}
           </div>
         ) : view === "table" ? (
           <RankingsTable countries={filtered} globalRanks={globalRanks} activeRegion={region} />
         ) : filtered.length === 0 ? (
-          <div className="text-center py-20 fade-up">
-            <p className="text-4xl mb-4">🌐</p>
-            <p className="text-lg font-semibold" style={{ color: "var(--text-2)" }}>No countries found</p>
+          <div style={{ textAlign: "center", padding: "80px 0" }}>
+            <div style={{ fontFamily: "var(--font-display)", fontSize: 48, color: "var(--dt-text-3)", marginBottom: 16 }}>—</div>
+            <p style={{ fontFamily: "var(--font-display)", fontSize: 20, color: "var(--dt-text-2)", margin: "0 0 8px" }}>No countries found</p>
             {fuzzySuggestion ? (
-              <p className="text-sm mt-2" style={{ color: "var(--text-3)" }}>
+              <p style={{ fontFamily: "var(--font-sans)", fontSize: 14, color: "var(--dt-text-3)", margin: 0 }}>
                 Did you mean{" "}
-                <button
-                  onClick={() => setSearch(fuzzySuggestion.name)}
-                  className="font-semibold transition-colors hover:text-white underline"
-                  style={{ color: "var(--accent)" }}
-                >
+                <button onClick={() => setSearch(fuzzySuggestion.name)} style={{ color: "var(--signal)", fontWeight: 600, background: "none", border: "none", cursor: "pointer", fontSize: 14, fontFamily: "var(--font-sans)" }}>
                   {fuzzySuggestion.flag} {fuzzySuggestion.name}
-                </button>
-                ?
+                </button>?
               </p>
             ) : (
-              <p className="text-sm mt-2" style={{ color: "var(--text-3)" }}>Try adjusting your search or filters</p>
+              <p style={{ fontFamily: "var(--font-sans)", fontSize: 14, color: "var(--dt-text-3)", margin: 0 }}>Try adjusting your search or filters</p>
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"
-            style={{ paddingBottom: compareList.length >= 1 ? "96px" : undefined }}>
-            {filtered.map((c) => (
-              <CountryCard
-                key={c.slug} country={c} rank={globalRanks[c.slug] ?? 0}
-                isComparing={compareList.includes(c.slug)} onCompareToggle={toggleCompare}
-                isWatchlisted={watchlist.includes(c.slug)} onWatchlistToggle={toggleWatchlist}
-              />
-            ))}
-          </div>
-        )}
-
-        {/* ── Footer ── */}
-        <footer className="mt-20 pt-10" style={{ borderTop: "1px solid var(--border)" }}>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-10">
-            {/* Left: about */}
-            <div>
-              <h3 className="text-sm font-black tracking-tight font-display mb-1" style={{ color: "var(--text-1)" }}>
-                AI TRAJECTORY INDEX
-              </h3>
-              <p className="text-sm mb-5" style={{ color: "var(--text-3)" }}>
-                Tracking which nations are winning the AI race — and why.
-              </p>
-              <div className="space-y-1 mb-5">
-                <p className="text-sm font-semibold" style={{ color: "var(--text-1)" }}>
-                  Built by{" "}
-                  <a href="https://ankitmishra.ca" target="_blank" rel="noopener noreferrer"
-                    className="hover:text-blue-400 transition-colors" style={{ color: "var(--accent)" }}>
-                    Ankit Mishra
-                  </a>
-                </p>
-                <p className="text-xs" style={{ color: "var(--text-3)" }}>Commercial Portfolio Director · African climatetech venture fund</p>
-                <p className="text-xs" style={{ color: "var(--text-3)" }}>Schwartz Reisman Institute AI &amp; Trust Working Group · University of Toronto</p>
-                <p className="text-xs" style={{ color: "var(--text-3)" }}>Forbes contributor · 50+ articles · 200,000+ readers</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <a href="https://ankitmishra.ca" target="_blank" rel="noopener noreferrer"
-                  className="text-xs font-semibold transition-colors hover:text-blue-300 px-3 py-1.5 rounded-lg"
-                  style={{ background: "var(--raised)", border: "1px solid var(--border)", color: "var(--text-2)" }}>
-                  ankitmishra.ca ↗
-                </a>
-                <a href="https://linkedin.com/in/ankitmishra01" target="_blank" rel="noopener noreferrer"
-                  className="text-xs font-semibold transition-colors hover:text-blue-300 px-3 py-1.5 rounded-lg"
-                  style={{ background: "var(--raised)", border: "1px solid var(--border)", color: "var(--text-2)" }}>
-                  LinkedIn ↗
-                </a>
-              </div>
-            </div>
-
-            {/* Right: data + citation */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: "var(--text-3)" }}>Data Sources</p>
-                <ul className="space-y-1.5">
-                  {["World Bank Open Data API", "OECD AI Policy Observatory", "UN E-Government Survey", "World Governance Indicators", "Anthropic Economic Index"].map((src) => (
-                    <li key={src} className="text-xs flex items-start gap-1.5" style={{ color: "var(--text-3)" }}>
-                      <span className="mt-1 w-1 h-1 rounded-full flex-shrink-0" style={{ background: "var(--accent)", marginTop: 6 }} />
-                      {src}
-                    </li>
-                  ))}
-                </ul>
-                <p className="text-[10px] mt-3" style={{ color: "var(--text-3)" }}>Scores updated daily from source APIs.</p>
-              </div>
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: "var(--text-3)" }}>Cite This Index</p>
-                <div className="rounded-xl p-3 text-xs leading-relaxed" style={{ background: "var(--raised)", border: "1px solid var(--border)", color: "var(--text-3)", fontFamily: "monospace" }}>
-                  Mishra, A. (2026).<br />
-                  <em>AI Trajectory Index</em>.<br />
-                  ai-trajectory-index.vercel.app
+          <>
+            {/* Top 4: leader cards */}
+            {filtered.slice(0, 4).length > 0 && (
+              <>
+                <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--dt-text-3)", letterSpacing: "0.14em", fontWeight: 700, marginBottom: 14, paddingTop: 8 }}>
+                  TOP {Math.min(4, filtered.length)} · LEADER FORMAT
                 </div>
-                <button
-                  onClick={() => navigator.clipboard.writeText('Mishra, A. (2026). AI Trajectory Index. ai-trajectory-index.vercel.app')}
-                  className="mt-2 text-[10px] transition-colors hover:text-blue-400 flex items-center gap-1"
-                  style={{ color: "var(--text-3)" }}
-                >
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                      d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3" />
-                  </svg>
-                  Copy citation
-                </button>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 1, background: "var(--dt-border)", marginBottom: 32 }}>
+                  {filtered.slice(0, 4).map((c) => (
+                    <CountryCard
+                      key={c.slug} country={c} rank={globalRanks[c.slug] ?? 0}
+                      variant="leader"
+                      isComparing={compareList.includes(c.slug)} onCompareToggle={toggleCompare}
+                      isWatchlisted={watchlist.includes(c.slug)} onWatchlistToggle={toggleWatchlist}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+
+            {/* Rank 5+: dense cards */}
+            {filtered.slice(4).length > 0 && (
+              <>
+                <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--dt-text-3)", letterSpacing: "0.14em", fontWeight: 700, marginBottom: 14 }}>
+                  RANKS {Math.min(5, filtered.length + 1)}–{filtered.length} · DENSE FORMAT
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8, paddingBottom: compareList.length ? 96 : 0 }}>
+                  {filtered.slice(4).map((c) => (
+                    <CountryCard
+                      key={c.slug} country={c} rank={globalRanks[c.slug] ?? 0}
+                      variant="dense"
+                      isComparing={compareList.includes(c.slug)} onCompareToggle={toggleCompare}
+                      isWatchlisted={watchlist.includes(c.slug)} onWatchlistToggle={toggleWatchlist}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </>
+        )}
+      </section>
+
+      {/* ── Regional Bands ── */}
+      {!loading && (
+        <section style={{ background: "var(--dt-bg)", padding: "32px 48px 48px", borderTop: "1px solid var(--dt-border)" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "240px 1fr", gap: 48 }}>
+            <div>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--signal)", letterSpacing: "0.16em", fontWeight: 700, marginBottom: 6 }}>REGIONAL AVERAGE</div>
+              <h4 style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 400, color: "var(--dt-text-0)", margin: 0, letterSpacing: "-0.015em" }}>
+                How regions compare on overall readiness.
+              </h4>
+            </div>
+            <div>
+              {REGIONS_DISPLAY.map((r) => {
+                const avg = regionalAvg(countries, r);
+                return (
+                  <div key={r} style={{ display: "grid", gridTemplateColumns: "220px 1fr 56px", gap: 16, alignItems: "center", padding: "12px 0", borderBottom: "1px solid var(--dt-border)" }}>
+                    <button onClick={() => { setRegion(r); scrollToGrid(); }} style={{ fontFamily: "var(--font-display)", fontSize: 16, color: "var(--dt-text-0)", fontWeight: 500, background: "none", border: "none", cursor: "pointer", textAlign: "left" as const, padding: 0 }}>
+                      {r}
+                    </button>
+                    <div style={{ position: "relative", height: 8, background: "var(--dt-raised)" }}>
+                      <div style={{ position: "absolute", inset: 0, width: `${avg}%`, background: "var(--signal)" }} />
+                    </div>
+                    <span style={{ fontFamily: "var(--font-mono)", fontSize: 14, color: "var(--dt-text-0)", fontWeight: 500, textAlign: "right" as const, fontVariantNumeric: "tabular-nums" }}>{avg}/100</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════════════════
+          FOOTER — editorial, light
+      ══════════════════════════════════════════════════════════════════════ */}
+      <footer style={{ background: "var(--ed-bg)", padding: "64px 48px 32px", borderTop: "8px solid var(--signal)" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: 48, marginBottom: 48 }}>
+          <div>
+            <h5 style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 400, color: "var(--ed-text-0)", margin: "0 0 8px", letterSpacing: "-0.015em" }}>
+              The AI Trajectory Index
+            </h5>
+            <p style={{ fontFamily: "var(--font-display)", fontSize: 15, fontStyle: "italic", color: "var(--ed-text-1)", margin: "0 0 16px", lineHeight: 1.5, maxWidth: 380 }}>
+              Tracking which nations are winning the AI race — and why. Built by Ankit Mishra, independent research at the intersection of AI governance and emerging markets.
+            </p>
+            <div style={{ display: "flex", gap: 12 }}>
+              <a href="https://ankitmishra.ca" target="_blank" rel="noopener noreferrer"
+                style={{ fontFamily: "var(--font-sans)", fontSize: 12, color: "var(--ed-text-1)", borderBottom: "1px solid var(--ed-text-1)", paddingBottom: 1, textDecoration: "none" }}>ankitmishra.ca ↗</a>
+              <a href="https://linkedin.com/in/ankitmishra01" target="_blank" rel="noopener noreferrer"
+                style={{ fontFamily: "var(--font-sans)", fontSize: 12, color: "var(--ed-text-1)", borderBottom: "1px solid var(--ed-text-1)", paddingBottom: 1, textDecoration: "none" }}>LinkedIn ↗</a>
+            </div>
+          </div>
+          {[
+            { title: "Sections", items: [{ label: "Index", href: "/" }, { label: "Map", href: "/map" }, { label: "Compare", href: "/compare" }, { label: "Adoption", href: "/adoption" }, { label: "Methodology", href: "/methodology" }] },
+            { title: "Regions", items: [{ label: "Americas", href: "/americas" }, { label: "Europe", href: "/europe" }, { label: "Asia-Pacific", href: "/asia-pacific" }, { label: "Middle East", href: "/middle-east" }, { label: "Africa", href: "/africa" }] },
+            { title: "Sources", items: [{ label: "World Bank", href: "#" }, { label: "OECD AI Observatory", href: "#" }, { label: "World Governance Indicators", href: "#" }, { label: "OECD AI Policy", href: "#" }, { label: "Anthropic Index", href: "#" }] },
+          ].map((col) => (
+            <div key={col.title}>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--signal)", letterSpacing: "0.16em", fontWeight: 700, marginBottom: 14 }}>{col.title.toUpperCase()}</div>
+              <div style={{ display: "flex", flexDirection: "column" as const, gap: 8 }}>
+                {col.items.map((it) => (
+                  <Link key={it.label} href={it.href}
+                    style={{ fontFamily: "var(--font-sans)", fontSize: 13, color: "var(--ed-text-1)", textDecoration: "none" }}>
+                    {it.label}
+                  </Link>
+                ))}
               </div>
             </div>
+          ))}
+        </div>
+        <div style={{ borderTop: "1px solid var(--ed-border-strong)", paddingTop: 20, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--ed-text-2)" }}>
+            © {new Date().getFullYear()} · INDEPENDENT RESEARCH · MIT LICENCE
           </div>
-
-          <div className="flex flex-wrap items-center justify-between gap-3 pt-6" style={{ borderTop: "1px solid var(--border)" }}>
-            <div className="flex flex-wrap gap-4">
-              {[
-                { href: "/americas",     label: "Americas"     },
-                { href: "/europe",       label: "Europe"       },
-                { href: "/africa",       label: "Africa"       },
-                { href: "/middle-east",  label: "Middle East"  },
-                { href: "/asia-pacific", label: "Asia-Pacific" },
-                { href: "/methodology",  label: "Methodology"  },
-                { href: "/map",          label: "Map View"     },
-              ].map(({ href, label }) => (
-                <Link key={href} href={href}
-                  className="text-xs hover:text-blue-400 transition-colors" style={{ color: "var(--text-3)" }}>
-                  {label}
-                </Link>
-              ))}
-            </div>
-            <p className="text-[10px]" style={{ color: "var(--text-3)" }}>
-              © {new Date().getFullYear()} AI Trajectory Index · Independent research
-            </p>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--ed-text-2)" }}>
+            CITE: <span style={{ color: "var(--ed-text-0)" }}>Mishra, A. ({new Date().getFullYear()}). AI Trajectory Index.</span>
           </div>
-        </footer>
-      </div>
+        </div>
+      </footer>
 
       {/* ── Comparison Panel ── */}
       <ComparisonPanel
@@ -735,15 +648,25 @@ export default function Home() {
 
       {/* ── Toasts ── */}
       {shareToast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-4 py-2.5 rounded-xl text-sm font-semibold pointer-events-none fade-up"
-          style={{ background: "var(--surface)", border: "1px solid rgba(59,130,246,.4)", color: "var(--text-1)", boxShadow: "0 4px 20px rgba(0,0,0,.6)" }}>
-          🔗 Link copied! Share this filtered view.
+        <div className="fade-up" style={{
+          position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)",
+          zIndex: 60, padding: "10px 16px",
+          background: "var(--dt-surface)", border: "1px solid var(--signal)",
+          color: "var(--dt-text-0)", fontFamily: "var(--font-sans)", fontSize: 13, fontWeight: 600,
+          boxShadow: "0 4px 24px rgba(0,0,0,.6)", pointerEvents: "none",
+        }}>
+          Link copied to clipboard.
         </div>
       )}
       {compareToast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-4 py-2.5 rounded-xl text-sm font-semibold pointer-events-none"
-          style={{ background: "var(--surface)", border: "1px solid var(--border)", color: "var(--text-1)", boxShadow: "0 4px 20px rgba(0,0,0,.6)" }}>
-          Max 3 countries in comparison
+        <div style={{
+          position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)",
+          zIndex: 60, padding: "10px 16px",
+          background: "var(--dt-surface)", border: "1px solid var(--dt-border)",
+          color: "var(--dt-text-0)", fontFamily: "var(--font-sans)", fontSize: 13,
+          boxShadow: "0 4px 24px rgba(0,0,0,.6)", pointerEvents: "none",
+        }}>
+          Max 3 countries in comparison.
         </div>
       )}
     </main>

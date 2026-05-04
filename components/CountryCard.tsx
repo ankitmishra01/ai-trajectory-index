@@ -1,8 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import ScoreSparkline from "@/components/ScoreSparkline";
-import { useCountUp } from "@/hooks/useCountUp";
 
 interface CountryData {
   slug: string;
@@ -24,9 +22,10 @@ interface CountryData {
   };
 }
 
-interface CountryCardProps {
+export interface CountryCardProps {
   country: CountryData;
   rank: number;
+  variant?: "leader" | "dense";
   isComparing?: boolean;
   onCompareToggle?: (slug: string) => void;
   isWatchlisted?: boolean;
@@ -34,221 +33,203 @@ interface CountryCardProps {
 }
 
 const PILLARS = [
-  { key: "infrastructure",     short: "Infra", color: "#3b82f6" },
-  { key: "talent",             short: "Talent", color: "#8b5cf6" },
-  { key: "governance",         short: "Gov",    color: "#06b6d4" },
-  { key: "investment",         short: "Invest", color: "#f59e0b" },
-  { key: "economic_readiness", short: "Econ",   color: "#22c55e" },
-] as const;
+  { key: "infrastructure"     as const, short: "Infra",  color: "var(--pillar-infra)"  },
+  { key: "talent"             as const, short: "Talent", color: "var(--pillar-talent)" },
+  { key: "governance"         as const, short: "Gov",    color: "var(--pillar-gov)"    },
+  { key: "investment"         as const, short: "Inv",    color: "var(--pillar-invest)" },
+  { key: "economic_readiness" as const, short: "Econ",   color: "var(--pillar-econ)"   },
+];
 
-const TRAJ_CONFIG: Record<string, { symbol: string; color: string; bg: string; border: string }> = {
-  "Strong Positive": { symbol: "↑↑", color: "#4ade80", bg: "rgba(34,197,94,.12)", border: "rgba(34,197,94,.35)" },
-  Positive:          { symbol: "↑",  color: "#86efac", bg: "rgba(34,197,94,.08)", border: "rgba(34,197,94,.22)" },
-  Neutral:           { symbol: "→",  color: "#94a3b8", bg: "rgba(148,163,184,.08)", border: "rgba(148,163,184,.2)" },
-  Negative:          { symbol: "↓",  color: "#fb923c", bg: "rgba(251,146,60,.08)", border: "rgba(251,146,60,.22)" },
-  "Strong Negative": { symbol: "↓↓", color: "#f87171", bg: "rgba(239,68,68,.12)", border: "rgba(239,68,68,.35)" },
+const TRAJ_CONFIG: Record<string, { glyph: string; color: string }> = {
+  "Strong Positive": { glyph: "▲▲", color: "var(--positive)" },
+  "Positive":        { glyph: "▲",  color: "var(--positive)" },
+  "Neutral":         { glyph: "◆",  color: "var(--dt-text-3)" },
+  "Negative":        { glyph: "▼",  color: "var(--negative)" },
+  "Strong Negative": { glyph: "▼▼", color: "var(--negative)" },
 };
 
-function scoreStyle(score: number): React.CSSProperties {
-  const color =
-    score >= 80 ? "#4ade80" :
-    score >= 60 ? "#93c5fd" :
-    score >= 40 ? "#fcd34d" : "#fca5a5";
-  return { color };
+function MiniSparkline({ from, to, width = 56, height = 18 }: { from: number; to: number; width?: number; height?: number }) {
+  const trend = to - from;
+  const color = trend > 0 ? "var(--positive)" : trend < 0 ? "var(--negative)" : "var(--dt-text-3)";
+  const pts = Array.from({ length: 12 }, (_, i) => {
+    const t = i / 11;
+    const noise = Math.sin(i * 1.7) * Math.abs(trend) * 0.15;
+    return from + trend * t + noise;
+  });
+  const min = Math.min(...pts) - 1;
+  const max = Math.max(...pts) + 1;
+  const range = max - min || 1;
+  const pathD = pts.map((p, i) => {
+    const x = (i / 11) * width;
+    const y = height - ((p - min) / range) * height;
+    return `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(" ");
+  const lastY = height - ((pts[11] - min) / range) * height;
+  return (
+    <svg width={width} height={height} style={{ display: "block", overflow: "visible", flexShrink: 0 }}>
+      <path d={pathD} stroke={color} strokeWidth={1.25} fill="none" />
+      <circle cx={width} cy={lastY.toFixed(2)} r={1.75} fill={color} />
+    </svg>
+  );
 }
 
-function scoreBand(score: number) {
-  if (score >= 80) return { label: "Leading",     color: "#4ade80", bg: "rgba(34,197,94,.10)",   border: "rgba(34,197,94,.25)"   };
-  if (score >= 60) return { label: "Advanced",    color: "#93c5fd", bg: "rgba(96,165,250,.10)",  border: "rgba(96,165,250,.25)"  };
-  if (score >= 40) return { label: "Developing",  color: "#fcd34d", bg: "rgba(251,191,36,.10)",  border: "rgba(251,191,36,.25)"  };
-  return                   { label: "Nascent",     color: "#fca5a5", bg: "rgba(248,113,113,.10)", border: "rgba(248,113,113,.25)" };
+function PillarBars({ scores }: { scores: CountryData["scores"] }) {
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 6 }}>
+      {PILLARS.map((p) => {
+        const score = scores[p.key].score;
+        return (
+          <div key={p.key}>
+            <div style={{ height: 3, background: "rgba(255,255,255,0.06)" }}>
+              <div style={{ width: `${(score / 20) * 100}%`, height: "100%", background: p.color }} />
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4 }}>
+              <span style={{ fontFamily: "var(--font-sans)", fontSize: 9, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" as const, color: "var(--dt-text-3)" }}>{p.short}</span>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 500, color: "var(--dt-text-1)" }}>{score}</span>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
-export default function CountryCard({ country, rank, isComparing = false, onCompareToggle, isWatchlisted = false, onWatchlistToggle }: CountryCardProps) {
-  const traj    = TRAJ_CONFIG[country.trajectory_label] ?? TRAJ_CONFIG["Neutral"];
-  const band    = scoreBand(country.total_score);
-  const delta   = country.projected_score_2028 - country.total_score;
-  const animated = useCountUp(country.total_score, 800);
+function TrajectoryGlyph({ label, traj }: { label: string; traj: number }) {
+  const cfg = TRAJ_CONFIG[label] ?? TRAJ_CONFIG["Neutral"];
+  return (
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontFamily: "var(--font-mono)", fontSize: 11, color: cfg.color, fontWeight: 600 }}>
+      <span style={{ fontSize: 10 }}>{cfg.glyph}</span>
+      <span>{traj > 0 ? "+" : ""}{traj}</span>
+    </span>
+  );
+}
 
+export default function CountryCard({
+  country,
+  rank,
+  variant = "dense",
+  isComparing = false,
+  onCompareToggle,
+  isWatchlisted = false,
+  onWatchlistToggle,
+}: CountryCardProps) {
+  const baseStyle: React.CSSProperties = {
+    display: "flex",
+    flexDirection: "column",
+    background: "var(--dt-surface)",
+    border: "1px solid var(--dt-border)",
+    textDecoration: "none",
+    transition: "border-color .15s",
+    position: "relative",
+  };
+
+  const actionBtns = (onWatchlistToggle || onCompareToggle) ? (
+    <div style={{ position: "absolute", top: 12, right: 12, display: "flex", gap: 6, zIndex: 10 }}
+      onClick={(e) => e.preventDefault()}>
+      {onWatchlistToggle && (
+        <button
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onWatchlistToggle(country.slug); }}
+          style={{
+            width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center",
+            background: isWatchlisted ? "rgba(181,138,46,.15)" : "transparent",
+            border: isWatchlisted ? "1px solid rgba(181,138,46,.5)" : "1px solid var(--dt-border)",
+            cursor: "pointer",
+          }}
+          title={isWatchlisted ? "Remove from watchlist" : "Add to watchlist"}
+        >
+          <span style={{ fontSize: 10 }}>{isWatchlisted ? "★" : "☆"}</span>
+        </button>
+      )}
+      {onCompareToggle && (
+        <button
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onCompareToggle(country.slug); }}
+          style={{
+            width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center",
+            background: isComparing ? "var(--signal)" : "transparent",
+            border: `1px solid ${isComparing ? "var(--signal)" : "var(--dt-border)"}`,
+            cursor: "pointer",
+          }}
+          title={isComparing ? "Remove from comparison" : "Add to comparison"}
+        >
+          <span style={{ fontSize: 12, color: isComparing ? "#fff" : "var(--dt-text-2)" }}>{isComparing ? "✓" : "+"}</span>
+        </button>
+      )}
+    </div>
+  ) : null;
+
+  if (variant === "leader") {
+    return (
+      <Link
+        href={`/country/${country.slug}`}
+        style={{ ...baseStyle, gap: 16, padding: 24 }}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--dt-border-strong)"; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--dt-border)"; }}
+      >
+        {actionBtns}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+          <div>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--dt-text-3)", letterSpacing: "0.14em", fontWeight: 700, marginBottom: 8 }}>
+              RANK · {String(rank).padStart(2, "0")} / 186
+            </div>
+            <div style={{ fontSize: 32, lineHeight: 1, marginBottom: 8 }}>{country.flag}</div>
+            <div style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 500, color: "var(--dt-text-0)", lineHeight: 1.05, letterSpacing: "-0.015em" }}>{country.name}</div>
+            <div style={{ fontFamily: "var(--font-sans)", fontSize: 11, color: "var(--dt-text-3)", marginTop: 4 }}>{country.region}</div>
+          </div>
+          <div style={{ textAlign: "right" }}>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 44, fontWeight: 500, color: "var(--dt-text-0)", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{country.total_score}</div>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--dt-text-3)", marginTop: 4 }}>/ 100</div>
+            <div style={{ marginTop: 8 }}>
+              <TrajectoryGlyph traj={Math.round(country.trajectory_score)} label={country.trajectory_label} />
+            </div>
+          </div>
+        </div>
+
+        {country.top_accelerator && (
+          <p style={{ fontFamily: "var(--font-display)", fontSize: 13, fontStyle: "italic", color: "var(--dt-text-1)", lineHeight: 1.45, margin: 0 }}>
+            &ldquo;{country.top_accelerator}&rdquo;
+          </p>
+        )}
+
+        <PillarBars scores={country.scores} />
+
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 12, borderTop: "1px solid var(--dt-border)", marginTop: "auto" }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--dt-text-3)" }}>
+            2028 · <span style={{ color: "var(--dt-text-0)", fontWeight: 600 }}>{country.projected_score_2028}</span>
+          </div>
+          <MiniSparkline from={country.total_score} to={country.projected_score_2028} width={72} height={18} />
+          <span style={{ fontFamily: "var(--font-sans)", fontSize: 11, color: "var(--signal)", fontWeight: 600 }}>Profile →</span>
+        </div>
+      </Link>
+    );
+  }
+
+  // Dense card
   return (
     <Link
       href={`/country/${country.slug}`}
-      className="group block relative overflow-hidden rounded-2xl transition-all duration-200"
-      style={{
-        background: "var(--surface)",
-        border: "1px solid var(--border)",
-        boxShadow: "0 1px 3px rgba(0,0,0,.45)",
-      }}
-      onMouseEnter={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor = "rgba(59,130,246,.30)";
-        (e.currentTarget as HTMLElement).style.boxShadow  = "0 4px 20px rgba(0,0,0,.5), 0 0 0 1px rgba(59,130,246,.15)";
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor = "var(--border)";
-        (e.currentTarget as HTMLElement).style.boxShadow  = "0 1px 3px rgba(0,0,0,.45)";
-      }}
+      style={{ ...baseStyle, gap: 10, padding: 16 }}
+      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--dt-border-strong)"; }}
+      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--dt-border)"; }}
     >
-      {/* Top accent bar — colour-coded by score band */}
-      <div className="h-0.5 w-full" style={{ background: band.color, opacity: 0.7 }} />
-
-      {/* Action buttons (top-right) */}
-      <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
-        {/* Watchlist star */}
-        {onWatchlistToggle && (
-          <button
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); onWatchlistToggle(country.slug); }}
-            className="w-5 h-5 rounded-full flex items-center justify-center transition-all duration-150"
-            title={isWatchlisted ? "Remove from watchlist" : "Add to watchlist"}
-            style={
-              isWatchlisted
-                ? { background: "rgba(251,191,36,.18)", border: "1.5px solid rgba(251,191,36,.6)" }
-                : { background: "transparent", border: "1.5px solid rgba(251,191,36,.3)" }
-            }
-          >
-            <svg className="w-2.5 h-2.5" fill={isWatchlisted ? "#fbbf24" : "none"}
-              stroke={isWatchlisted ? "#fbbf24" : "rgba(251,191,36,.7)"} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-            </svg>
-          </button>
-        )}
-        {/* Compare toggle button */}
-        {onCompareToggle && (
-          <button
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); onCompareToggle(country.slug); }}
-            className="w-5 h-5 rounded-full flex items-center justify-center transition-all duration-150"
-            title={isComparing ? "Remove from comparison" : "Add to comparison"}
-            style={
-              isComparing
-                ? { background: "var(--accent)", border: "1.5px solid var(--accent)", boxShadow: "0 0 8px rgba(59,130,246,.5)" }
-                : { background: "transparent", border: "1.5px solid rgba(59,130,246,.35)" }
-            }
-          >
-            {isComparing ? (
-              <svg className="w-2.5 h-2.5" fill="none" stroke="white" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-              </svg>
-            ) : (
-              <svg className="w-2.5 h-2.5" fill="none" stroke="rgba(96,165,250,.8)" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-              </svg>
-            )}
-          </button>
-        )}
+      {actionBtns}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", paddingRight: (onWatchlistToggle || onCompareToggle) ? 52 : 0 }}>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--dt-text-3)", fontWeight: 700 }}>#{rank}</span>
+          <span style={{ fontSize: 20 }}>{country.flag}</span>
+          <div>
+            <div style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 500, color: "var(--dt-text-0)", lineHeight: 1.1 }}>{country.name}</div>
+            <div style={{ fontFamily: "var(--font-sans)", fontSize: 10, color: "var(--dt-text-3)" }}>{country.region}</div>
+          </div>
+        </div>
+        <div style={{ fontFamily: "var(--font-mono)", fontSize: 20, fontWeight: 500, color: "var(--dt-text-0)", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{country.total_score}</div>
       </div>
 
-      <div className="p-5">
-        {/* ── Row 1: Rank · Flag · Country · Score ── */}
-        <div className="flex items-start gap-3 mb-4">
-          {/* Rank */}
-          <div className="flex-shrink-0 w-8 text-center pt-0.5">
-            <span className="text-xs font-bold tabular-nums" style={{ color: "var(--text-3)" }}>
-              #{rank}
-            </span>
-          </div>
+      <PillarBars scores={country.scores} />
 
-          {/* Flag + name */}
-          <div className="flex items-center gap-2.5 flex-1 min-w-0">
-            <span className="text-3xl leading-none flex-shrink-0">{country.flag}</span>
-            <div className="min-w-0">
-              <h3 className="text-sm font-bold leading-tight truncate" style={{ color: "var(--text-1)" }}>
-                {country.name}
-              </h3>
-              <p className="text-[11px] mt-0.5 truncate" style={{ color: "var(--text-3)" }}>
-                {country.region}
-              </p>
-            </div>
-          </div>
-
-          {/* Score */}
-          <div className="flex-shrink-0 text-right">
-            <span className="text-3xl font-black leading-none tabular-nums" style={scoreStyle(country.total_score)}>
-              {animated}
-            </span>
-            <span className="text-xs" style={{ color: "var(--text-3)" }}>/100</span>
-          </div>
-        </div>
-
-        {/* ── Row 2: Score band label + Trajectory ── */}
-        <div className="flex items-center gap-2 mb-4">
-          <span className="text-[10px] font-bold px-2 py-0.5 rounded"
-            style={{ background: band.bg, color: band.color, border: `1px solid ${band.border}` }}>
-            {band.label}
-          </span>
-          <span className="text-[10px]" style={{ color: "var(--text-3)" }}>·</span>
-          <span className="text-[10px] font-semibold px-2 py-0.5 rounded"
-            style={{ background: traj.bg, color: traj.color, border: `1px solid ${traj.border}` }}>
-            {traj.symbol} {country.trajectory_label}
-          </span>
-        </div>
-
-        {/* ── Row 3: Pillar scores ── */}
-        <div className="rounded-xl overflow-hidden mb-4" style={{ border: "1px solid var(--border)" }}>
-          {/* Bar row */}
-          <div className="flex h-2">
-            {PILLARS.map((p) => {
-              const score = country.scores[p.key].score;
-              return (
-                <div key={p.key} className="flex-1 overflow-hidden" title={`${p.short}: ${score}/20`}>
-                  <div className="h-full" style={{ background: "var(--raised)" }}>
-                    <div className="h-full transition-all" style={{ width: `${(score / 20) * 100}%`, background: p.color }} />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          {/* Labels row */}
-          <div className="flex" style={{ borderTop: "1px solid var(--border)" }}>
-            {PILLARS.map((p) => {
-              const score = country.scores[p.key].score;
-              return (
-                <div key={p.key} className="flex-1 text-center py-1.5 px-1">
-                  <p className="text-[9px] font-medium mb-0.5" style={{ color: "var(--text-3)" }}>{p.short}</p>
-                  <p className="text-[11px] font-bold tabular-nums" style={{ color: p.color }}>{score}</p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* ── Row 4: 2028 projection + sparkline + trend ── */}
-        <div className="flex items-center justify-between text-xs">
-          <span style={{ color: "var(--text-3)" }}>
-            Projected 2028:{" "}
-            <span className="font-bold" style={{ color: "var(--accent)" }}>
-              {country.projected_score_2028}/100
-            </span>
-          </span>
-          <div className="flex items-center gap-1.5">
-            <ScoreSparkline score={country.total_score} trajectory={country.trajectory_score} width={40} height={18} />
-            {/* Rank trend from trajectory */}
-            {(country.trajectory_label === "Strong Positive" || country.trajectory_label === "Positive") && (
-              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded"
-                style={{ background: "rgba(74,222,128,.10)", color: "#4ade80", border: "1px solid rgba(74,222,128,.25)" }}>
-                ▲ rising
-              </span>
-            )}
-            {(country.trajectory_label === "Strong Negative" || country.trajectory_label === "Negative") && (
-              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded"
-                style={{ background: "rgba(239,68,68,.10)", color: "#f87171", border: "1px solid rgba(239,68,68,.25)" }}>
-                ▼ falling
-              </span>
-            )}
-            <span className="font-semibold"
-              style={{ color: delta > 0 ? "#4ade80" : delta < 0 ? "#f87171" : "var(--text-3)" }}>
-              {delta > 0 ? "+" : ""}{delta} pts
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Hover CTA strip */}
-      <div className="px-5 py-2.5 flex items-center justify-between transition-all duration-200 opacity-0 group-hover:opacity-100"
-        style={{ borderTop: "1px solid var(--border)", background: "rgba(59,130,246,.06)" }}>
-        <span className="text-xs font-semibold" style={{ color: "var(--accent)" }}>
-          View Country Profile
-        </span>
-        <span className="text-xs" style={{ color: "var(--accent)" }}>→</span>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 8, borderTop: "1px solid var(--dt-border)" }}>
+        <TrajectoryGlyph traj={Math.round(country.trajectory_score)} label={country.trajectory_label} />
+        <MiniSparkline from={country.total_score} to={country.projected_score_2028} width={44} height={14} />
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--dt-text-3)" }}>→ {country.projected_score_2028}</span>
       </div>
     </Link>
   );

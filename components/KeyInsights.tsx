@@ -11,174 +11,90 @@ interface KeyInsightsProps {
 }
 
 interface Insight {
-  icon: string;
-  category: string;
-  text: string;
+  kicker: string;
+  body: string;
   onClick: () => void;
 }
 
-export default function KeyInsights({
-  countries,
-  onSortChange,
-  onRegionChange,
-  onNavigate,
-}: KeyInsightsProps) {
+export default function KeyInsights({ countries, onSortChange, onRegionChange, onNavigate }: KeyInsightsProps) {
   if (countries.length === 0) return null;
 
-  const insights: Insight[] = [];
-
-  // 1. Global leader
   const byScore = [...countries].sort((a, b) => b.total_score - a.total_score);
   const leader = byScore[0];
-  insights.push({
-    icon: "🏆",
-    category: "Global Leader",
-    text: `${leader.flag} ${leader.name} leads globally at ${leader.total_score}/100`,
-    onClick: () => onNavigate("/country/" + leader.slug),
-  });
 
-  // 2. Fastest mover
-  const byGain = [...countries].sort(
-    (a, b) =>
-      b.projected_score_2028 - b.total_score - (a.projected_score_2028 - a.total_score)
+  const byGain = [...countries].sort((a, b) =>
+    (b.projected_score_2028 - b.total_score) - (a.projected_score_2028 - a.total_score)
   );
   const mover = byGain[0];
   const delta = Math.round(mover.projected_score_2028 - mover.total_score);
-  insights.push({
-    icon: "⚡",
-    category: "Fastest Mover",
-    text: `${mover.flag} ${mover.name} is the fastest-rising nation — +${delta} pts by 2028`,
-    onClick: () => onSortChange("trajectory_gain"),
-  });
 
-  // 3. Regional leader
   const regionMap: Record<string, { total: number; count: number }> = {};
   for (const c of countries) {
     if (!regionMap[c.region]) regionMap[c.region] = { total: 0, count: 0 };
     regionMap[c.region].total += c.total_score;
     regionMap[c.region].count += 1;
   }
-  const globalAvg =
-    countries.reduce((sum, c) => sum + c.total_score, 0) / countries.length;
+  const globalAvg = countries.reduce((s, c) => s + c.total_score, 0) / countries.length;
   let topRegion = "";
   let topRegionAvg = -1;
-  for (const [region, data] of Object.entries(regionMap)) {
-    const avg = data.total / data.count;
-    if (avg > topRegionAvg) {
-      topRegionAvg = avg;
-      topRegion = region;
-    }
+  for (const [r, d] of Object.entries(regionMap)) {
+    const avg = d.total / d.count;
+    if (avg > topRegionAvg) { topRegionAvg = avg; topRegion = r; }
   }
-  const regionGap = Math.round(topRegionAvg - globalAvg);
-  insights.push({
-    icon: "🌍",
-    category: "Regional Leader",
-    text: `${topRegion} leads regions at ${Math.round(topRegionAvg)}/100 — ${regionGap} pts above global average`,
-    onClick: () => onRegionChange(topRegion as Region),
-  });
 
-  // 4. Africa investment gap
-  const africaCountries = countries.filter(
-    (c) => c.region === "Middle East & Africa"
-  );
-  const africaInvAvg =
-    africaCountries.length > 0
-      ? africaCountries.reduce((sum, c) => sum + c.scores.investment.score, 0) /
-        africaCountries.length
-      : 0;
-  insights.push({
-    icon: "⚠️",
-    category: "Investment Gap",
-    text: `Investment is Africa & Middle East's weakest pillar at ${africaInvAvg.toFixed(1)}/20 avg`,
-    onClick: () => onNavigate("/africa"),
-  });
+  const africaCountries = countries.filter((c) => c.region === "Middle East & Africa");
+  const africaInvAvg = africaCountries.length > 0
+    ? africaCountries.reduce((s, c) => s + c.scores.investment.score, 0) / africaCountries.length
+    : 0;
 
-  // 5. Governance gap
-  const govGapCount = countries.filter((c) => {
-    const avgPillar = c.total_score / 5;
-    return c.scores.governance.score < avgPillar;
-  }).length;
-  insights.push({
-    icon: "📋",
-    category: "Governance Gap",
-    text: `${govGapCount} economies score below average on governance — the widest gap globally`,
-    onClick: () => onSortChange("governance_gap"),
-  });
+  const insights: Insight[] = [
+    {
+      kicker: "CONVERGENCE",
+      body: `Top-10 readiness scores cluster between 70–${leader.total_score} — frontier capacity is now table stakes among advanced economies.`,
+      onClick: () => onNavigate("/country/" + leader.slug),
+    },
+    {
+      kicker: "TRAJECTORY",
+      body: `${mover.flag} ${mover.name} is the fastest-rising economy at +${delta} pts — trajectory separates leaders from plateauing nations.`,
+      onClick: () => onSortChange("trajectory_gain"),
+    },
+    {
+      kicker: "GOVERNANCE",
+      body: `${topRegion} leads on governance avg at ${Math.round(topRegionAvg)}/100 — ${Math.round(topRegionAvg - globalAvg)} pts above the global average.`,
+      onClick: () => onRegionChange(topRegion as Region),
+    },
+    {
+      kicker: "INVESTMENT GAP",
+      body: `Investment is Africa & Middle East's weakest pillar at ${africaInvAvg.toFixed(1)}/20 avg — capital access is the binding constraint.`,
+      onClick: () => onNavigate("/africa"),
+    },
+  ];
 
   return (
-    <div className="mb-6">
-      {/* Heading row */}
-      <div className="flex items-center justify-between mb-3">
-        <span
-          className="text-[10px] font-bold uppercase tracking-widest"
-          style={{ color: "var(--accent)" }}
-        >
-          Key Insights
-        </span>
-        {countries.length > 0 && (
-          <span className="text-[10px]" style={{ color: "var(--text-3)" }}>
-            Auto-generated from live data
-          </span>
-        )}
-      </div>
-
-      {/* Horizontal scrolling row */}
-      <div
-        className="flex gap-3 pb-2"
-        style={{ overflowX: "auto", scrollbarWidth: "none" }}
-      >
-        {insights.map((insight, i) => (
-          <div
-            key={i}
-            onClick={insight.onClick}
-            className="transition-all duration-200"
-            style={{
-              minWidth: "240px",
-              borderRadius: "0.75rem",
-              padding: "1rem",
-              background: "var(--surface)",
-              border: "1px solid var(--border)",
-              borderLeft: "3px solid var(--accent)",
-              cursor: "pointer",
-              flexShrink: 0,
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLDivElement).style.borderColor =
-                "var(--accent)";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLDivElement).style.borderColor =
-                "var(--border)";
-              (e.currentTarget as HTMLDivElement).style.borderLeftColor =
-                "var(--accent)";
-            }}
-          >
-            {/* Top row: icon + category */}
-            <div className="flex items-center gap-1.5">
-              <span className="text-lg leading-none">{insight.icon}</span>
-              <span
-                className="text-[10px] uppercase tracking-widest font-bold"
-                style={{ color: "var(--accent)" }}
-              >
-                {insight.category}
-              </span>
-            </div>
-
-            {/* Main text */}
-            <p
-              className="text-sm font-semibold mt-1 leading-snug"
-              style={{ color: "var(--text-1)" }}
+    <section style={{ background: "var(--ed-raised)", padding: "64px 48px", borderTop: "1px solid var(--ed-border)" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "240px 1fr", gap: 48 }}>
+        <div>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--signal)", letterSpacing: "0.16em", fontWeight: 700, marginBottom: 12 }}>AT A GLANCE</div>
+          <h3 style={{ fontFamily: "var(--font-display)", fontSize: 34, fontWeight: 400, color: "var(--ed-text-0)", lineHeight: 1.05, letterSpacing: "-0.02em", margin: 0 }}>
+            Four signals from the <em style={{ fontStyle: "italic" }}>2026 data.</em>
+          </h3>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "32px 48px" }}>
+          {insights.map((ins, i) => (
+            <div
+              key={i}
+              onClick={ins.onClick}
+              style={{ paddingTop: 16, borderTop: "1px solid var(--ed-border-strong)", cursor: "pointer" }}
             >
-              {insight.text}
-            </p>
-
-            {/* Explore link */}
-            <p className="text-[10px] mt-2" style={{ color: "var(--text-3)" }}>
-              Explore →
-            </p>
-          </div>
-        ))}
+              <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 8 }}>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--ed-text-2)", fontWeight: 600 }}>{String(i + 1).padStart(2, "0")}</span>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--signal)", letterSpacing: "0.14em", fontWeight: 700 }}>{ins.kicker}</span>
+              </div>
+              <p style={{ fontFamily: "var(--font-display)", fontSize: 17, fontWeight: 400, color: "var(--ed-text-0)", lineHeight: 1.4, margin: 0 }}>{ins.body}</p>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
