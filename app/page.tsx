@@ -91,7 +91,7 @@ export default function Home() {
   const [compareToast, setCompareToast]   = useState(false);
 
   const [countries, setCountries] = useState<ScoredCountry[]>(() =>
-    staticData.countries.map((c) => ({ ...c, data_source: "fallback" as const, wb_data_year: null }))
+    staticData.countries.map((c) => ({ ...c, data_source: "fallback" as const, wb_data_year: null, imf_data: false, oecd_data: false, anthropic_data: false }))
   );
   const [loading, setLoading]     = useState(true);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);

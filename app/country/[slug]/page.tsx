@@ -67,7 +67,7 @@ export default function CountryPage({ params }: { params: { slug: string } }) {
   const staticCountry = staticData.countries.find((c) => c.slug === params.slug);
   if (!staticCountry) notFound();
 
-  const initialCountry: ScoredCountry = { ...staticCountry, data_source: "fallback" as const, wb_data_year: null };
+  const initialCountry: ScoredCountry = { ...staticCountry, data_source: "fallback" as const, wb_data_year: null, imf_data: false, oecd_data: false, anthropic_data: false };
 
   const ranked = [...staticData.countries].sort((a, b) => b.total_score - a.total_score);
   const rank   = ranked.findIndex((c) => c.slug === params.slug) + 1;

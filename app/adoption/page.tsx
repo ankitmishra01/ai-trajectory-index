@@ -64,7 +64,7 @@ export default function AdoptionPage() {
   const gridRef = useRef<HTMLDivElement>(null);
 
   const countries = useMemo(
-    () => countriesRaw.countries.map((c) => ({ ...c, data_source: "fallback" as const, wb_data_year: null })) as ScoredCountry[],
+    () => countriesRaw.countries.map((c) => ({ ...c, data_source: "fallback" as const, wb_data_year: null, imf_data: false, oecd_data: false, anthropic_data: false })) as ScoredCountry[],
     []
   );
   const enriched: EnrichedAdoption[] = useMemo(

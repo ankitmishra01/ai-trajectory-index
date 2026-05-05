@@ -27,7 +27,10 @@ export interface Country {
 
 export interface ScoredCountry extends Country {
   data_source: "live" | "fallback";
-  wb_data_year: number | null;   // most recent calendar year of World Bank data used
+  wb_data_year: number | null;
+  imf_data: boolean;
+  oecd_data: boolean;
+  anthropic_data: boolean;
 }
 
 export interface ScoresResponse {

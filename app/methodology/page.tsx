@@ -254,6 +254,62 @@ export default function MethodologyPage() {
           </div>
         </div>
 
+        {/* ── Data Status ── */}
+        <div style={{ background: "var(--dt-bg)", border: "1px solid var(--dt-border)", padding: "28px 32px", marginBottom: 32 }}>
+          <p style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "var(--signal)", textTransform: "uppercase", marginBottom: 20 }}>
+            Data Connection Status
+          </p>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 0 }}>
+              <thead>
+                <tr>
+                  {["SOURCE", "STATUS", "UPDATE FREQ.", "COUNTRIES", "INDICATORS"].map((h) => (
+                    <th key={h} style={{ textAlign: "left", padding: "6px 12px 6px 0", fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, color: "var(--dt-text-3)", borderBottom: "1px solid var(--dt-border)", letterSpacing: "0.06em", whiteSpace: "nowrap" }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { source: "World Bank Open Data", status: "LIVE API",    freq: "24h cache",    countries: "186",  indicators: "17 indicators", badgeColor: "#3F7A4D" },
+                  { source: "IMF DataMapper",        status: "LIVE API",    freq: "24h cache",    countries: "190+", indicators: "Govt exp, Debt % GDP", badgeColor: "#3F7A4D" },
+                  { source: "OECD MSTI",             status: "LIVE API",    freq: "24h cache",    countries: "38",   indicators: "R&D % GDP, Researchers/1000", badgeColor: "#3F7A4D" },
+                  { source: "Anthropic Economic Index", status: "AUTO-FETCH", freq: "Weekly CSV", countries: "150+", indicators: "AI usage intensity (0–100)", badgeColor: "#B58A2E" },
+                  { source: "Oxford Insights GARI",  status: "ANNUAL",     freq: "Yearly (2024)", countries: "195",  indicators: "Govt AI Readiness (0–100)", badgeColor: "#3B5BA5" },
+                  { source: "Stanford HAI AI Index", status: "ANNUAL",     freq: "Yearly (2025)", countries: "75+",  indicators: "Research output (0–100)", badgeColor: "#3B5BA5" },
+                  { source: "Tortoise Global AI",    status: "ANNUAL",     freq: "Yearly (2024)", countries: "83",   indicators: "Composite AI score (0–100)", badgeColor: "#3B5BA5" },
+                  { source: "WIPO Global Innovation Index", status: "ANNUAL", freq: "Yearly (2024)", countries: "133", indicators: "Innovation score (0–100)", badgeColor: "#3B5BA5" },
+                  { source: "WEF Global Competitiveness", status: "ANNUAL", freq: "Yearly (2019)", countries: "141", indicators: "Competitiveness (0–100)", badgeColor: "#3B5BA5" },
+                  { source: "ITU ICT Dev. Index",    status: "ANNUAL",     freq: "Yearly (2023)", countries: "190+", indicators: "ICT Development (0–100)", badgeColor: "#3B5BA5" },
+                ].map((row) => (
+                  <tr key={row.source} style={{ borderBottom: "1px solid var(--dt-border)" }}>
+                    <td style={{ padding: "10px 12px 10px 0", fontFamily: "var(--font-sans)", fontSize: 13, color: "var(--dt-text-1)", whiteSpace: "nowrap" }}>{row.source}</td>
+                    <td style={{ padding: "10px 12px 10px 0" }}>
+                      <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, padding: "3px 8px", background: row.badgeColor + "22", border: `1px solid ${row.badgeColor}`, color: row.badgeColor, letterSpacing: "0.06em", whiteSpace: "nowrap" }}>
+                        {row.status}
+                      </span>
+                    </td>
+                    <td style={{ padding: "10px 12px 10px 0", fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--dt-text-2)", whiteSpace: "nowrap" }}>{row.freq}</td>
+                    <td style={{ padding: "10px 12px 10px 0", fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--dt-text-2)", whiteSpace: "nowrap" }}>{row.countries}</td>
+                    <td style={{ padding: "10px 0", fontFamily: "var(--font-sans)", fontSize: 12, color: "var(--dt-text-3)" }}>{row.indicators}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div style={{ display: "flex", gap: 20, marginTop: 16, flexWrap: "wrap" }}>
+            {[
+              { label: "LIVE API", color: "#3F7A4D", desc: "Fetched every request, cached 24h" },
+              { label: "AUTO-FETCH", color: "#B58A2E", desc: "Pulled from public dataset automatically" },
+              { label: "ANNUAL", color: "#3B5BA5", desc: "Updated manually when report publishes" },
+            ].map((b) => (
+              <div key={b.label} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, padding: "2px 7px", background: b.color + "22", border: `1px solid ${b.color}`, color: b.color, letterSpacing: "0.06em" }}>{b.label}</span>
+                <span style={{ fontFamily: "var(--font-sans)", fontSize: 12, color: "var(--dt-text-3)" }}>{b.desc}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* ── Score formula ── */}
         <div style={{ background: "var(--ed-raised)", border: "1px solid var(--ed-border)", padding: 32, marginBottom: 32 }}>
           <p style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "var(--signal)", textTransform: "uppercase", marginBottom: 20 }}>

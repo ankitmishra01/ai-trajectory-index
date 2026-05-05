@@ -47,6 +47,9 @@ export default function MapPage() {
       ...c,
       data_source: "fallback" as const,
       wb_data_year: null,
+      imf_data: false,
+      oecd_data: false,
+      anthropic_data: false,
     }))
   );
   const [selectedSlugs, setSelectedSlugs] = useState<Set<string>>(new Set());

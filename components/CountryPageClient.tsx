@@ -55,7 +55,7 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
 
   const adoption = (adoptionData.countries as AdoptionEntry[]).find((a) => a.slug === slug) ?? null;
   const [allCountries, setAllCountries] = useState<ScoredCountry[]>(
-    staticData.countries.map((c) => ({ ...c, data_source: "fallback" as const, wb_data_year: null }))
+    staticData.countries.map((c) => ({ ...c, data_source: "fallback" as const, wb_data_year: null, imf_data: false, oecd_data: false, anthropic_data: false }))
   );
   const [narrative, setNarrative] = useState<NarrativeState>({ status: "idle", paragraphs: [] });
   const [copied, setCopied]       = useState(false);

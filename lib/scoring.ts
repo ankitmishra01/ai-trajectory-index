@@ -1,5 +1,20 @@
 import type { Country, ScoredCountry } from "./types";
 import type { WorldBankData } from "./worldbank";
+import type { IMFData } from "./imf";
+import type { OECDData } from "./oecd";
+
+export interface ExternalIndicesEntry {
+  oxford_insights: number | null;
+  stanford_hai: number | null;
+  tortoise: number | null;
+  wipo_gii: number | null;
+  wef_gci: number | null;
+  itu_idi: number | null;
+}
+
+export interface ExternalIndices {
+  countries: Record<string, ExternalIndicesEntry>;
+}
 
 export interface PolicyData {
   has_national_ai_strategy: boolean;
@@ -115,7 +130,9 @@ function scoreLaborProductivity(laborProd: number | null): number {
 function scoreTalent(
   tertiary: number | null,
   laborProd: number | null,
-  staticScore: number
+  staticScore: number,
+  oecdResearchers: number | null,
+  wipoGii: number | null
 ): number {
   const hasAny = tertiary !== null || laborProd !== null;
   if (!hasAny) return staticScore;
@@ -134,18 +151,32 @@ function scoreTalent(
   }
 
   // Labor productivity (6 pts) — GDP per employed person (constant 2017 PPP$)
-  // Captures whether talent translates to productive output, penalises structural inefficiency
   if (laborProd !== null) {
     points += scoreLaborProductivity(laborProd);
   } else {
     points += (staticScore / 20) * 6;
   }
 
-  // Static talent quality proxy (8 pts)
-  // Captures researcher density, PISA/PIAAC scores, brain-drain balance, ICT skill levels
-  points += (staticScore / 20) * 8;
+  // Static talent quality proxy — 8pts, partially replaced by live sources when available
+  // OECD researchers/1000 employed (−2pts from static, +2pts live)
+  // WIPO GII innovation score (−1pt from static, +1pt live)
+  let staticAlloc = 8;
+  if (oecdResearchers !== null) {
+    staticAlloc -= 2;
+    if (oecdResearchers > 10)      points += 2;
+    else if (oecdResearchers > 6)  points += 1.5;
+    else if (oecdResearchers > 3)  points += 1;
+    else                           points += 0.5;
+  }
+  if (wipoGii !== null) {
+    staticAlloc -= 1;
+    if (wipoGii > 55)      points += 1;
+    else if (wipoGii > 40) points += 0.7;
+    else if (wipoGii > 25) points += 0.4;
+    else                   points += 0.2;
+  }
+  points += (staticScore / 20) * staticAlloc;
 
-  // Max raw = 20 (6+6+8)
   return clamp(Math.round(points), 0, 20);
 }
 
@@ -181,7 +212,8 @@ function scoreGovernance(
   ruleOfLaw: number | null,
   regQuality: number | null,
   policy: PolicyData,
-  staticScore: number
+  staticScore: number,
+  oxfordInsights: number | null
 ): number {
   let points = 0;
 
@@ -208,8 +240,15 @@ function scoreGovernance(
   // AI regulation (1 pt) — existence only, not quality
   if (policy.has_ai_regulation) points += 1;
 
-  // Static institutional proxy (2 pts) — press freedom, anti-corruption, etc.
-  points += (staticScore / 20) * 2;
+  // Static institutional proxy (2 pts) — replaced by Oxford Insights when available
+  if (oxfordInsights !== null) {
+    if (oxfordInsights >= 65)      points += 2;
+    else if (oxfordInsights >= 45) points += 1.5;
+    else if (oxfordInsights >= 30) points += 1;
+    else                           points += 0.5;
+  } else {
+    points += (staticScore / 20) * 2;
+  }
 
   // Max raw = 20
   return clamp(Math.round(points), 0, 20);
@@ -229,42 +268,50 @@ function scoreGovernance(
 function scoreInvestment(
   rd: number | null,
   fdi: number | null,
-  staticScore: number
+  staticScore: number,
+  imfGovtExpenditure: number | null,
+  oecdRd: number | null
 ): number {
-  const hasAny = rd !== null || fdi !== null;
+  const hasAny = rd !== null || fdi !== null || imfGovtExpenditure !== null || oecdRd !== null;
   if (!hasAny) return staticScore;
 
   let points = 0;
 
-  // R&D spend % GDP (6 pts) — public + private research investment commitment
-  if (rd !== null) {
-    if (rd > 3.5) points += 6;     // Research leaders: Israel, South Korea, Taiwan
-    else if (rd > 2) points += 4.5; // Strong: US, Germany, Japan, Sweden
-    else if (rd > 1) points += 3;   // Mid: China, UK, France, Canada
-    else if (rd > 0.3) points += 1.5;
-    else points += 0.5;
+  // R&D spend % GDP (6 pts) — prefer OECD business R&D when available, else WB total R&D
+  const effectiveRd = oecdRd ?? rd;
+  if (effectiveRd !== null) {
+    if (effectiveRd > 3.5)      points += 6;
+    else if (effectiveRd > 2)   points += 4.5;
+    else if (effectiveRd > 1)   points += 3;
+    else if (effectiveRd > 0.3) points += 1.5;
+    else                        points += 0.5;
   } else {
     points += (staticScore / 20) * 6;
   }
 
   // FDI net inflows % GDP (5 pts) — actual foreign capital attraction signal
-  // Note: large FDI for tax-haven micro-states (Luxembourg, Ireland) is normal but partly illusory.
-  // Cap scoring at 20% to avoid extreme outlier distortion.
   if (fdi !== null) {
     const clampedFdi = Math.min(fdi, 20);
-    if (clampedFdi > 10) points += 5;     // Very high attraction: Singapore, Vietnam, Czechia
-    else if (clampedFdi > 4) points += 4; // Strong: most EU+OECD average
-    else if (clampedFdi > 1.5) points += 3; // Moderate
-    else if (clampedFdi > 0) points += 2;  // Positive but low
-    else points += 0.5;                    // Net outflow
+    if (clampedFdi > 10)      points += 5;
+    else if (clampedFdi > 4)  points += 4;
+    else if (clampedFdi > 1.5) points += 3;
+    else if (clampedFdi > 0)  points += 2;
+    else                      points += 0.5;
   } else {
     points += (staticScore / 20) * 5;
   }
 
-  // Static VC ecosystem proxy (9 pts) — startup density, unicorn count, patent filings, VC deal flow
-  points += (staticScore / 20) * 9;
+  // Static VC ecosystem proxy: 9pts when no IMF data; 3pts replaced by IMF govt expenditure signal
+  if (imfGovtExpenditure !== null) {
+    if (imfGovtExpenditure >= 45)      points += 3;
+    else if (imfGovtExpenditure >= 35) points += 2;
+    else if (imfGovtExpenditure >= 25) points += 1;
+    else                               points += 0.5;
+    points += (staticScore / 20) * 6;
+  } else {
+    points += (staticScore / 20) * 9;
+  }
 
-  // Max raw = 20
   return clamp(Math.round(points), 0, 20);
 }
 
@@ -289,7 +336,8 @@ function scoreEconomicReadiness(
   privateCredit: number | null,
   tradeOpenness: number | null,
   servicesShare: number | null,
-  staticScore: number
+  staticScore: number,
+  imfGovtDebt: number | null
 ): number {
   const hasAny =
     gdpPpp !== null || privateCredit !== null ||
@@ -345,10 +393,13 @@ function scoreEconomicReadiness(
     points += (staticScore / 20) * 3;
   }
 
-  // Static market capacity proxy (5 pts) — economic complexity, regulatory ease, digital economy
-  points += (staticScore / 20) * 5;
+  // Static market capacity proxy (5 pts); high govt debt (>100% GDP) reduces by 1pt
+  let staticPts = (staticScore / 20) * 5;
+  if (imfGovtDebt !== null && imfGovtDebt > 100) {
+    staticPts = Math.max(0, staticPts - 1);
+  }
+  points += staticPts;
 
-  // Max raw = 20
   return clamp(Math.round(points), 0, 20);
 }
 
@@ -381,7 +432,8 @@ function calcTrajectoryScore(
   broadbandCurrent: number | null,
   broadbandPrevious: number | null,
   policy: PolicyData,
-  staticTrajectory: number
+  staticTrajectory: number,
+  anthropicUsage: number | null
 ): number {
   let score = 0;
 
@@ -458,6 +510,12 @@ function calcTrajectoryScore(
   // 10% — Static baseline
   score += (staticTrajectory / 10) * 1.0;
 
+  // Anthropic AI usage intensity signal — ±0.5pt modifier
+  if (anthropicUsage !== null) {
+    if (anthropicUsage >= 60)      score += 0.5;
+    else if (anthropicUsage < 20)  score -= 0.5;
+  }
+
   return clamp(Math.round(score), -10, 10);
 }
 
@@ -474,10 +532,20 @@ function trajectoryLabel(score: number): string {
 export function calculateScores(
   country: Country,
   iso2: string,
+  iso3: string,
   wbData: WorldBankData,
-  policies: Record<string, PolicyData>
+  policies: Record<string, PolicyData>,
+  imfData: IMFData,
+  oecdData: OECDData,
+  anthropicData: Record<string, number>,
+  externalIndices: ExternalIndices
 ): ScoredCountry {
-  const wb = wbData[iso2];
+  const wb   = wbData[iso2];
+  const imf  = imfData[iso3];
+  const oecd = oecdData[iso3];
+  const anthropicScore = anthropicData[iso3] ?? null;
+  const ext  = externalIndices.countries[country.slug] ?? null;
+
   const policy = policies[country.slug] ?? {
     has_national_ai_strategy: false,
     strategy_year: null,
@@ -532,7 +600,9 @@ export function calculateScores(
   const talentScore = scoreTalent(
     tertiary,
     laborProd,
-    country.scores.talent.score
+    country.scores.talent.score,
+    oecd?.researchers.current ?? null,
+    ext?.wipo_gii ?? null
   );
 
   const govScore = scoreGovernance(
@@ -540,13 +610,16 @@ export function calculateScores(
     ruleOfLaw,
     regQuality,
     policy,
-    country.scores.governance.score
+    country.scores.governance.score,
+    ext?.oxford_insights ?? null
   );
 
   const investScore = scoreInvestment(
     rd,
     fdi,
-    country.scores.investment.score
+    country.scores.investment.score,
+    imf?.govt_expenditure.current ?? null,
+    oecd?.rd_expenditure.current ?? null
   );
 
   const econScore = scoreEconomicReadiness(
@@ -554,7 +627,8 @@ export function calculateScores(
     privateCredit,
     tradeOpenness,
     servicesShare,
-    country.scores.economic_readiness.score
+    country.scores.economic_readiness.score,
+    imf?.govt_debt.current ?? null
   );
 
   const totalScore = clamp(
@@ -575,7 +649,8 @@ export function calculateScores(
     broadband,
     broadbandPrev,
     policy,
-    country.trajectory_score
+    country.trajectory_score,
+    anthropicScore
   );
 
   const projectedScore2028 = clamp(
@@ -610,5 +685,8 @@ export function calculateScores(
     projected_score_2028: projectedScore2028,
     data_source: hasLiveData ? "live" : "fallback",
     wb_data_year: wbDataYear,
+    imf_data: !!imf,
+    oecd_data: !!oecd,
+    anthropic_data: anthropicScore !== null,
   };
 }
