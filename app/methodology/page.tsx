@@ -1,5 +1,5 @@
-import Link from "next/link";
 import type { Metadata } from "next";
+import SiteHeader from "@/components/SiteHeader";
 
 export const metadata: Metadata = {
   title: "Methodology — AI Trajectory Index",
@@ -143,7 +143,8 @@ const PILLARS = [
   {
     name: "Infrastructure",
     score: "0–20",
-    color: "#3b82f6",
+    color: "#3B5BA5",
+    cssVar: "var(--pillar-infra)",
     icon: "🔌",
     description: "The physical and digital foundation for AI deployment.",
     measures: [
@@ -157,7 +158,8 @@ const PILLARS = [
   {
     name: "Talent",
     score: "0–20",
-    color: "#8b5cf6",
+    color: "#7A4F8C",
+    cssVar: "var(--pillar-talent)",
     icon: "🎓",
     description: "The human capital pipeline for AI development and deployment.",
     measures: [
@@ -170,7 +172,8 @@ const PILLARS = [
   {
     name: "Governance",
     score: "0–20",
-    color: "#06b6d4",
+    color: "#3F7A4D",
+    cssVar: "var(--pillar-gov)",
     icon: "⚖️",
     description: "Policy maturity, regulatory frameworks, and government AI strategy.",
     measures: [
@@ -184,7 +187,8 @@ const PILLARS = [
   {
     name: "Investment",
     score: "0–20",
-    color: "#f59e0b",
+    color: "#B58A2E",
+    cssVar: "var(--pillar-invest)",
     icon: "💰",
     description: "Capital flowing into AI — public R&D, private venture capital, and FDI.",
     measures: [
@@ -197,7 +201,8 @@ const PILLARS = [
   {
     name: "Economic Readiness",
     score: "0–20",
-    color: "#22c55e",
+    color: "#8B4A3F",
+    cssVar: "var(--pillar-econ)",
     icon: "📊",
     description: "The economy's structural capacity to adopt and commercialise AI.",
     measures: [
@@ -212,120 +217,150 @@ const PILLARS = [
 
 export default function MethodologyPage() {
   return (
-    <main className="min-h-screen" style={{ background: "var(--bg)" }}>
-      <div className="page-glow" />
+    <main style={{ minHeight: "100vh", background: "var(--ed-bg)" }}>
+      <SiteHeader activePage="methodology" />
 
-      <header className="sticky top-0 z-50 backdrop-blur-sm"
-        style={{ borderBottom: "1px solid var(--border)", background: "rgba(6,11,20,.94)" }}>
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3.5 flex items-center gap-4">
-          <Link href="/" className="text-sm transition-colors hover:text-white" style={{ color: "var(--text-3)" }}>
-            ← Index
-          </Link>
-          <span style={{ color: "var(--border)" }}>|</span>
-          <span className="text-xs font-medium uppercase tracking-wider" style={{ color: "var(--text-3)" }}>
-            Methodology
-          </span>
-        </div>
-      </header>
+      <div style={{ maxWidth: 896, margin: "0 auto", padding: "48px" }}>
 
-      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-12 space-y-10">
-
-        {/* Hero */}
-        <div>
-          <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "rgba(96,165,250,.7)" }}>
+        {/* ── Hero ── */}
+        <div style={{ background: "var(--ed-raised)", border: "1px solid var(--ed-border)", padding: "40px", marginBottom: 32 }}>
+          <p style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "var(--signal)", textTransform: "uppercase", marginBottom: 16 }}>
             Multi-Source Scoring Framework
           </p>
-          <h1 className="font-serif-display text-4xl sm:text-5xl mb-4 leading-tight" style={{ color: "var(--text-1)" }}>
+          <h1 style={{ fontFamily: "var(--font-display)", fontSize: 56, fontWeight: 400, fontStyle: "italic", letterSpacing: "-0.02em", color: "var(--ed-text-0)", lineHeight: 1.05, margin: "0 0 20px" }}>
             How we score 186 economies
           </h1>
-          <p className="text-base leading-relaxed max-w-2xl mb-4" style={{ color: "var(--text-2)" }}>
-            The AI Trajectory Index draws from <strong className="text-white">10 primary data sources</strong> to score
+          <p style={{ fontFamily: "var(--font-display)", fontStyle: "italic", fontSize: 18, lineHeight: 1.65, color: "var(--ed-text-1)", maxWidth: 640, margin: "0 0 24px" }}>
+            The AI Trajectory Index draws from <strong style={{ fontStyle: "normal", color: "var(--ed-text-0)" }}>10 primary data sources</strong> to score
             every country across five pillars (0–20 each, total 100). Live World Bank data is our quantitative backbone —
             but the methodology is enriched and validated against the IMF AI Preparedness Index, Stanford HAI,
             Anthropic Economic Index, Oxford Insights, OECD.AI, Tortoise, WIPO GII, ITU IDI, and WEF.
           </p>
-          <div className="flex flex-wrap gap-2">
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
             {["World Bank", "IMF AIPI", "Oxford Insights", "Stanford HAI", "OECD.AI", "Anthropic", "Tortoise", "WIPO GII", "ITU IDI", "WEF"].map((s) => (
-              <span key={s} className="text-[10px] font-semibold px-2 py-1 rounded-full"
-                style={{ background: "rgba(59,130,246,.08)", color: "var(--accent)", border: "1px solid rgba(59,130,246,.18)" }}>
+              <span key={s} style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: 10,
+                fontWeight: 600,
+                padding: "4px 10px",
+                background: "var(--ed-raised)",
+                border: "1px solid var(--ed-border)",
+                color: "var(--ed-text-1)",
+                letterSpacing: "0.04em",
+              }}>
                 {s}
               </span>
             ))}
           </div>
         </div>
 
-        {/* Score formula */}
-        <div className="card rounded-2xl p-6 sm:p-8">
-          <h2 className="text-xs font-bold uppercase tracking-wider mb-5" style={{ color: "var(--text-3)" }}>
+        {/* ── Score formula ── */}
+        <div style={{ background: "var(--ed-raised)", border: "1px solid var(--ed-border)", padding: 32, marginBottom: 32 }}>
+          <p style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "var(--signal)", textTransform: "uppercase", marginBottom: 20 }}>
             Composite Score Formula
-          </h2>
-          <div className="rounded-xl p-4 font-mono text-sm mb-5"
-            style={{ background: "var(--raised)", border: "1px solid var(--border)", color: "var(--text-1)" }}>
-            <span style={{ color: "var(--accent)" }}>Total Score</span>
+          </p>
+          <div style={{
+            background: "var(--dt-bg)",
+            border: "1px solid var(--dt-border)",
+            padding: "20px 24px",
+            fontFamily: "var(--font-mono)",
+            fontSize: 13,
+            color: "var(--dt-text-0)",
+            marginBottom: 24,
+          }}>
+            <span style={{ color: "var(--signal)" }}>Total Score</span>
             {" = "}Infrastructure + Talent + Governance + Investment + Economic Readiness
             <br />
-            <span style={{ color: "var(--text-3)" }}>Each pillar: 0–20 pts → Total: 0–100 · Classification: Leading (80+), Advanced (60–79), Developing (40–59), Nascent (&lt;40)</span>
+            <span style={{ color: "var(--dt-text-3)" }}>
+              Each pillar: 0–20 pts → Total: 0–100 · Classification: Leading (80+), Advanced (60–79), Developing (40–59), Nascent (&lt;40)
+            </span>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12 }}>
             {PILLARS.map((p) => (
-              <div key={p.name} className="text-center rounded-xl p-3"
-                style={{ background: `${p.color}10`, border: `1px solid ${p.color}25` }}>
-                <p className="text-lg mb-1">{p.icon}</p>
-                <p className="text-xs font-bold" style={{ color: p.color }}>{p.name}</p>
-                <p className="text-xs mt-0.5" style={{ color: "var(--text-3)" }}>0–20 pts</p>
+              <div key={p.name} style={{
+                background: "var(--ed-bg)",
+                borderTop: `3px solid ${p.color}`,
+                border: `1px solid var(--ed-border)`,
+                borderTopWidth: 3,
+                borderTopColor: p.color,
+                padding: "14px 12px",
+                textAlign: "center",
+              }}>
+                <p style={{ fontSize: 18, margin: "0 0 6px" }}>{p.icon}</p>
+                <p style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, color: p.color, letterSpacing: "0.04em", margin: "0 0 4px" }}>{p.name}</p>
+                <p style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--signal)", margin: 0 }}>0–20</p>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Pillar definitions */}
-        <div className="space-y-4">
-          <h2 className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-3)" }}>
+        {/* ── Pillar definitions ── */}
+        <div style={{ marginBottom: 32 }}>
+          <p style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "var(--ed-muted)", textTransform: "uppercase", marginBottom: 16 }}>
             Pillar Definitions &amp; Sources
-          </h2>
-          {PILLARS.map((p) => (
-            <div key={p.name} className="card rounded-2xl overflow-hidden">
-              <div className="h-1 w-full" style={{ background: p.color, opacity: 0.6 }} />
-              <div className="p-6 sm:p-8">
-                <div className="flex items-center gap-3 mb-3">
-                  <span className="text-2xl">{p.icon}</span>
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            {PILLARS.map((p) => (
+              <div key={p.name} style={{
+                background: "var(--ed-raised)",
+                border: "1px solid var(--ed-border)",
+                borderLeft: `4px solid ${p.color}`,
+                padding: "28px 32px",
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
+                  <span style={{ fontSize: 22 }}>{p.icon}</span>
                   <div>
-                    <h3 className="text-lg font-bold" style={{ color: "var(--text-1)" }}>{p.name}</h3>
-                    <p className="text-xs font-semibold" style={{ color: p.color }}>{p.score} points</p>
+                    <h3 style={{ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 400, color: "var(--ed-text-0)", margin: 0, lineHeight: 1.2 }}>{p.name}</h3>
+                    <p style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: p.color, margin: 0, fontWeight: 600, letterSpacing: "0.04em" }}>{p.score} points</p>
                   </div>
                 </div>
-                <p className="text-sm mb-4 leading-relaxed" style={{ color: "var(--text-2)" }}>{p.description}</p>
-                <div className="space-y-2 mb-4">
+                <p style={{ fontFamily: "var(--font-sans)", fontSize: 14, lineHeight: 1.65, color: "var(--ed-text-2)", margin: "0 0 16px" }}>{p.description}</p>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
                   {p.measures.map((m, i) => (
-                    <div key={i} className="flex gap-3 items-start text-sm" style={{ color: "var(--text-2)" }}>
-                      <span className="mt-1 flex-shrink-0 w-1.5 h-1.5 rounded-full" style={{ background: p.color }} />
-                      {m}
+                    <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                      <span style={{
+                        marginTop: 7,
+                        flexShrink: 0,
+                        width: 6,
+                        height: 6,
+                        background: p.color,
+                        borderRadius: "50%",
+                        display: "inline-block",
+                      }} />
+                      <span style={{ fontFamily: "var(--font-sans)", fontSize: 13, color: "var(--ed-text-2)", lineHeight: 1.6 }}>{m}</span>
                     </div>
                   ))}
                 </div>
-                <div className="flex flex-wrap gap-1.5">
-                  <span className="text-[10px] font-semibold" style={{ color: "var(--text-3)" }}>Sources:</span>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}>
+                  <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--ed-muted)", fontWeight: 600, letterSpacing: "0.04em" }}>SOURCES:</span>
                   {p.sources.map((s) => (
-                    <span key={s} className="text-[10px] font-semibold px-1.5 py-0.5 rounded"
-                      style={{ background: `${p.color}12`, color: p.color, border: `1px solid ${p.color}25` }}>
+                    <span key={s} style={{
+                      fontFamily: "var(--font-sans)",
+                      fontSize: 11,
+                      fontWeight: 500,
+                      padding: "3px 8px",
+                      background: "var(--ed-bg)",
+                      border: "1px solid var(--ed-border)",
+                      color: "var(--ed-text-1)",
+                    }}>
                       {s}
                     </span>
                   ))}
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
-        {/* Trajectory */}
-        <div className="card rounded-2xl p-6 sm:p-8">
-          <h2 className="text-xs font-bold uppercase tracking-wider mb-5" style={{ color: "var(--text-3)" }}>
+        {/* ── Trajectory ── */}
+        <div style={{ background: "var(--ed-raised)", border: "1px solid var(--ed-border)", padding: 32, marginBottom: 32 }}>
+          <p style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "var(--ed-muted)", textTransform: "uppercase", marginBottom: 16 }}>
             Trajectory Score &amp; 2028 Projection
-          </h2>
-          <p className="text-sm leading-relaxed mb-5" style={{ color: "var(--text-2)" }}>
+          </p>
+          <p style={{ fontFamily: "var(--font-sans)", fontSize: 14, lineHeight: 1.65, color: "var(--ed-text-2)", margin: "0 0 20px" }}>
             The trajectory score (–10 to +10) reflects momentum. Four forward-looking components:
           </p>
-          <div className="space-y-3 mb-6">
+          <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 24 }}>
             {[
               { label: "GDP growth rate (3-year avg)", weight: "25%", source: "World Bank NY.GDP.MKTP.KD.ZG", note: "Structural proxy for economic capacity to fund AI investment. Compounding growth signals a broadening tax base and increasing government AI budget." },
               { label: "Internet penetration growth",  weight: "20%", source: "World Bank IT.NET.USER.ZS (YoY delta)", note: "Captures digital adoption momentum. Accelerating internet growth predicts faster AI tool adoption cycles within 2–3 years." },
@@ -333,97 +368,140 @@ export default function MethodologyPage() {
               { label: "R&D spending trend",           weight: "15%", source: "World Bank GB.XPD.RSDV.GD.ZS (YoY delta)", note: "Year-over-year change in R&D as % of GDP. Increasing R&D signals a structural commitment to innovation that produces compounding AI capability returns." },
               { label: "AI adoption momentum proxy",   weight: "15%", source: "Anthropic Economic Index · Stanford HAI · WEF", note: "Incorporates AI augmentation adoption rates (Anthropic), employer upskilling commitments (WEF), and research output growth (Stanford HAI)." },
             ].map((item) => (
-              <div key={item.label} className="rounded-xl p-4"
-                style={{ background: "var(--raised)", border: "1px solid var(--border)" }}>
-                <div className="flex items-start gap-3 mb-1">
-                  <span className="text-xs font-black px-2 py-0.5 rounded flex-shrink-0 mt-0.5"
-                    style={{ background: "rgba(59,130,246,.12)", color: "var(--accent)", border: "1px solid rgba(59,130,246,.22)" }}>
+              <div key={item.label} style={{
+                background: "var(--ed-bg)",
+                border: "1px solid var(--ed-border)",
+                padding: "16px 20px",
+              }}>
+                <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
+                  <span style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: 11,
+                    fontWeight: 700,
+                    padding: "3px 8px",
+                    background: "var(--dt-bg)",
+                    border: "1px solid var(--dt-border)",
+                    color: "var(--dt-text-1)",
+                    flexShrink: 0,
+                    marginTop: 2,
+                    letterSpacing: "0.04em",
+                  }}>
                     {item.weight}
                   </span>
                   <div>
-                    <p className="text-sm font-semibold" style={{ color: "var(--text-1)" }}>{item.label}</p>
-                    <p className="text-[10px] font-mono mb-1" style={{ color: "var(--accent)" }}>{item.source}</p>
-                    <p className="text-xs" style={{ color: "var(--text-3)" }}>{item.note}</p>
+                    <p style={{ fontFamily: "var(--font-sans)", fontSize: 14, fontWeight: 600, color: "var(--ed-text-0)", margin: "0 0 2px" }}>{item.label}</p>
+                    <p style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--ed-text-2)", margin: "0 0 6px", letterSpacing: "0.03em" }}>{item.source}</p>
+                    <p style={{ fontFamily: "var(--font-sans)", fontSize: 12, color: "var(--ed-text-2)", margin: 0, lineHeight: 1.55 }}>{item.note}</p>
                   </div>
                 </div>
               </div>
             ))}
           </div>
-          <div className="rounded-xl p-4 font-mono text-sm"
-            style={{ background: "var(--raised)", border: "1px solid var(--border)", color: "var(--text-1)" }}>
-            <span style={{ color: "var(--accent)" }}>Projected 2028</span>
+          <div style={{
+            background: "var(--dt-bg)",
+            border: "1px solid var(--dt-border)",
+            padding: "20px 24px",
+            fontFamily: "var(--font-mono)",
+            fontSize: 13,
+            color: "var(--dt-text-0)",
+          }}>
+            <span style={{ color: "var(--signal)" }}>Projected 2028</span>
             {" = clamp(Total + Trajectory × 1.5, 0, 100)"}
             <br />
-            <span style={{ color: "var(--text-3)" }}>
+            <span style={{ color: "var(--dt-text-3)" }}>
               Labels: Strong Positive (+6→+10) · Positive (+2→+5) · Neutral (-1→+1) · Negative (-5→-2) · Strong Negative (-10→-6)
             </span>
           </div>
         </div>
 
-        {/* Primary data sources — detailed */}
-        <div>
-          <div className="mb-6">
-            <h2 className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: "var(--text-3)" }}>
+        {/* ── Primary data sources ── */}
+        <div style={{ marginBottom: 32 }}>
+          <div style={{ marginBottom: 20 }}>
+            <p style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "var(--ed-muted)", textTransform: "uppercase", marginBottom: 8 }}>
               Primary Data Sources
-            </h2>
-            <p className="text-sm" style={{ color: "var(--text-2)" }}>
+            </p>
+            <p style={{ fontFamily: "var(--font-sans)", fontSize: 14, color: "var(--ed-text-2)", lineHeight: 1.65, margin: 0 }}>
               The index is deliberately multi-source. Each source has different country coverage, update frequency, and methodological strengths. Using them together reduces single-source bias and improves cross-country comparability.
             </p>
           </div>
 
-          <div className="space-y-4">
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             {PRIMARY_SOURCES.map((src) => (
-              <div key={src.name} className="card rounded-2xl overflow-hidden">
-                <div className="h-0.5 w-full" style={{ background: src.color, opacity: 0.5 }} />
-                <div className="p-6">
-                  <div className="flex items-start justify-between gap-4 mb-3">
-                    <div className="flex items-start gap-3">
-                      <span className="text-2xl flex-shrink-0">{src.icon}</span>
+              <div key={src.name} style={{
+                background: "var(--ed-raised)",
+                border: "1px solid var(--ed-border)",
+                overflow: "hidden",
+              }}>
+                <div style={{ height: 3, background: src.color }} />
+                <div style={{ padding: "24px 28px" }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, marginBottom: 16 }}>
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+                      <span style={{ fontSize: 22, flexShrink: 0 }}>{src.icon}</span>
                       <div>
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <h3 className="text-sm font-bold" style={{ color: "var(--text-1)" }}>{src.name}</h3>
-                          <span className="text-[10px] px-1.5 py-0.5 rounded"
-                            style={{ background: `${src.color}12`, color: src.color, border: `1px solid ${src.color}25` }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 4 }}>
+                          <h3 style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 400, color: "var(--ed-text-0)", margin: 0, lineHeight: 1.2 }}>{src.name}</h3>
+                          <span style={{
+                            fontFamily: "var(--font-mono)",
+                            fontSize: 10,
+                            fontWeight: 600,
+                            padding: "3px 8px",
+                            background: "var(--ed-bg)",
+                            border: "1px solid var(--ed-border)",
+                            color: src.color,
+                            letterSpacing: "0.03em",
+                          }}>
                             {src.coverage}
                           </span>
                         </div>
-                        <p className="text-xs mt-0.5" style={{ color: "var(--text-3)" }}>
+                        <p style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--ed-muted)", margin: 0, letterSpacing: "0.03em" }}>
                           {src.org} · Updated {src.year}
                         </p>
                       </div>
                     </div>
-                    <a href={src.url} target="_blank" rel="noopener noreferrer"
-                      className="text-xs flex-shrink-0 transition-colors hover:text-blue-300"
-                      style={{ color: "var(--accent)" }}>
+                    <a href={src.url} target="_blank" rel="noopener noreferrer" style={{
+                      fontFamily: "var(--font-sans)",
+                      fontSize: 12,
+                      fontWeight: 600,
+                      color: "var(--signal)",
+                      flexShrink: 0,
+                      textDecoration: "none",
+                    }}>
                       Visit ↗
                     </a>
                   </div>
 
-                  <div className="space-y-3">
+                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                     <div>
-                      <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "var(--text-3)" }}>
+                      <p style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", color: "var(--ed-muted)", textTransform: "uppercase", margin: "0 0 4px" }}>
                         What it measures
                       </p>
-                      <p className="text-sm leading-relaxed" style={{ color: "var(--text-2)" }}>{src.whatItMeasures}</p>
+                      <p style={{ fontFamily: "var(--font-sans)", fontSize: 13, lineHeight: 1.65, color: "var(--ed-text-2)", margin: 0 }}>{src.whatItMeasures}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "var(--text-3)" }}>
+                      <p style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", color: "var(--ed-muted)", textTransform: "uppercase", margin: "0 0 4px" }}>
                         How we use it
                       </p>
-                      <p className="text-sm leading-relaxed" style={{ color: "var(--text-2)" }}>{src.howWeUseIt}</p>
+                      <p style={{ fontFamily: "var(--font-sans)", fontSize: 13, lineHeight: 1.65, color: "var(--ed-text-2)", margin: 0 }}>{src.howWeUseIt}</p>
                     </div>
-                    <div className="rounded-xl p-3"
-                      style={{ background: `${src.color}06`, border: `1px solid ${src.color}18` }}>
-                      <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: src.color }}>
+                    <div style={{ background: "var(--ed-bg)", border: "1px solid var(--ed-border)", padding: "12px 16px" }}>
+                      <p style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", color: src.color, textTransform: "uppercase", margin: "0 0 4px" }}>
                         Key insight
                       </p>
-                      <p className="text-xs leading-relaxed" style={{ color: "var(--text-2)" }}>{src.keyInsight}</p>
+                      <p style={{ fontFamily: "var(--font-sans)", fontSize: 12, lineHeight: 1.65, color: "var(--ed-text-2)", margin: 0 }}>{src.keyInsight}</p>
                     </div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-[10px]" style={{ color: "var(--text-3)" }}>Informs:</span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                      <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--ed-muted)", letterSpacing: "0.04em" }}>INFORMS:</span>
                       {src.dimensions.map((d) => (
-                        <span key={d} className="text-[10px] font-semibold px-1.5 py-0.5 rounded"
-                          style={{ background: "rgba(59,130,246,.08)", color: "var(--accent)", border: "1px solid rgba(59,130,246,.18)" }}>
+                        <span key={d} style={{
+                          fontFamily: "var(--font-mono)",
+                          fontSize: 10,
+                          fontWeight: 600,
+                          padding: "3px 8px",
+                          background: "var(--ed-bg)",
+                          border: "1px solid var(--ed-border)",
+                          color: "var(--ed-text-1)",
+                          letterSpacing: "0.03em",
+                        }}>
                           {d}
                         </span>
                       ))}
@@ -435,20 +513,20 @@ export default function MethodologyPage() {
           </div>
         </div>
 
-        {/* Source coverage matrix */}
-        <div className="card rounded-2xl p-6 sm:p-8">
-          <h2 className="text-xs font-bold uppercase tracking-wider mb-5" style={{ color: "var(--text-3)" }}>
+        {/* ── Source coverage matrix ── */}
+        <div style={{ background: "var(--ed-raised)", border: "1px solid var(--ed-border)", padding: 32, marginBottom: 32 }}>
+          <p style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "var(--ed-muted)", textTransform: "uppercase", marginBottom: 20 }}>
             Source Coverage by Pillar
-          </h2>
-          <div className="overflow-x-auto">
+          </p>
+          <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 0 }}>
               <thead>
                 <tr>
-                  <th className="text-left py-2 pr-4 text-xs font-bold" style={{ color: "var(--text-3)", borderBottom: "1px solid var(--border)", minWidth: 160 }}>Source</th>
-                  {["Infra", "Talent", "Gov", "Invest", "Econ Ready"].map((p) => (
-                    <th key={p} className="text-center py-2 px-2 text-xs font-bold" style={{ color: "var(--text-3)", borderBottom: "1px solid var(--border)", minWidth: 72 }}>{p}</th>
+                  <th style={{ textAlign: "left", padding: "8px 16px 8px 0", fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, color: "var(--ed-muted)", borderBottom: "1px solid var(--ed-border)", minWidth: 160, letterSpacing: "0.06em" }}>SOURCE</th>
+                  {["INFRA", "TALENT", "GOV", "INVEST", "ECON READY"].map((p) => (
+                    <th key={p} style={{ textAlign: "center", padding: "8px", fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, color: "var(--ed-muted)", borderBottom: "1px solid var(--ed-border)", minWidth: 72, letterSpacing: "0.06em" }}>{p}</th>
                   ))}
-                  <th className="text-center py-2 px-2 text-xs font-bold" style={{ color: "var(--text-3)", borderBottom: "1px solid var(--border)", minWidth: 60 }}>Traj.</th>
+                  <th style={{ textAlign: "center", padding: "8px", fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, color: "var(--ed-muted)", borderBottom: "1px solid var(--ed-border)", minWidth: 60, letterSpacing: "0.06em" }}>TRAJ.</th>
                 </tr>
               </thead>
               <tbody>
@@ -464,11 +542,14 @@ export default function MethodologyPage() {
                   { src: "ITU IDI",                  infra: "●", talent: "", gov: "", invest: "", econ: "", traj: "" },
                   { src: "WEF Future of Jobs",       infra: "", talent: "●", gov: "", invest: "", econ: "●", traj: "●" },
                 ].map((row) => (
-                  <tr key={row.src} style={{ borderBottom: "1px solid var(--border)" }}>
-                    <td className="py-2 pr-4 text-xs" style={{ color: "var(--text-2)" }}>{row.src}</td>
+                  <tr key={row.src} style={{ borderBottom: "1px solid var(--ed-border)" }}>
+                    <td style={{ padding: "10px 16px 10px 0", fontFamily: "var(--font-sans)", fontSize: 13, color: "var(--ed-text-2)" }}>{row.src}</td>
                     {[row.infra, row.talent, row.gov, row.invest, row.econ, row.traj].map((cell, i) => (
-                      <td key={i} className="text-center py-2 px-2">
-                        {cell ? <span style={{ color: "var(--accent)" }}>●</span> : <span style={{ color: "var(--border)" }}>○</span>}
+                      <td key={i} style={{ textAlign: "center", padding: "10px 8px" }}>
+                        {cell
+                          ? <span style={{ color: "var(--signal)", fontFamily: "var(--font-mono)" }}>●</span>
+                          : <span style={{ color: "var(--ed-border-strong)", fontFamily: "var(--font-mono)" }}>○</span>
+                        }
                       </td>
                     ))}
                   </tr>
@@ -478,34 +559,33 @@ export default function MethodologyPage() {
           </div>
         </div>
 
-        {/* Normalisation */}
-        <div className="card rounded-2xl p-6 sm:p-8">
-          <h2 className="text-xs font-bold uppercase tracking-wider mb-4" style={{ color: "var(--text-3)" }}>
+        {/* ── Normalisation ── */}
+        <div style={{ background: "var(--ed-raised)", border: "1px solid var(--ed-border)", padding: 32, marginBottom: 32 }}>
+          <p style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "var(--ed-muted)", textTransform: "uppercase", marginBottom: 16 }}>
             Normalisation &amp; Cross-Validation
-          </h2>
-          <p className="text-sm leading-relaxed mb-3" style={{ color: "var(--text-2)" }}>
+          </p>
+          <p style={{ fontFamily: "var(--font-sans)", fontSize: 14, lineHeight: 1.65, color: "var(--ed-text-2)", margin: "0 0 12px" }}>
             Each live World Bank indicator is normalised against a global benchmarking range using min-max scaling.
             For example, internet penetration uses a 0–95% practical ceiling. GDP per capita uses a logarithmic scale.
           </p>
-          <p className="text-sm leading-relaxed mb-3" style={{ color: "var(--text-2)" }}>
+          <p style={{ fontFamily: "var(--font-sans)", fontSize: 14, lineHeight: 1.65, color: "var(--ed-text-2)", margin: "0 0 12px" }}>
             The composite is cross-validated against IMF AIPI scores (174 countries) and Oxford Insights rankings (195 countries).
             Where our score diverges by more than 10 points from IMF AIPI on the same country, we flag for manual review and
             adjust static proxy weights accordingly.
           </p>
-          <p className="text-sm leading-relaxed" style={{ color: "var(--text-2)" }}>
+          <p style={{ fontFamily: "var(--font-sans)", fontSize: 14, lineHeight: 1.65, color: "var(--ed-text-2)", margin: 0 }}>
             Countries missing World Bank data fall back to the static 2024 baseline. The{" "}
-            <code className="text-xs px-1 py-0.5 rounded" style={{ background: "var(--raised)", color: "var(--accent)" }}>data_source</code>
+            <code style={{ fontFamily: "var(--font-mono)", fontSize: 12, padding: "2px 6px", background: "var(--dt-bg)", border: "1px solid var(--dt-border)", color: "var(--dt-text-1)" }}>data_source</code>
             {" "}flag on each country response indicates whether scores are live-calculated or from the static baseline.
           </p>
         </div>
 
-        {/* Limitations */}
-        <div className="card rounded-2xl p-6 sm:p-8"
-          style={{ background: "rgba(245,158,11,.04)", borderColor: "rgba(245,158,11,.18)" }}>
-          <h2 className="text-xs font-bold uppercase tracking-wider mb-4" style={{ color: "#f59e0b" }}>
+        {/* ── Limitations ── */}
+        <div style={{ background: "var(--ed-raised)", border: "1px solid var(--ed-border)", borderLeft: "4px solid #B58A2E", padding: 32, marginBottom: 32 }}>
+          <p style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "#B58A2E", textTransform: "uppercase", marginBottom: 16 }}>
             Limitations &amp; Caveats
-          </h2>
-          <div className="space-y-3">
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {[
               "World Bank data lags by 1–3 years for many countries. The most recent available point is used, which may not reflect the current situation.",
               "The Anthropic Economic Index reflects Claude usage patterns — not all AI adoption globally. It should be read as a directional signal, not a census of AI use.",
@@ -515,25 +595,26 @@ export default function MethodologyPage() {
               "Countries with populations under 1M (small island states, city-states) may have extreme indicator values. Singapore and Luxembourg are legitimate outliers; Maldives and Seychelles should be interpreted with caution.",
               "AI safety, ethics oversight, and bias mitigation are not scored — critical dimensions omitted due to data availability constraints.",
             ].map((lim, i) => (
-              <div key={i} className="flex gap-3 items-start text-sm" style={{ color: "var(--text-2)" }}>
-                <span className="mt-1 flex-shrink-0 text-amber-400">⚠</span>
-                {lim}
+              <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <span style={{ marginTop: 1, flexShrink: 0, color: "#B58A2E", fontFamily: "var(--font-mono)", fontSize: 14 }}>⚠</span>
+                <span style={{ fontFamily: "var(--font-sans)", fontSize: 14, lineHeight: 1.65, color: "var(--ed-text-2)" }}>{lim}</span>
               </div>
             ))}
           </div>
         </div>
-        {/* Changelog */}
-        <div className="card rounded-2xl p-6 sm:p-8">
-          <h2 className="text-xs font-bold uppercase tracking-wider mb-5" style={{ color: "var(--text-3)" }}>
+
+        {/* ── Changelog ── */}
+        <div style={{ background: "var(--ed-raised)", border: "1px solid var(--ed-border)", padding: 32, marginBottom: 32 }}>
+          <p style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "var(--ed-muted)", textTransform: "uppercase", marginBottom: 24 }}>
             Methodology Changelog
-          </h2>
-          <div className="space-y-5">
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
             {[
               {
                 version: "v3",
                 date: "March 2026",
                 tag: "Current",
-                tagColor: "#4ade80",
+                tagColor: "#3F7A4D",
                 changes: [
                   "Removed R&D expenditure from Talent pillar — was double-counted with Investment.",
                   "Removed GDP per capita from Investment pillar — was double-counted with Economic Readiness.",
@@ -548,7 +629,7 @@ export default function MethodologyPage() {
                 version: "v2",
                 date: "February 2026",
                 tag: "Previous",
-                tagColor: "#93c5fd",
+                tagColor: "#3B5BA5",
                 changes: [
                   "Replaced fully static scoring with live World Bank API integration (6 indicators, 24h cache).",
                   "Added trajectory score (–10 to +10) based on year-over-year WB indicator deltas.",
@@ -561,7 +642,7 @@ export default function MethodologyPage() {
                 version: "v1",
                 date: "January 2026",
                 tag: "Initial",
-                tagColor: "#fcd34d",
+                tagColor: "#B58A2E",
                 changes: [
                   "Static baseline scores for 186 countries across 5 pillars (0–20 each).",
                   "Scores cross-validated against IMF AIPI (174 countries) and Oxford Insights (195 countries).",
@@ -570,24 +651,32 @@ export default function MethodologyPage() {
                 ],
               },
             ].map((entry) => (
-              <div key={entry.version} className="flex gap-4">
-                <div className="flex flex-col items-center flex-shrink-0" style={{ width: 48 }}>
-                  <span className="text-xs font-black" style={{ color: entry.tagColor }}>{entry.version}</span>
-                  <div className="w-px flex-1 mt-1" style={{ background: "var(--border)" }} />
+              <div key={entry.version} style={{ display: "flex", gap: 20 }}>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0, width: 40 }}>
+                  <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, fontWeight: 700, color: entry.tagColor }}>{entry.version}</span>
+                  <div style={{ width: 1, flex: 1, marginTop: 6, background: "var(--ed-border)" }} />
                 </div>
-                <div className="pb-2 flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-sm font-bold" style={{ color: "var(--text-1)" }}>{entry.date}</span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                      style={{ background: `${entry.tagColor}14`, color: entry.tagColor, border: `1px solid ${entry.tagColor}30` }}>
-                      {entry.tag}
+                <div style={{ paddingBottom: 8, flex: 1 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+                    <span style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 400, color: "var(--ed-text-0)" }}>{entry.date}</span>
+                    <span style={{
+                      fontFamily: "var(--font-mono)",
+                      fontSize: 10,
+                      fontWeight: 700,
+                      padding: "3px 8px",
+                      background: "var(--ed-bg)",
+                      border: `1px solid ${entry.tagColor}`,
+                      color: entry.tagColor,
+                      letterSpacing: "0.06em",
+                    }}>
+                      {entry.tag.toUpperCase()}
                     </span>
                   </div>
-                  <ul className="space-y-1.5">
+                  <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 6 }}>
                     {entry.changes.map((c, i) => (
-                      <li key={i} className="flex gap-2.5 items-start text-sm" style={{ color: "var(--text-2)" }}>
-                        <span className="mt-1.5 flex-shrink-0 w-1 h-1 rounded-full" style={{ background: entry.tagColor }} />
-                        {c}
+                      <li key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                        <span style={{ marginTop: 8, flexShrink: 0, width: 4, height: 4, background: entry.tagColor, borderRadius: "50%", display: "inline-block" }} />
+                        <span style={{ fontFamily: "var(--font-sans)", fontSize: 13, lineHeight: 1.65, color: "var(--ed-text-2)" }}>{c}</span>
                       </li>
                     ))}
                   </ul>
@@ -596,62 +685,53 @@ export default function MethodologyPage() {
             ))}
           </div>
         </div>
-      </div>
 
-      {/* About the Builder */}
-      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 mt-8">
-        <div className="card rounded-2xl p-6 sm:p-8">
-          <h2 className="text-xs font-bold uppercase tracking-wider mb-4" style={{ color: "var(--accent)" }}>
+        {/* ── About the Builder ── */}
+        <div style={{ background: "var(--ed-raised)", border: "1px solid var(--ed-border)", padding: 32, marginBottom: 32 }}>
+          <p style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "var(--signal)", textTransform: "uppercase", marginBottom: 16 }}>
             About the Builder
-          </h2>
-          <p className="text-sm leading-relaxed" style={{ color: "var(--text-2)" }}>
+          </p>
+          <p style={{ fontFamily: "var(--font-sans)", fontSize: 14, lineHeight: 1.75, color: "var(--ed-text-2)", margin: "0 0 16px" }}>
             This index was built by{" "}
-            <a href="https://ankitmishra.ca" target="_blank" rel="noopener noreferrer"
-              className="font-semibold hover:text-blue-300 transition-colors" style={{ color: "var(--text-1)" }}>
+            <a href="https://ankitmishra.ca" target="_blank" rel="noopener noreferrer" style={{ fontWeight: 600, color: "var(--ed-text-0)", textDecoration: "none" }}>
               Ankit Mishra
             </a>
             {" "}as an independent research tool to support work at the intersection of AI governance,
             emerging markets, and technology policy. Ankit is Commercial Portfolio Director at a leading
             African climatetech venture fund, a member of the{" "}
-            <span style={{ color: "var(--text-1)" }}>Schwartz Reisman Institute AI &amp; Trust Working Group</span>
+            <span style={{ color: "var(--ed-text-0)" }}>Schwartz Reisman Institute AI &amp; Trust Working Group</span>
             {" "}at the University of Toronto, and a Forbes contributor with 50+ articles reaching
             200,000+ readers.
           </p>
-          <div className="flex items-center gap-4 mt-4">
-            <a href="https://ankitmishra.ca" target="_blank" rel="noopener noreferrer"
-              className="text-xs font-semibold transition-colors hover:text-blue-300"
-              style={{ color: "var(--accent)" }}>
+          <div style={{ display: "flex", gap: 24 }}>
+            <a href="https://ankitmishra.ca" target="_blank" rel="noopener noreferrer" style={{ fontFamily: "var(--font-sans)", fontSize: 13, fontWeight: 600, color: "var(--signal)", textDecoration: "none" }}>
               ankitmishra.ca ↗
             </a>
-            <a href="https://linkedin.com/in/ankitmishra01" target="_blank" rel="noopener noreferrer"
-              className="text-xs font-semibold transition-colors hover:text-blue-300"
-              style={{ color: "var(--accent)" }}>
+            <a href="https://linkedin.com/in/ankitmishra01" target="_blank" rel="noopener noreferrer" style={{ fontFamily: "var(--font-sans)", fontSize: 13, fontWeight: 600, color: "var(--signal)", textDecoration: "none" }}>
               LinkedIn ↗
             </a>
           </div>
         </div>
-      </div>
 
-      {/* ── Adoption Scorecard section ── */}
-      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 mt-12 mb-8">
-        <div className="card rounded-2xl p-8">
-          <div className="flex items-center gap-3 mb-6">
-            <span className="text-2xl">🚀</span>
+        {/* ── Adoption Scorecard ── */}
+        <div style={{ background: "var(--ed-raised)", border: "1px solid var(--ed-border)", padding: 32, marginBottom: 48 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+            <span style={{ fontSize: 22 }}>🚀</span>
             <div>
-              <h2 className="text-lg font-black" style={{ color: "var(--text-1)" }}>AI Adoption Scorecard</h2>
-              <p className="text-xs mt-0.5" style={{ color: "var(--text-3)" }}>Methodology · 2026</p>
+              <h2 style={{ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 400, color: "var(--ed-text-0)", margin: 0, lineHeight: 1.2 }}>AI Adoption Scorecard</h2>
+              <p style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--ed-muted)", margin: 0, letterSpacing: "0.04em" }}>METHODOLOGY · 2026</p>
             </div>
           </div>
-          <div className="space-y-5 text-sm leading-relaxed" style={{ color: "var(--text-2)" }}>
-            <p>
-              The Adoption Scorecard measures whether countries are actively <strong style={{ color: "var(--text-1)" }}>deploying and using AI</strong> — distinct from the Readiness Index which measures capacity. A country can score highly on readiness but deploy AI slowly due to cultural, regulatory, or economic friction. Conversely, some countries deploy AI rapidly through mobile-first channels despite lower readiness scores. This gap between readiness and adoption is one of the most important insights the combined platform reveals.
+          <div style={{ display: "flex", flexDirection: "column", gap: 16, fontFamily: "var(--font-sans)", fontSize: 14, lineHeight: 1.75, color: "var(--ed-text-2)" }}>
+            <p style={{ margin: 0 }}>
+              The Adoption Scorecard measures whether countries are actively <strong style={{ color: "var(--ed-text-0)" }}>deploying and using AI</strong> — distinct from the Readiness Index which measures capacity. A country can score highly on readiness but deploy AI slowly due to cultural, regulatory, or economic friction. Conversely, some countries deploy AI rapidly through mobile-first channels despite lower readiness scores. This gap between readiness and adoption is one of the most important insights the combined platform reveals.
             </p>
-            <p>
-              <strong style={{ color: "var(--text-1)" }}>The gap</strong> is calculated as: <code className="px-1.5 py-0.5 rounded text-xs font-mono"
-                style={{ background: "var(--raised)", color: "var(--accent)", border: "1px solid var(--border)" }}>adoption_score − readiness_score</code>.<br />
+            <p style={{ margin: 0 }}>
+              <strong style={{ color: "var(--ed-text-0)" }}>The gap</strong> is calculated as:{" "}
+              <code style={{ fontFamily: "var(--font-mono)", fontSize: 12, padding: "2px 6px", background: "var(--dt-bg)", border: "1px solid var(--dt-border)", color: "var(--dt-text-1)" }}>adoption_score − readiness_score</code>.<br />
               A positive gap means the country is adopting faster than its capacity predicts. A negative gap means it has untapped AI capacity not yet being utilised.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               {[
                 { icon: "🏛️", key: "Government Deployment (0–20)", desc: "Active AI in public services: e-government AI integration, AI in healthcare delivery, algorithmic public administration, smart city deployments, government AI procurement.", sources: "Oxford Insights Government AI Readiness Index, UNDP e-government surveys, national AI strategy implementation reports" },
                 { icon: "🏢", key: "Enterprise Adoption (0–20)", desc: "Business AI usage: World Bank Enterprise Survey digital adoption rates, OECD business AI data, fintech AI penetration, manufacturing and retail AI adoption.", sources: "OECD Business AI Adoption Survey, World Bank Enterprise Surveys, McKinsey Global AI Survey" },
@@ -659,30 +739,30 @@ export default function MethodologyPage() {
                 { icon: "📱", key: "Consumer Usage (0–20)", desc: "Everyday AI adoption: smartphone AI assistant penetration, AI-powered mobile payments, voice assistant adoption, AI in e-commerce and healthcare apps. Mobile-first fintech (M-Pesa, GCash, bKash) is a key signal for emerging markets.", sources: "GSMA Mobile Economy, Statista AI consumer surveys, fintech adoption data" },
                 { icon: "🔬", key: "R&D Pipeline (0–20)", desc: "Research-to-deployment velocity: AI patent filings per million (WIPO), university-to-industry AI transfer rate, AI unicorn and soonicorn count per capita, AI accelerator density.", sources: "WIPO Patent Database, Crunchbase AI unicorn tracking, Stanford HAI AI Index" },
               ].map(({ icon, key, desc, sources }) => (
-                <div key={key} className="rounded-xl p-4" style={{ background: "var(--raised)", border: "1px solid var(--border)" }}>
-                  <p className="text-xs font-black mb-1" style={{ color: "var(--text-1)" }}>{icon} {key}</p>
-                  <p className="text-xs leading-relaxed mb-2" style={{ color: "var(--text-2)" }}>{desc}</p>
-                  <p className="text-[10px]" style={{ color: "var(--text-3)" }}>Sources: {sources}</p>
+                <div key={key} style={{ background: "var(--ed-bg)", border: "1px solid var(--ed-border)", padding: 16 }}>
+                  <p style={{ fontFamily: "var(--font-sans)", fontSize: 13, fontWeight: 700, color: "var(--ed-text-0)", margin: "0 0 6px" }}>{icon} {key}</p>
+                  <p style={{ fontFamily: "var(--font-sans)", fontSize: 12, lineHeight: 1.6, color: "var(--ed-text-2)", margin: "0 0 8px" }}>{desc}</p>
+                  <p style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--ed-muted)", margin: 0, letterSpacing: "0.02em" }}>Sources: {sources}</p>
                 </div>
               ))}
             </div>
-            <div className="rounded-xl p-4 mt-2" style={{ background: "rgba(74,222,128,.05)", border: "1px solid rgba(74,222,128,.18)" }}>
-              <p className="text-xs font-bold mb-1" style={{ color: "#4ade80" }}>The Leapfrogging Effect</p>
-              <p className="text-xs leading-relaxed" style={{ color: "var(--text-2)" }}>
+            <div style={{ background: "var(--ed-bg)", border: "1px solid var(--ed-border)", borderLeft: "4px solid var(--positive)", padding: "16px 20px" }}>
+              <p style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, color: "var(--positive)", margin: "0 0 6px", letterSpacing: "0.06em" }}>THE LEAPFROGGING EFFECT</p>
+              <p style={{ fontFamily: "var(--font-sans)", fontSize: 13, lineHeight: 1.65, color: "var(--ed-text-2)", margin: 0 }}>
                 Several Sub-Saharan African and Southeast Asian economies score higher on adoption than their readiness would predict. This is the <em>mobile-first leapfrogging effect</em>: countries without legacy banking or desktop internet infrastructure have adopted mobile-first AI tools (M-Pesa in Kenya, GCash in the Philippines, bKash in Bangladesh) at scale, embedding AI into daily financial life ahead of their overall digital infrastructure development.
               </p>
             </div>
           </div>
         </div>
+
       </div>
 
-      <footer className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-8 mt-4 text-center space-y-1"
-        style={{ borderTop: "1px solid var(--border)" }}>
-        <p className="text-xs" style={{ color: "var(--text-3)" }}>
-          AI Trajectory Index · Built by{" "}
-          <a href="https://ankitmishra.ca" target="_blank" rel="noopener noreferrer"
-            className="hover:text-blue-400 transition-colors">Ankit Mishra</a>
-          {" "}— Commercial Portfolio Director · African climatetech VC · Forbes contributor · Schwartz Reisman Institute AI & Trust Working Group
+      {/* ── Footer ── */}
+      <footer style={{ maxWidth: 896, margin: "0 auto", padding: "32px 48px", borderTop: "1px solid var(--ed-border)", textAlign: "center" }}>
+        <p style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--ed-muted)", margin: 0, letterSpacing: "0.04em" }}>
+          AI TRAJECTORY INDEX · BUILT BY{" "}
+          <a href="https://ankitmishra.ca" target="_blank" rel="noopener noreferrer" style={{ color: "var(--ed-text-1)", textDecoration: "none" }}>ANKIT MISHRA</a>
+          {" "}— COMMERCIAL PORTFOLIO DIRECTOR · AFRICAN CLIMATETECH VC · FORBES CONTRIBUTOR · SCHWARTZ REISMAN INSTITUTE AI &amp; TRUST WORKING GROUP
         </p>
       </footer>
     </main>

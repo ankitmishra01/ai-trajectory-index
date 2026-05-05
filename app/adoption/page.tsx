@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import NewsTicker from "@/components/NewsTicker";
+import SiteHeader from "@/components/SiteHeader";
 import AdoptionCard from "@/components/AdoptionCard";
 import AdoptionTable from "@/components/AdoptionTable";
 import AdoptionInsights from "@/components/AdoptionInsights";
@@ -23,10 +23,10 @@ const REGIONS: Region[] = ["All", "Americas", "Europe", "Asia-Pacific", "Middle 
 const TIERS: TierFilter[] = ["All", "High Adoption", "Growing Adoption", "Early Adoption", "Nascent Adoption"];
 
 const TIER_COLORS: Record<string, { color: string; bg: string; border: string }> = {
-  "High Adoption":    { color: "#4ade80", bg: "rgba(74,222,128,.10)",  border: "rgba(74,222,128,.30)"  },
-  "Growing Adoption": { color: "#60a5fa", bg: "rgba(96,165,250,.10)",  border: "rgba(96,165,250,.30)"  },
-  "Early Adoption":   { color: "#f59e0b", bg: "rgba(245,158,11,.10)",  border: "rgba(245,158,11,.30)"  },
-  "Nascent Adoption": { color: "#f87171", bg: "rgba(248,113,113,.10)", border: "rgba(248,113,113,.30)" },
+  "High Adoption":    { color: "#3F7A4D", bg: "rgba(63,122,77,.10)",   border: "rgba(63,122,77,.30)"   },
+  "Growing Adoption": { color: "#3B5BA5", bg: "rgba(59,91,165,.10)",   border: "rgba(59,91,165,.30)"   },
+  "Early Adoption":   { color: "#B58A2E", bg: "rgba(181,138,46,.10)",  border: "rgba(181,138,46,.30)"  },
+  "Nascent Adoption": { color: "#A8513D", bg: "rgba(168,81,61,.10)",   border: "rgba(168,81,61,.30)"   },
 };
 
 function triggerDownload(content: string, filename: string, type: string) {
@@ -144,126 +144,64 @@ export default function AdoptionPage() {
   );
 
   return (
-    <main className="min-h-screen" style={{ background: "var(--bg)" }}>
-      <div className="page-glow" />
+    <main style={{ minHeight: "100vh", background: "var(--dt-bg)" }}>
+      <SiteHeader activePage="adoption" />
 
-      <NewsTicker />
-
-      {/* ── Header ── */}
-      <header className="sticky top-0 z-50 backdrop-blur-sm"
-        style={{ borderBottom: "1px solid var(--border)", background: "rgba(6,11,20,.96)" }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-2" style={{ textDecoration: "none" }}>
-            <div>
-              <h1 className="text-sm font-black tracking-tight font-display leading-none" style={{ color: "var(--text-1)" }}>
-                AI Trajectory Index
-              </h1>
-              <p className="text-[11px] mt-1" style={{ color: "var(--text-3)" }}>Adoption Scorecard · 2026</p>
-            </div>
-          </Link>
-          <div className="flex items-center gap-3">
-            <Link href="/methodology" className="hidden sm:block text-[11px] transition-colors hover:text-blue-400"
-              style={{ color: "var(--text-3)" }}>Methodology</Link>
-            <div className="hidden sm:block h-4 w-px" style={{ background: "var(--border)" }} />
-            <Link href="/map" className="btn-secondary flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                  d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-              </svg>
-              <span className="hidden sm:inline">Map</span>
-            </Link>
-          </div>
-        </div>
-        <div style={{ borderTop: "1px solid var(--border)" }}>
-          <nav className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center gap-0 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
-            {[
-              { href: "/americas",     emoji: "🌎", label: "Americas"     },
-              { href: "/europe",       emoji: "🌍", label: "Europe"       },
-              { href: "/africa",       emoji: "🌍", label: "Africa"       },
-              { href: "/middle-east",  emoji: "🕌", label: "Middle East"  },
-              { href: "/asia-pacific", emoji: "🌏", label: "Asia-Pacific" },
-            ].map(({ href, emoji, label }) => (
-              <Link key={href} href={href}
-                className="flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium whitespace-nowrap transition-colors hover:text-blue-400"
-                style={{ color: "var(--text-2)", borderBottom: "2px solid transparent" }}>
-                <span>{emoji}</span><span>{label}</span>
-              </Link>
-            ))}
-          </nav>
-        </div>
-      </header>
-
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+      <div style={{ maxWidth: 1400, margin: "0 auto", padding: "32px 24px" }}>
 
         {/* ── Lens toggle ── */}
-        <div className="flex justify-center">
-          <div className="inline-flex rounded-2xl p-1 gap-1"
-            style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-            <Link href="/" className="px-5 py-2 rounded-xl text-sm font-semibold transition-all"
-              style={{ color: "var(--text-3)", background: "transparent" }}>Readiness Index</Link>
-            <span className="px-5 py-2 rounded-xl text-sm font-semibold"
-              style={{ background: "var(--accent)", color: "#fff" }}>Adoption Scorecard</span>
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 32 }}>
+          <div style={{ display: "inline-flex", gap: 2, border: "1px solid var(--dt-border)", background: "var(--dt-surface)", padding: 4 }}>
+            <Link href="/" style={{ padding: "6px 20px", fontFamily: "var(--font-sans)", fontSize: 13, fontWeight: 500, color: "var(--dt-text-3)", textDecoration: "none" }}>
+              Readiness Index
+            </Link>
+            <span style={{ padding: "6px 20px", fontFamily: "var(--font-sans)", fontSize: 13, fontWeight: 600, background: "var(--signal)", color: "#fff" }}>
+              Adoption Scorecard
+            </span>
           </div>
         </div>
 
         {/* ── Hero ── */}
-        <div className="relative card shine-on-hover rounded-3xl overflow-hidden">
-          <div className="absolute inset-x-0 top-0 h-px"
-            style={{ background: "linear-gradient(90deg, transparent, rgba(34,197,94,.35), transparent)" }} />
-          <div className="absolute inset-0 pointer-events-none"
-            style={{ background: "radial-gradient(ellipse 70% 60% at 50% 0%, rgba(34,197,94,.06) 0%, transparent 70%)" }} />
-          <div className="relative px-6 sm:px-12 pt-10 pb-8">
-            <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "rgba(74,222,128,.7)" }}>
-              AI Adoption Scorecard · 2026
-            </p>
-            <h2 className="font-serif-display text-3xl sm:text-5xl mb-3 leading-tight" style={{ color: "var(--text-1)" }}>
-              Which countries are{" "}
-              <em className="not-italic" style={{
-                background: "linear-gradient(135deg, #4ade80, #22c55e 60%, #86efac)",
-                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
-              }}>actually using AI</em>?
-            </h2>
-            <p className="text-base max-w-2xl mb-6 leading-relaxed" style={{ color: "var(--text-2)" }}>
-              Having the infrastructure and talent to build AI is not the same as actually using it.
-              This scorecard measures real deployment — in government services, businesses, and everyday life — across 186 countries.
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8 max-w-2xl">
-              <div className="rounded-2xl p-4" style={{ background: "rgba(59,130,246,.07)", border: "1px solid rgba(59,130,246,.22)" }}>
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-base">📊</span>
-                  <span className="text-xs font-black uppercase tracking-wider" style={{ color: "var(--accent)" }}>Readiness Score</span>
-                </div>
-                <p className="text-sm font-semibold mb-1" style={{ color: "var(--text-1)" }}>Can this country build AI?</p>
-                <p className="text-xs leading-relaxed" style={{ color: "var(--text-3)" }}>
-                  Measures the underlying capacity — digital infrastructure, AI talent, investment, governance frameworks, and economic strength.
-                </p>
-              </div>
-              <div className="rounded-2xl p-4" style={{ background: "rgba(34,197,94,.07)", border: "1px solid rgba(34,197,94,.22)" }}>
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-base">🚀</span>
-                  <span className="text-xs font-black uppercase tracking-wider" style={{ color: "#4ade80" }}>Adoption Score</span>
-                </div>
-                <p className="text-sm font-semibold mb-1" style={{ color: "var(--text-1)" }}>Is this country using AI now?</p>
-                <p className="text-xs leading-relaxed" style={{ color: "var(--text-3)" }}>
-                  Measures active deployment — AI in public services, businesses, labour markets, and consumer apps.
-                </p>
-              </div>
+        <div style={{ background: "var(--dt-surface)", borderTop: "4px solid var(--positive)", border: "1px solid var(--dt-border)", padding: "32px 40px", marginBottom: 32 }}>
+          <p style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", color: "var(--positive)", marginBottom: 12 }}>
+            AI ADOPTION SCORECARD · 2026
+          </p>
+          <h2 style={{ fontFamily: "var(--font-display)", fontSize: 42, fontWeight: 400, fontStyle: "italic", letterSpacing: "-0.02em", color: "var(--dt-text-0)", lineHeight: 1.1, marginBottom: 12 }}>
+            Which countries are <em style={{ color: "var(--positive)" }}>actually using AI</em>?
+          </h2>
+          <p style={{ fontFamily: "var(--font-sans)", fontSize: 15, lineHeight: 1.6, color: "var(--dt-text-2)", maxWidth: 640, marginBottom: 24 }}>
+            Having the infrastructure and talent to build AI is not the same as actually using it.
+            This scorecard measures real deployment — in government services, businesses, and everyday life — across 186 countries.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, maxWidth: 600, marginBottom: 24 }}>
+            <div style={{ padding: 16, background: "var(--dt-raised)", border: "1px solid var(--dt-border)", borderLeft: "3px solid var(--signal)" }}>
+              <p style={{ fontFamily: "var(--font-mono)", fontSize: 9, fontWeight: 700, letterSpacing: "0.12em", color: "var(--signal)", marginBottom: 8 }}>READINESS SCORE</p>
+              <p style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 500, color: "var(--dt-text-0)", marginBottom: 6 }}>Can this country build AI?</p>
+              <p style={{ fontFamily: "var(--font-sans)", fontSize: 11, lineHeight: 1.5, color: "var(--dt-text-3)" }}>
+                Measures the underlying capacity — digital infrastructure, AI talent, investment, governance frameworks, and economic strength.
+              </p>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {[
-                { label: "Highest Adoption",     value: topCountry     ? `${topCountry.flag} ${topCountry.name}` : "—",                         sub: topCountry     ? `${topCountry.adoption_total}/100` : "" },
-                { label: "Global Average",        value: `${avgScore}`,                                                                           sub: "out of 100" },
-                { label: "Biggest Leapfrogger",   value: topOverperform  ? `${topOverperform.flag} ${topOverperform.name.split(" ")[0]}` : "—",   sub: topOverperform  ? `+${topOverperform.adoption_gap} pts above readiness` : "" },
-                { label: "Biggest Underutiliser", value: topUnderperform ? `${topUnderperform.flag} ${topUnderperform.name.split(" ")[0]}` : "—", sub: topUnderperform ? `${topUnderperform.adoption_gap} pts below readiness` : "" },
-              ].map((s) => (
-                <div key={s.label} className="rounded-2xl p-4"
-                  style={{ background: "rgba(6,11,20,.55)", border: "1px solid var(--border)", backdropFilter: "blur(8px)" }}>
-                  <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: "var(--text-3)" }}>{s.label}</p>
-                  <p className="text-lg font-black leading-none mb-1" style={{ color: "#4ade80" }}>{s.value}</p>
-                  {s.sub && <p className="text-xs" style={{ color: "var(--text-3)" }}>{s.sub}</p>}
-                </div>
-              ))}
+            <div style={{ padding: 16, background: "var(--dt-raised)", border: "1px solid var(--dt-border)", borderLeft: "3px solid var(--positive)" }}>
+              <p style={{ fontFamily: "var(--font-mono)", fontSize: 9, fontWeight: 700, letterSpacing: "0.12em", color: "var(--positive)", marginBottom: 8 }}>ADOPTION SCORE</p>
+              <p style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 500, color: "var(--dt-text-0)", marginBottom: 6 }}>Is this country using AI now?</p>
+              <p style={{ fontFamily: "var(--font-sans)", fontSize: 11, lineHeight: 1.5, color: "var(--dt-text-3)" }}>
+                Measures active deployment — AI in public services, businesses, labour markets, and consumer apps.
+              </p>
             </div>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
+            {[
+              { label: "Highest Adoption",     value: topCountry     ? `${topCountry.flag} ${topCountry.name}` : "—",                         sub: topCountry     ? `${topCountry.adoption_total}/100` : "" },
+              { label: "Global Average",        value: `${avgScore}`,                                                                           sub: "out of 100" },
+              { label: "Biggest Leapfrogger",   value: topOverperform  ? `${topOverperform.flag} ${topOverperform.name.split(" ")[0]}` : "—",   sub: topOverperform  ? `+${topOverperform.adoption_gap} pts above readiness` : "" },
+              { label: "Biggest Underutiliser", value: topUnderperform ? `${topUnderperform.flag} ${topUnderperform.name.split(" ")[0]}` : "—", sub: topUnderperform ? `${topUnderperform.adoption_gap} pts below readiness` : "" },
+            ].map((s) => (
+              <div key={s.label} style={{ padding: 14, background: "var(--dt-raised)", border: "1px solid var(--dt-border)" }}>
+                <p style={{ fontFamily: "var(--font-mono)", fontSize: 9, fontWeight: 700, letterSpacing: "0.12em", color: "var(--dt-text-3)", marginBottom: 8 }}>{s.label.toUpperCase()}</p>
+                <p style={{ fontFamily: "var(--font-mono)", fontSize: 16, fontWeight: 500, color: "var(--positive)", lineHeight: 1.2, marginBottom: 4 }}>{s.value}</p>
+                {s.sub && <p style={{ fontFamily: "var(--font-sans)", fontSize: 10, color: "var(--dt-text-3)" }}>{s.sub}</p>}
+              </div>
+            ))}
           </div>
         </div>
 
@@ -275,22 +213,22 @@ export default function AdoptionPage() {
         />
 
         {/* ── Gap explainer ── */}
-        <div className="rounded-2xl p-6" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-          <h3 className="text-sm font-black mb-3" style={{ color: "var(--text-1)" }}>
+        <div style={{ background: "var(--dt-surface)", border: "1px solid var(--dt-border)", padding: 24, marginBottom: 0 }}>
+          <h3 style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 500, color: "var(--dt-text-0)", marginBottom: 16 }}>
             Why the gap between readiness and adoption matters
           </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs leading-relaxed" style={{ color: "var(--text-2)" }}>
-            <div>
-              <p className="font-bold mb-1" style={{ color: "#4ade80" }}>Leapfroggers ↑</p>
-              <p>Countries adopting AI faster than their readiness predicts. Often driven by mobile-first technology — Kenya&apos;s M-Pesa, the Philippines&apos; GCash, Bangladesh&apos;s bKash embedded AI into daily financial life before broadband or desktop infrastructure arrived.</p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+            <div style={{ borderLeft: "3px solid var(--positive)", paddingLeft: 16 }}>
+              <p style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", color: "var(--positive)", marginBottom: 8 }}>LEAPFROGGERS ↑</p>
+              <p style={{ fontFamily: "var(--font-sans)", fontSize: 12, lineHeight: 1.6, color: "var(--dt-text-2)" }}>Countries adopting AI faster than their readiness predicts. Often driven by mobile-first technology — Kenya&apos;s M-Pesa, the Philippines&apos; GCash, Bangladesh&apos;s bKash embedded AI into daily financial life before broadband or desktop infrastructure arrived.</p>
             </div>
-            <div>
-              <p className="font-bold mb-1" style={{ color: "var(--accent)" }}>Aligned ≈</p>
-              <p>Countries where deployment roughly matches capacity. The US, UK, and China are broadly aligned — their high readiness scores translate into correspondingly high real-world AI use.</p>
+            <div style={{ borderLeft: "3px solid var(--signal)", paddingLeft: 16 }}>
+              <p style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", color: "var(--signal)", marginBottom: 8 }}>ALIGNED ≈</p>
+              <p style={{ fontFamily: "var(--font-sans)", fontSize: 12, lineHeight: 1.6, color: "var(--dt-text-2)" }}>Countries where deployment roughly matches capacity. The US, UK, and China are broadly aligned — their high readiness scores translate into correspondingly high real-world AI use.</p>
             </div>
-            <div>
-              <p className="font-bold mb-1" style={{ color: "#f59e0b" }}>Underutilisers ↓</p>
-              <p>Countries with strong AI foundations that are slow to deploy. Japan, Germany, Switzerland, and Italy consistently underperform their readiness — due to conservative adoption culture, regulatory caution, or legacy enterprise systems resisting change.</p>
+            <div style={{ borderLeft: "3px solid #B58A2E", paddingLeft: 16 }}>
+              <p style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", color: "#B58A2E", marginBottom: 8 }}>UNDERUTILISERS ↓</p>
+              <p style={{ fontFamily: "var(--font-sans)", fontSize: 12, lineHeight: 1.6, color: "var(--dt-text-2)" }}>Countries with strong AI foundations that are slow to deploy. Japan, Germany, Switzerland, and Italy consistently underperform their readiness — due to conservative adoption culture, regulatory caution, or legacy enterprise systems resisting change.</p>
             </div>
           </div>
         </div>
@@ -299,75 +237,77 @@ export default function AdoptionPage() {
         <GapMatrix data={enriched} />
 
         {/* ── Filter bar ── */}
-        <div ref={gridRef} className="flex flex-col gap-3 scroll-mt-32">
+        <div ref={gridRef} style={{ display: "flex", flexDirection: "column", gap: 10, scrollMarginTop: 128, marginTop: 24 }}>
           {/* Row 1 */}
-          <div className="flex flex-wrap gap-3 items-center">
-            <div className="relative flex-1 min-w-48">
+          <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 10, alignItems: "center" }}>
+            <div style={{ position: "relative", flex: 1, minWidth: 200 }}>
               <input type="text" placeholder="Search countries…" value={search}
-                onChange={(e) => setSearch(e.target.value)} className="input-base pr-8 text-sm" />
+                onChange={(e) => setSearch(e.target.value)} className="input-base" style={{ fontSize: 13 }} />
               {search && (
-                <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-xs"
-                  style={{ color: "var(--text-3)" }}>✕</button>
+                <button onClick={() => setSearch("")} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", fontSize: 11, color: "var(--dt-text-3)", background: "none", border: "none", cursor: "pointer" }}>✕</button>
               )}
             </div>
             <select value={sort} onChange={(e) => setSort(e.target.value as SortKey)}
-              className="input-base text-xs" style={{ width: "auto", minWidth: 190 }}>
+              className="input-base" style={{ width: "auto", minWidth: 190, fontSize: 12 }}>
               <option value="adoption_total">Sort: Adoption Score</option>
               <option value="adoption_gap">Sort: Biggest Leapfrogger</option>
               <option value="gap_negative">Sort: Biggest Underutiliser</option>
               <option value="government">Sort: Government Deployment</option>
               <option value="consumer">Sort: Consumer Usage</option>
             </select>
-            <span className="text-xs" style={{ color: "var(--text-3)" }}>{filtered.length} of {enriched.length} countries</span>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--dt-text-3)" }}>{filtered.length} of {enriched.length} countries</span>
 
-            <div className="ml-auto flex items-center gap-2">
+            <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
               {/* Grid / Table toggle */}
               {(["grid", "table"] as ViewMode[]).map((v) => (
                 <button key={v} onClick={() => setView(v)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
-                  style={view === v
-                    ? { background: "var(--accent)", color: "#fff", border: "1px solid var(--accent)" }
-                    : { background: "transparent", color: "var(--text-3)", border: "1px solid var(--border)" }
-                  }>
+                  style={{
+                    display: "flex", alignItems: "center", gap: 6,
+                    padding: "5px 12px", fontSize: 11,
+                    fontFamily: "var(--font-mono)", fontWeight: 600, letterSpacing: "0.06em",
+                    border: "1px solid", cursor: "pointer",
+                    ...(view === v
+                      ? { background: "var(--signal)", color: "#fff", borderColor: "var(--signal)" }
+                      : { background: "transparent", color: "var(--dt-text-3)", borderColor: "var(--dt-border)" })
+                  }}>
                   {v === "grid" ? (
-                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 16 16">
-                      <rect x="1" y="1" width="6" height="6" rx="1" /><rect x="9" y="1" width="6" height="6" rx="1" />
-                      <rect x="1" y="9" width="6" height="6" rx="1" /><rect x="9" y="9" width="6" height="6" rx="1" />
+                    <svg width={12} height={12} fill="currentColor" viewBox="0 0 16 16">
+                      <rect x="1" y="1" width="6" height="6" /><rect x="9" y="1" width="6" height="6" />
+                      <rect x="1" y="9" width="6" height="6" /><rect x="9" y="9" width="6" height="6" />
                     </svg>
                   ) : (
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 16 16">
+                    <svg width={12} height={12} fill="none" stroke="currentColor" viewBox="0 0 16 16">
                       <line x1="1" y1="4" x2="15" y2="4" strokeWidth="1.5" />
                       <line x1="1" y1="8" x2="15" y2="8" strokeWidth="1.5" />
                       <line x1="1" y1="12" x2="15" y2="12" strokeWidth="1.5" />
                     </svg>
                   )}
-                  <span className="hidden sm:inline">{v === "grid" ? "Cards" : "Table"}</span>
+                  {v === "grid" ? "Cards" : "Table"}
                 </button>
               ))}
 
               {/* Share */}
-              <div className="relative">
-                <button onClick={shareView} className="btn-secondary flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl"
+              <div style={{ position: "relative" }}>
+                <button onClick={shareView} className="btn-secondary" style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 12px", fontSize: 11, fontFamily: "var(--font-mono)" }}
                   title="Copy link to this filtered view">
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg width={12} height={12} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                       d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                   </svg>
-                  <span className="hidden sm:inline">Share</span>
+                  Share
                 </button>
                 {shareToast && (
-                  <div className="absolute right-0 top-full mt-2 z-50 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap"
-                    style={{ background: "var(--surface)", border: "1px solid var(--border)", color: "#4ade80" }}>
+                  <div style={{ position: "absolute", right: 0, top: "calc(100% + 6px)", zIndex: 50, padding: "5px 12px", fontSize: 11, fontFamily: "var(--font-mono)", whiteSpace: "nowrap", background: "var(--dt-surface)", border: "1px solid var(--dt-border)", color: "var(--positive)" }}>
                     Link copied!
                   </div>
                 )}
               </div>
 
               {/* Export */}
-              <div className="relative">
+              <div style={{ position: "relative" }}>
                 <button onClick={() => setExportOpen((o) => !o)}
-                  className="btn-secondary flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl">
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  className="btn-secondary" style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 12px", fontSize: 11, fontFamily: "var(--font-mono)" }}>
+                  <svg width={12} height={12} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                       d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
@@ -375,17 +315,15 @@ export default function AdoptionPage() {
                 </button>
                 {exportOpen && (
                   <>
-                    <div className="fixed inset-0 z-40" onClick={() => setExportOpen(false)} />
-                    <div className="absolute right-0 top-full mt-2 z-50 rounded-xl overflow-hidden shadow-xl"
-                      style={{ background: "var(--surface)", border: "1px solid var(--border)", minWidth: 160 }}>
+                    <div style={{ position: "fixed", inset: 0, zIndex: 40 }} onClick={() => setExportOpen(false)} />
+                    <div style={{ position: "absolute", right: 0, top: "calc(100% + 6px)", zIndex: 50, background: "var(--dt-surface)", border: "1px solid var(--dt-border)", minWidth: 160 }}>
                       <button
                         onClick={() => { triggerDownload(buildAdoptionCSV(filtered, globalRanks), "ai_adoption_scorecard_2026.csv", "text/csv"); setExportOpen(false); }}
-                        className="w-full flex items-center gap-2.5 px-4 py-3 text-xs font-semibold text-left"
-                        style={{ color: "var(--text-1)" }}
-                        onMouseEnter={(e) => (e.currentTarget.style.background = "var(--raised)")}
+                        style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", fontSize: 11, fontFamily: "var(--font-sans)", fontWeight: 600, color: "var(--dt-text-1)", background: "none", border: "none", cursor: "pointer", textAlign: "left" as const }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "var(--dt-raised)")}
                         onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                       >
-                        <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg width={14} height={14} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                             d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
@@ -399,47 +337,51 @@ export default function AdoptionPage() {
           </div>
 
           {/* Row 2: Region pills */}
-          <div className="flex gap-1.5 flex-wrap">
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" as const }}>
             {REGIONS.map((r) => (
               <button key={r} onClick={() => setRegion(r)}
-                className="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"
-                style={region === r
-                  ? { background: "var(--accent)", color: "#fff", border: "1px solid var(--accent)" }
-                  : { background: "transparent", color: "var(--text-3)", border: "1px solid var(--border)" }
-                }>{r}</button>
+                style={{
+                  padding: "4px 12px", fontSize: 11, fontFamily: "var(--font-sans)", fontWeight: 600,
+                  border: "1px solid", cursor: "pointer",
+                  ...(region === r
+                    ? { background: "var(--signal)", color: "#fff", borderColor: "var(--signal)" }
+                    : { background: "transparent", color: "var(--dt-text-3)", borderColor: "var(--dt-border)" })
+                }}>{r}</button>
             ))}
           </div>
 
           {/* Row 3: Tier pills */}
-          <div className="flex gap-1.5 flex-wrap items-center">
-            <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--text-3)" }}>Tier:</span>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" as const, alignItems: "center" }}>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, fontWeight: 700, letterSpacing: "0.12em", color: "var(--dt-text-3)" }}>TIER:</span>
             {TIERS.map((t) => {
               const ts = t !== "All" ? TIER_COLORS[t] : null;
               const isActive = tier === t;
               return (
                 <button key={t} onClick={() => setTier(t)}
-                  className="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"
-                  style={isActive && ts
-                    ? { background: ts.bg, color: ts.color, border: `1px solid ${ts.border}` }
-                    : isActive
-                    ? { background: "var(--accent)", color: "#fff", border: "1px solid var(--accent)" }
-                    : { background: "transparent", color: "var(--text-3)", border: "1px solid var(--border)" }
-                  }>{t}</button>
+                  style={{
+                    padding: "4px 12px", fontSize: 11, fontFamily: "var(--font-sans)", fontWeight: 600,
+                    border: "1px solid", cursor: "pointer",
+                    ...(isActive && ts
+                      ? { background: ts.bg, color: ts.color, borderColor: ts.border }
+                      : isActive
+                      ? { background: "var(--signal)", color: "#fff", borderColor: "var(--signal)" }
+                      : { background: "transparent", color: "var(--dt-text-3)", borderColor: "var(--dt-border)" })
+                  }}>{t}</button>
               );
             })}
           </div>
 
           {compareToast && (
-            <p className="text-xs" style={{ color: "#f59e0b" }}>Max 3 countries — remove one first.</p>
+            <p style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "#B58A2E" }}>Max 3 countries — remove one first.</p>
           )}
         </div>
 
         {/* ── Section header ── */}
-        <div>
-          <h2 className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: "var(--text-3)" }}>
-            All Countries · Adoption Rankings
+        <div style={{ marginTop: 24, marginBottom: 16 }}>
+          <h2 style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", color: "var(--dt-text-3)", marginBottom: 4 }}>
+            ALL COUNTRIES · ADOPTION RANKINGS
           </h2>
-          <p className="text-xs mb-4" style={{ color: "var(--text-3)" }}>
+          <p style={{ fontFamily: "var(--font-sans)", fontSize: 12, color: "var(--dt-text-3)" }}>
             {view === "grid"
               ? "Click any card to see the full country profile. Use the + button to compare up to 3 countries side by side."
               : "Click any column header to sort. Click a country name to see its full profile."}
@@ -450,10 +392,10 @@ export default function AdoptionPage() {
         {view === "table" ? (
           <AdoptionTable countries={filtered} globalRanks={globalRanks} />
         ) : filtered.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-4xl mb-4">🚀</p>
-            <p className="text-lg font-semibold" style={{ color: "var(--text-2)" }}>No countries found</p>
-            <p className="text-sm mt-2" style={{ color: "var(--text-3)" }}>Try adjusting your search or filters</p>
+          <div style={{ textAlign: "center", padding: "80px 0" }}>
+            <p style={{ fontSize: 40, marginBottom: 16 }}>🚀</p>
+            <p style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 500, color: "var(--dt-text-2)" }}>No countries found</p>
+            <p style={{ fontFamily: "var(--font-sans)", fontSize: 13, marginTop: 8, color: "var(--dt-text-3)" }}>Try adjusting your search or filters</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"
@@ -471,10 +413,10 @@ export default function AdoptionPage() {
         )}
 
         {/* ── Footer ── */}
-        <footer className="pt-8 pb-4 text-center">
-          <p className="text-xs" style={{ color: "var(--text-3)" }}>
+        <footer style={{ paddingTop: 32, paddingBottom: 16, textAlign: "center" }}>
+          <p style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--dt-text-3)" }}>
             AI Adoption Scorecard · AI Trajectory Index · {new Date().getFullYear()} ·{" "}
-            <Link href="/methodology" className="hover:text-blue-400 transition-colors">Methodology</Link>
+            <Link href="/methodology" style={{ color: "inherit", textDecoration: "none" }}>Methodology</Link>
           </p>
         </footer>
       </div>

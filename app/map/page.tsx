@@ -8,13 +8,14 @@ import adoptionRaw from "@/data/adoption.json";
 import type { ScoredCountry, ScoresResponse } from "@/lib/types";
 import type { CountryContext } from "@/lib/openrouter";
 import type { MapMode } from "@/components/WorldMap";
+import SiteHeader from "@/components/SiteHeader";
 
 // Dynamic import — react-simple-maps uses browser APIs
 const WorldMap = dynamic(() => import("@/components/WorldMap"), {
   ssr: false,
   loading: () => (
-    <div className="w-full aspect-[900/460] bg-[#0f1628] border border-[#1c2847] rounded-xl animate-pulse flex items-center justify-center">
-      <span className="text-slate-600 text-sm">Loading map…</span>
+    <div style={{ background: "var(--dt-raised)", border: "1px solid var(--dt-border)" }} className="w-full aspect-[900/460] animate-pulse flex items-center justify-center">
+      <span style={{ color: "var(--dt-text-3)", fontSize: 14 }}>Loading map…</span>
     </div>
   ),
 });
@@ -197,122 +198,115 @@ export default function MapPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#0a0f1e] flex flex-col">
-      {/* Header */}
-      <header className="border-b border-[#1c2847] sticky top-0 z-50 bg-[#0a0f1e]/95 backdrop-blur-sm">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-3 flex items-center gap-4">
-          <Link
-            href="/"
-            className="text-slate-400 hover:text-white transition-colors text-sm flex items-center gap-1.5"
-          >
-            ← Index
-          </Link>
-          <span className="text-[#1c2847]">|</span>
-          <h1 className="text-sm font-bold text-white">
-            AI Trajectory Map
-          </h1>
-          <div className="ml-auto flex items-center gap-2">
-            {/* Lens toggle */}
-            <div className="flex items-center gap-1.5 flex-wrap">
-              {([
-                { key: "readiness",         label: "Readiness",    color: "#3b82f6" },
-                { key: "adoption",          label: "Adoption",     color: "#22c55e" },
-                { key: "infrastructure",    label: "Infra",        color: "#3b82f6" },
-                { key: "talent",            label: "Talent",       color: "#8b5cf6" },
-                { key: "governance",        label: "Gov",          color: "#06b6d4" },
-                { key: "investment",        label: "Invest",       color: "#f59e0b" },
-                { key: "economic_readiness",label: "Econ",         color: "#22c55e" },
-              ] as const).map(({ key, label, color }) => (
-                <button
-                  key={key}
-                  onClick={() => setMapLens(key)}
-                  className="px-2.5 py-1 text-[11px] font-semibold rounded-lg transition-all border"
-                  style={mapLens === key
-                    ? { background: color, color: "#fff", borderColor: color }
-                    : { background: "#0f1628", color: "#64748b", borderColor: "#1c2847" }
-                  }
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
+    <main style={{ minHeight: "100vh", background: "var(--dt-bg)", display: "flex", flexDirection: "column" }}>
+      <SiteHeader activePage="map" />
 
-            {/* Mode toggle */}
+      {/* Control bar */}
+      <div style={{ background: "var(--dt-bg)", borderBottom: "1px solid var(--dt-border)", padding: "8px 16px", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" as const }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" as const }}>
+          {([
+            { key: "readiness",          label: "Readiness", color: "#D64528" },
+            { key: "adoption",           label: "Adoption",  color: "#3F7A4D" },
+            { key: "infrastructure",     label: "Infra",     color: "#3B5BA5" },
+            { key: "talent",             label: "Talent",    color: "#7A4F8C" },
+            { key: "governance",         label: "Gov",       color: "#3F7A4D" },
+            { key: "investment",         label: "Invest",    color: "#B58A2E" },
+            { key: "economic_readiness", label: "Econ",      color: "#8B4A3F" },
+          ] as const).map(({ key, label, color }) => (
             <button
-              onClick={() => setMode(mode === "view" ? "select" : "view")}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                mode === "select"
-                  ? "bg-blue-500 text-white"
-                  : "bg-[#1c2847] text-slate-400 hover:text-white"
-              }`}
+              key={key}
+              onClick={() => setMapLens(key)}
+              style={{
+                padding: "3px 10px",
+                fontSize: 11,
+                fontFamily: "var(--font-mono)",
+                fontWeight: 600,
+                letterSpacing: "0.06em",
+                border: "1px solid",
+                cursor: "pointer",
+                ...(mapLens === key
+                  ? { background: color, color: "#fff", borderColor: color }
+                  : { background: "transparent", color: "var(--dt-text-3)", borderColor: "var(--dt-border)" })
+              }}
             >
-              <svg
-                className="w-3.5 h-3.5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                />
-              </svg>
-              {mode === "select" ? "Drawing…" : "Draw selection"}
+              {label}
             </button>
-            {selectedSlugs.size > 0 && (
-              <button
-                onClick={() => {
-                  setSelectedSlugs(new Set());
-                  setMessages([]);
-                }}
-                className="px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-red-400 bg-[#1c2847] transition-colors"
-              >
-                Clear ({selectedSlugs.size})
-              </button>
-            )}
-          </div>
+          ))}
         </div>
-      </header>
+
+        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
+          <button
+            onClick={() => setMode(mode === "view" ? "select" : "view")}
+            style={{
+              display: "flex", alignItems: "center", gap: 6,
+              padding: "5px 12px", fontSize: 11,
+              fontFamily: "var(--font-mono)", fontWeight: 600, letterSpacing: "0.06em",
+              border: "1px solid", cursor: "pointer",
+              ...(mode === "select"
+                ? { background: "var(--signal)", color: "#fff", borderColor: "var(--signal)" }
+                : { background: "transparent", color: "var(--dt-text-2)", borderColor: "var(--dt-border)" })
+            }}
+          >
+            <svg width={12} height={12} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+            </svg>
+            {mode === "select" ? "Drawing…" : "Draw selection"}
+          </button>
+          {selectedSlugs.size > 0 && (
+            <button
+              onClick={() => { setSelectedSlugs(new Set()); setMessages([]); }}
+              style={{
+                padding: "5px 12px", fontSize: 11,
+                fontFamily: "var(--font-mono)", fontWeight: 600, letterSpacing: "0.06em",
+                background: "transparent", color: "var(--dt-text-3)",
+                border: "1px solid var(--dt-border)", cursor: "pointer",
+              }}
+            >
+              Clear ({selectedSlugs.size})
+            </button>
+          )}
+        </div>
+      </div>
 
       {/* Mobile panel toggle (floating button) */}
       <button
-        className="fixed bottom-4 right-4 z-50 lg:hidden flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold shadow-xl transition-all"
+        className="fixed bottom-4 right-4 z-50 lg:hidden flex items-center gap-2 px-4 py-2.5 text-xs font-bold shadow-xl"
         style={{
-          background: mobilePanelOpen ? "#3b82f6" : "#0f1628",
-          border: "1px solid " + (mobilePanelOpen ? "#3b82f6" : "#1c2847"),
-          color: mobilePanelOpen ? "#fff" : "#94a3b8",
+          fontFamily: "var(--font-mono)",
+          background: mobilePanelOpen ? "var(--signal)" : "var(--dt-raised)",
+          border: "1px solid " + (mobilePanelOpen ? "var(--signal)" : "var(--dt-border)"),
+          color: mobilePanelOpen ? "#fff" : "var(--dt-text-2)",
         }}
         onClick={() => setMobilePanelOpen((o) => !o)}
       >
-        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg width={14} height={14} fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
             d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-3 3-3-3z" />
         </svg>
         {mobilePanelOpen ? "Close" : `Chat${selectedSlugs.size > 0 ? ` · ${selectedSlugs.size}` : ""}`}
       </button>
 
-      <div className="flex flex-col lg:flex-row flex-1 max-w-[1600px] mx-auto w-full">
+      <div style={{ display: "flex", flex: 1, maxWidth: 1600, margin: "0 auto", width: "100%", flexDirection: "column" }} className="lg:flex-row">
         {/* Left: Map */}
-        <div className="flex-1 p-4">
+        <div style={{ flex: 1, padding: 16 }}>
           {/* Mode hint */}
           {mode === "select" ? (
-            <div className="mb-3 px-4 py-2 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+            <div style={{ marginBottom: 12, padding: "6px 14px", border: "1px solid var(--signal)", background: "rgba(214,69,40,.08)", color: "var(--signal)", fontSize: 11, fontFamily: "var(--font-mono)", display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ width: 6, height: 6, borderRadius: 3, background: "var(--signal)", display: "inline-block" }} />
               Click and drag on the map to circle countries. Release to select them.
             </div>
           ) : (
-            <div className="mb-3 px-4 py-2 rounded-lg bg-[#0f1628] border border-[#1c2847] text-slate-500 text-xs flex items-center gap-2">
+            <div style={{ marginBottom: 12, padding: "6px 14px", border: "1px solid var(--dt-border)", background: "var(--dt-raised)", color: "var(--dt-text-3)", fontSize: 11, fontFamily: "var(--font-mono)", display: "flex", alignItems: "center", gap: 6 }}>
               <span>
                 Showing{" "}
                 <span style={{ fontWeight: 600, color:
-                  mapLens === "adoption" ? "#4ade80" :
-                  mapLens === "talent" ? "#8b5cf6" :
-                  mapLens === "governance" ? "#06b6d4" :
-                  mapLens === "investment" ? "#f59e0b" :
-                  mapLens === "economic_readiness" ? "#22c55e" :
-                  mapLens === "infrastructure" ? "#3b82f6" : "#60a5fa" }}>
+                  mapLens === "adoption" ? "#3F7A4D" :
+                  mapLens === "talent" ? "#7A4F8C" :
+                  mapLens === "governance" ? "#3F7A4D" :
+                  mapLens === "investment" ? "#B58A2E" :
+                  mapLens === "economic_readiness" ? "#8B4A3F" :
+                  mapLens === "infrastructure" ? "#3B5BA5" : "var(--signal)" }}>
                   {mapLens === "readiness" ? "Readiness Scores"
                    : mapLens === "adoption" ? "Adoption Scores"
                    : mapLens.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase()) + " Scores"}
@@ -334,129 +328,81 @@ export default function MapPage() {
         </div>
 
         {/* Right: Selection + Chat */}
-        <div className={`
-          lg:w-96 xl:w-[420px] flex flex-col border-[#1c2847]
-          lg:border-t-0 lg:border-l
-          ${mobilePanelOpen
-            ? "fixed inset-x-0 bottom-0 z-40 max-h-[75vh] border-t rounded-t-2xl overflow-hidden"
-            : "hidden lg:flex border-t"}
-        `} style={{ background: "#0a0f1e" }}>
+        <div
+          className={`lg:w-96 xl:w-[420px] flex flex-col ${
+            mobilePanelOpen ? "fixed inset-x-0 bottom-0 z-40 max-h-[75vh] overflow-hidden" : "hidden lg:flex"
+          }`}
+          style={{ background: "var(--dt-bg)", borderLeft: "1px solid var(--dt-border)" }}
+        >
           {/* Selected countries panel */}
-          <div className="flex-1 overflow-y-auto max-h-[50vh] lg:max-h-none">
-            <div className="sticky top-0 bg-[#0a0f1e] border-b border-[#1c2847] px-4 py-3 flex items-center justify-between">
-              <h2 className="text-sm font-bold text-white">
+          <div style={{ flex: 1, overflowY: "auto", maxHeight: mobilePanelOpen ? "50vh" : undefined }}>
+            <div style={{ position: "sticky", top: 0, background: "var(--dt-bg)", borderBottom: "1px solid var(--dt-border)", padding: "10px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", color: "var(--dt-text-0)" }}>
                 {selectedCountries.length === 0
-                  ? "No countries selected"
-                  : `${selectedCountries.length} countr${selectedCountries.length === 1 ? "y" : "ies"} selected`}
-              </h2>
+                  ? "NO SELECTION"
+                  : `${selectedCountries.length} COUNTR${selectedCountries.length === 1 ? "Y" : "IES"} SELECTED`}
+              </span>
               {selectedCountries.length > 0 && (
-                <span className="text-xs text-slate-500">
-                  Avg{" "}
-                  {Math.round(
-                    selectedCountries.reduce(
-                      (s, c) => s + c.total_score,
-                      0
-                    ) / selectedCountries.length
-                  )}
-                  /100
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--dt-text-3)" }}>
+                  AVG {Math.round(selectedCountries.reduce((s, c) => s + c.total_score, 0) / selectedCountries.length)}/100
                 </span>
               )}
             </div>
 
             {selectedCountries.length === 0 ? (
-              <div className="p-6 text-center text-slate-600 text-sm">
-                <p className="text-2xl mb-2">🗺️</p>
-                <p>Click countries or draw a selection to get started</p>
+              <div style={{ padding: 24, textAlign: "center", color: "var(--dt-text-3)" }}>
+                <p style={{ fontSize: 28, marginBottom: 8 }}>🗺️</p>
+                <p style={{ fontFamily: "var(--font-sans)", fontSize: 12 }}>Click countries or draw a selection to get started</p>
               </div>
             ) : (
-              <div className="divide-y divide-[#1c2847]">
+              <div>
                 {selectedCountries
                   .sort((a, b) => b.total_score - a.total_score)
                   .map((c) => (
                     <div
                       key={c.slug}
-                      className="px-4 py-3 hover:bg-[#0f1628] transition-colors group"
+                      style={{ padding: "10px 16px", borderBottom: "1px solid var(--dt-border)" }}
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "var(--dt-raised)"; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
                     >
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xl">{c.flag}</span>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <span style={{ fontSize: 18 }}>{c.flag}</span>
                           <div>
-                            <p className="text-sm font-semibold text-white leading-none">
-                              {c.name}
-                            </p>
-                            <p className="text-xs text-slate-500 mt-0.5">
-                              {c.region}
-                            </p>
+                            <p style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 500, color: "var(--dt-text-0)", lineHeight: 1.1 }}>{c.name}</p>
+                            <p style={{ fontFamily: "var(--font-sans)", fontSize: 10, color: "var(--dt-text-3)", marginTop: 2 }}>{c.region}</p>
                           </div>
                         </div>
-                        <div className="text-right flex items-center gap-2">
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                           <div>
-                            <span
-                              className={`text-lg font-black ${
-                                c.total_score >= 80
-                                  ? "text-emerald-400"
-                                  : c.total_score >= 60
-                                  ? "text-blue-400"
-                                  : c.total_score >= 40
-                                  ? "text-amber-400"
-                                  : "text-red-400"
-                              }`}
-                            >
-                              {c.total_score}
-                            </span>
-                            <span className="text-xs text-slate-500">/100</span>
+                            <span style={{ fontFamily: "var(--font-mono)", fontSize: 18, fontWeight: 500, color: "var(--dt-text-0)" }}>{c.total_score}</span>
+                            <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--dt-text-3)" }}>/100</span>
                           </div>
-                          <button
-                            onClick={() => handleCountryClick(c.slug)}
-                            className="text-slate-600 hover:text-red-400 transition-colors text-xs opacity-0 group-hover:opacity-100"
-                          >
-                            ✕
-                          </button>
+                          <button onClick={() => handleCountryClick(c.slug)} style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--dt-text-3)", background: "none", border: "none", cursor: "pointer" }}>✕</button>
                         </div>
                       </div>
                       {/* Mini dimension bars */}
-                      <div className="flex gap-1">
-                        {DIMS.map((dim) => {
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 4 }}>
+                        {DIMS.map((dim, di) => {
                           const s = c.scores[dim].score;
                           const pct = (s / 20) * 100;
+                          const colors = ["#3B5BA5", "#7A4F8C", "#3F7A4D", "#B58A2E", "#8B4A3F"];
                           return (
-                            <div
-                              key={dim}
-                              className="flex-1"
-                              title={`${DIM_LABELS[dim]}: ${s}/20`}
-                            >
-                              <div className="h-1.5 bg-[#1c2847] rounded-full overflow-hidden">
-                                <div
-                                  className="h-full bg-blue-500 rounded-full"
-                                  style={{ width: `${pct}%` }}
-                                />
+                            <div key={dim} title={`${DIM_LABELS[dim]}: ${s}/20`}>
+                              <div style={{ height: 3, background: "rgba(255,255,255,0.06)" }}>
+                                <div style={{ width: `${pct}%`, height: "100%", background: colors[di] }} />
                               </div>
+                              <div style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "var(--dt-text-3)", marginTop: 2 }}>{DIM_LABELS[dim]}</div>
                             </div>
                           );
                         })}
                       </div>
-                      <div className="flex items-center justify-between mt-1.5 text-[10px] text-slate-600">
-                        <span>
-                          Traj:{" "}
-                          <span
-                            className={
-                              c.trajectory_score > 0
-                                ? "text-emerald-400"
-                                : c.trajectory_score < 0
-                                ? "text-red-400"
-                                : "text-slate-400"
-                            }
-                          >
-                            {c.trajectory_score > 0 ? "+" : ""}
-                            {c.trajectory_score}
-                          </span>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 6 }}>
+                        <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: c.trajectory_score > 0 ? "var(--positive)" : c.trajectory_score < 0 ? "var(--negative)" : "var(--dt-text-3)" }}>
+                          {c.trajectory_score > 0 ? "+" : ""}{c.trajectory_score}
                         </span>
-                        <span>→ {c.projected_score_2028} by 2028</span>
-                        <Link
-                          href={`/country/${c.slug}`}
-                          className="text-blue-500 hover:text-blue-400 transition-colors"
-                          target="_blank"
-                        >
+                        <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--dt-text-3)" }}>→ {c.projected_score_2028} · 2028</span>
+                        <Link href={`/country/${c.slug}`} target="_blank" style={{ fontFamily: "var(--font-sans)", fontSize: 10, color: "var(--signal)", fontWeight: 600, textDecoration: "none" }}>
                           Detail ↗
                         </Link>
                       </div>
@@ -467,41 +413,31 @@ export default function MapPage() {
           </div>
 
           {/* Chat panel */}
-          <div className="border-t border-[#1c2847] flex flex-col" style={{ minHeight: "280px" }}>
-            <div className="px-4 py-2.5 flex items-center gap-2 border-b border-[#1c2847] bg-[#0a0f1e]">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-              <h3 className="text-xs font-bold text-white uppercase tracking-wider">
-                Ask about selection
-              </h3>
+          <div style={{ borderTop: "1px solid var(--dt-border)", display: "flex", flexDirection: "column", minHeight: 280 }}>
+            <div style={{ padding: "8px 16px", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid var(--dt-border)", background: "var(--dt-bg)" }}>
+              <span style={{ width: 6, height: 6, borderRadius: 3, background: "var(--signal)", display: "inline-block" }} />
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", color: "var(--dt-text-0)" }}>ASK ABOUT SELECTION</span>
               {selectedCountries.length === 0 && (
-                <span className="text-xs text-slate-600 ml-1">
-                  — select countries first
-                </span>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--dt-text-3)" }}>— select countries first</span>
               )}
             </div>
 
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 max-h-64 lg:max-h-72">
+            <div style={{ flex: 1, overflowY: "auto", padding: "12px 16px", maxHeight: 288 }}>
               {messages.length === 0 && (
-                <div className="text-center py-4">
-                  <p className="text-xs text-slate-600">
+                <div style={{ textAlign: "center", padding: "12px 0" }}>
+                  <p style={{ fontFamily: "var(--font-sans)", fontSize: 11, color: "var(--dt-text-3)" }}>
                     Ask anything about the selected countries
                   </p>
                   {selectedCountries.length > 0 && (
-                    <div className="mt-3 flex flex-wrap gap-1.5 justify-center">
+                    <div style={{ marginTop: 12, display: "flex", flexWrap: "wrap" as const, gap: 6, justifyContent: "center" }}>
                       {[
                         "Which is best positioned for AI?",
                         "Compare their governance approaches",
                         "Who has the strongest trajectory?",
                         "What risks do they share?",
                       ].map((q) => (
-                        <button
-                          key={q}
-                          onClick={() => {
-                            setInput(q);
-                          }}
-                          className="px-2 py-1 text-[10px] bg-[#1c2847] text-slate-400 rounded hover:text-blue-400 hover:border-blue-500/30 border border-[#1c2847] transition-colors"
-                        >
+                        <button key={q} onClick={() => setInput(q)}
+                          style={{ padding: "3px 8px", fontSize: 10, fontFamily: "var(--font-sans)", background: "var(--dt-raised)", color: "var(--dt-text-2)", border: "1px solid var(--dt-border)", cursor: "pointer" }}>
                           {q}
                         </button>
                       ))}
@@ -510,58 +446,42 @@ export default function MapPage() {
                 </div>
               )}
               {messages.map((msg, i) => (
-                <div
-                  key={i}
-                  className={`text-sm leading-relaxed ${
-                    msg.role === "user"
-                      ? "text-white font-medium"
-                      : msg.role === "error"
-                      ? "text-amber-400 text-xs bg-amber-500/5 border border-amber-500/20 rounded-lg p-3"
-                      : "text-slate-300"
-                  }`}
-                >
-                  {msg.role === "user" && (
-                    <span className="text-blue-400 mr-1.5 text-xs">You:</span>
-                  )}
-                  {msg.role === "assistant" && (
-                    <span className="text-emerald-400 mr-1.5 text-xs">AI:</span>
-                  )}
+                <div key={i} style={{ marginBottom: 10, fontSize: 12, lineHeight: 1.5,
+                  color: msg.role === "user" ? "var(--dt-text-0)" : msg.role === "error" ? "var(--negative)" : "var(--dt-text-1)",
+                  fontFamily: "var(--font-sans)",
+                  ...(msg.role === "error" ? { padding: "8px 10px", border: "1px solid var(--negative)", background: "rgba(168,81,61,.06)" } : {})
+                }}>
+                  {msg.role === "user" && <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "var(--signal)", marginRight: 6, letterSpacing: "0.1em" }}>YOU</span>}
+                  {msg.role === "assistant" && <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "var(--positive)", marginRight: 6, letterSpacing: "0.1em" }}>AI</span>}
                   {msg.content}
                 </div>
               ))}
               {thinking && (
-                <div className="flex items-center gap-2 text-slate-500 text-xs">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse [animation-delay:0.2s]" />
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse [animation-delay:0.4s]" />
+                <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+                  {[0, 0.2, 0.4].map((delay) => (
+                    <span key={delay} style={{ width: 6, height: 6, borderRadius: 3, background: "var(--signal)", display: "inline-block", animation: `live-dot-pulse 1.8s ${delay}s ease-in-out infinite` }} />
+                  ))}
                 </div>
               )}
               <div ref={chatEndRef} />
             </div>
 
-            {/* Input */}
-            <div className="p-3 border-t border-[#1c2847]">
-              <div className="flex gap-2">
+            <div style={{ padding: 10, borderTop: "1px solid var(--dt-border)" }}>
+              <div style={{ display: "flex", gap: 6 }}>
                 <input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
-                  placeholder={
-                    selectedCountries.length === 0
-                      ? "Select countries first…"
-                      : "Ask a question…"
-                  }
+                  placeholder={selectedCountries.length === 0 ? "Select countries first…" : "Ask a question…"}
                   disabled={selectedCountries.length === 0 || thinking}
-                  className="flex-1 bg-[#0f1628] border border-[#1c2847] rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-blue-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="input-base"
+                  style={{ flex: 1, fontSize: 12 }}
                 />
                 <button
                   onClick={sendMessage}
-                  disabled={
-                    !input.trim() ||
-                    selectedCountries.length === 0 ||
-                    thinking
-                  }
-                  className="px-3 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-[#1c2847] disabled:text-slate-600 text-white rounded-lg text-sm font-semibold transition-all disabled:cursor-not-allowed"
+                  disabled={!input.trim() || selectedCountries.length === 0 || thinking}
+                  className="btn-primary"
+                  style={{ padding: "0 14px", fontSize: 14 }}
                 >
                   →
                 </button>
