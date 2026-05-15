@@ -60,7 +60,7 @@ function buildJSON(countries: ScoredCountry[], globalRanks: Record<string, numbe
   return JSON.stringify(
     {
       title: "AI Trajectory Index 2026",
-      source: "https://ai-index.ankitmishra.ca",
+      source: "https://ai-trajectory-index.vercel.app",
       generated: new Date().toISOString(),
       countries: [...countries]
         .sort((a, b) => (globalRanks[a.slug] ?? 999) - (globalRanks[b.slug] ?? 999))

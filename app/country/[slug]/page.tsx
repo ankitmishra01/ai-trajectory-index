@@ -4,7 +4,7 @@ import staticData from "@/data/countries.json";
 import CountryPageClient from "@/components/CountryPageClient";
 import type { ScoredCountry } from "@/lib/types";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ai-index.ankitmishra.ca";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ai-trajectory-index.vercel.app";
 
 function scoreBandLabel(score: number): string {
   if (score >= 80) return "Leading";

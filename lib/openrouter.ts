@@ -69,7 +69,7 @@ async function callOpenRouter(
     Authorization: `Bearer ${apiKey}`,
     "Content-Type": "application/json",
     "HTTP-Referer":
-      process.env.NEXT_PUBLIC_SITE_URL ?? "https://ai-index.ankitmishra.ca",
+      process.env.NEXT_PUBLIC_SITE_URL ?? "https://ai-trajectory-index.vercel.app",
     "X-Title": "AI Trajectory Index",
   };
 

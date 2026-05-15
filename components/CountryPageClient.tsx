@@ -212,12 +212,12 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
             </p>
             <div className="rounded-xl p-3 mb-4 font-mono text-xs overflow-x-auto"
               style={{ background: "var(--raised)", border: "1px solid var(--border)", color: "#93c5fd", whiteSpace: "pre-wrap" }}>
-              {`<iframe\n  src="https://ai-index.ankitmishra.ca/widget/${slug}"\n  width="320"\n  height="280"\n  frameborder="0"\n  style="border-radius:12px;"\n  title="${country.name} — AI Trajectory Index"\n></iframe>`}
+              {`<iframe\n  src="https://ai-trajectory-index.vercel.app/widget/${slug}"\n  width="320"\n  height="280"\n  frameborder="0"\n  style="border-radius:12px;"\n  title="${country.name} — AI Trajectory Index"\n></iframe>`}
             </div>
             <div className="flex gap-2">
               <button
                 onClick={() => {
-                  navigator.clipboard.writeText(`<iframe\n  src="https://ai-index.ankitmishra.ca/widget/${slug}"\n  width="320"\n  height="280"\n  frameborder="0"\n  style="border-radius:12px;"\n  title="${country.name} — AI Trajectory Index"\n></iframe>`);
+                  navigator.clipboard.writeText(`<iframe\n  src="https://ai-trajectory-index.vercel.app/widget/${slug}"\n  width="320"\n  height="280"\n  frameborder="0"\n  style="border-radius:12px;"\n  title="${country.name} — AI Trajectory Index"\n></iframe>`);
                   setEmbedOpen(false);
                 }}
                 className="flex-1 py-2 rounded-xl text-xs font-semibold transition-all"

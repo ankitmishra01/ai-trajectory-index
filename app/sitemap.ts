@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import countriesData from "@/data/countries.json";
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ai-index.ankitmishra.ca";
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ai-trajectory-index.vercel.app";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date().toISOString();

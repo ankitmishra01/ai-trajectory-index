@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import staticData from "@/data/countries.json";
 
 // Minimal embeddable widget — designed to be used as an iframe src
-// Usage: <iframe src="https://ai-index.ankitmishra.ca/widget/usa" width="300" height="260" />
+// Usage: <iframe src="https://ai-trajectory-index.vercel.app/widget/usa" width="300" height="260" />
 
 const PILLARS = [
   { key: "infrastructure",     label: "Infrastructure",      color: "#3b82f6" },
@@ -152,7 +152,7 @@ export default function WidgetPage({ params }: { params: { slug: string } }) {
 
           {/* Footer */}
           <p style={{ fontSize: 9, color: "rgba(255,255,255,.25)", textAlign: "center", marginTop: 4 }}>
-            AI Trajectory Index · ai-index.ankitmishra.ca
+            AI Trajectory Index · ai-trajectory-index.vercel.app
           </p>
         </div>
       </body>
