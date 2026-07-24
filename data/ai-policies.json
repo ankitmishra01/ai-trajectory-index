@@ -146,10 +146,10 @@
   "morocco":                  { "has_national_ai_strategy": true,  "strategy_year": 2019, "has_ai_regulation": false, "oecd_member": false },
   "tunisia":                  { "has_national_ai_strategy": true,  "strategy_year": 2020, "has_ai_regulation": false, "oecd_member": false },
   "algeria":                  { "has_national_ai_strategy": false, "strategy_year": null,  "has_ai_regulation": false, "oecd_member": false },
-  "libya":                    { "has_national_ai_strategy": false, "strategy_year": null,  "has_ai_regulation": false, "oecd_member": false },
+  "libya":                    { "has_national_ai_strategy": true,  "strategy_year": 2026, "has_ai_regulation": false, "oecd_member": false },
 
   "ethiopia":                 { "has_national_ai_strategy": true,  "strategy_year": 2020, "has_ai_regulation": false, "oecd_member": false },
-  "ghana":                    { "has_national_ai_strategy": true,  "strategy_year": 2022, "has_ai_regulation": false, "oecd_member": false },
+  "ghana":                    { "has_national_ai_strategy": true,  "strategy_year": 2026, "has_ai_regulation": false, "oecd_member": false },
   "rwanda":                   { "has_national_ai_strategy": true,  "strategy_year": 2019, "has_ai_regulation": false, "oecd_member": false },
   "tanzania":                 { "has_national_ai_strategy": false, "strategy_year": null,  "has_ai_regulation": false, "oecd_member": false },
   "uganda":                   { "has_national_ai_strategy": false, "strategy_year": null,  "has_ai_regulation": false, "oecd_member": false },

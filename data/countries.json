@@ -1031,7 +1031,7 @@
           "reasons": [
             "POPIA (Protection of Personal Information Act) provides a GDPR-equivalent data framework",
             "South African AI Institute established with government backing",
-            "Progressive AI policy stance for the continent — AI implementation framework published 2023"
+            "Draft National AI Policy 2026 was withdrawn weeks after publication (Apr 2026) when it was found to contain fabricated, AI-hallucinated citations — officials suspended, revised draft not expected before late 2026"
           ]
         },
         "investment": {
@@ -7697,7 +7697,7 @@
           "score": 10,
           "reasons": [
             "Personal Data Protection Law (Royal Decree 6/2022) enacted 2022",
-            "Oman Digital Economy Strategy with AI components; ITA coordinating",
+            "Oman Digital Economy Strategy with AI components; Royal Decree 50/2026 (Apr 2026) established a dedicated AI Special Zone in Muscat",
             "Oman's neutral foreign policy creating a stable governance environment for international AI partnerships"
           ]
         },
@@ -8404,7 +8404,7 @@
         "governance": {
           "score": 3,
           "reasons": [
-            "Split government (GNU/GNS) preventing coherent national digital policy",
+            "Split government (GNU/GNS) constrains implementation, but GNU launched a National AI Strategy 2026-2030 and AI Ethics Charter (Jun 2026), targeting 80% government AI adoption by 2028",
             "No functioning data protection authority; governance capacity near-zero",
             "UN-recognised government struggling with basic state function"
           ]
@@ -8523,7 +8523,7 @@
           "score": 10,
           "reasons": [
             "Data Protection Act 2012 — one of Africa's earliest and most comprehensive",
-            "NITDA coordinating digital transformation; National AI Strategy in development",
+            "National AI Strategy (2025-2035) formally launched Apr 2026 with a dedicated AI Fund and planned Responsible AI Office",
             "Democratic governance with strong rule of law — most stable political environment in West Africa"
           ]
         },
