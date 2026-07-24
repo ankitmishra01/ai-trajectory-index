@@ -26,7 +26,7 @@
         "governance": {
           "score": 14,
           "reasons": [
-            "Executive Order on Safe, Secure, and Trustworthy AI (Oct 2023) establishes safety reporting requirements",
+            "White House 'National Policy Framework for AI' (Mar 2026, building on Dec 2025 EO 14365) pushes Congress toward federal preemption of state AI laws — no binding federal AI law yet",
             "Fragmented state-level AI regulation creates compliance complexity for companies",
             "NIST AI Risk Management Framework provides voluntary guidance but lacks enforcement teeth"
           ]
@@ -3862,7 +3862,7 @@
           "score": 8,
           "reasons": [
             "Personal data protection law (Ley 29733) providing baseline governance framework",
-            "Digital Government Secretariat coordinating AI adoption in public services",
+            "National AI Strategy 2026-2030 (ENIA) approved via Resolución Ministerial N° 152-2026-PCM, effective May 2, 2026, binding for the public sector",
             "Political instability (multiple presidents in recent years) disrupts policy continuity"
           ]
         },
@@ -4394,7 +4394,7 @@
           "reasons": [
             "Authoritarian government limiting internet freedom and civil society",
             "No meaningful AI strategy; surveillance-oriented technology policy",
-            "Opposition to US and international institutions constraining access to digital development programmes"
+            "Pursuing AI cooperation via China-led channels instead of Western institutions — signed the China-driven World Organization for AI Cooperation (Waico) in Shanghai, July 2026"
           ]
         },
         "investment": {
@@ -4511,7 +4511,7 @@
           "score": 7,
           "reasons": [
             "Personal data protection law enacted; ANTAI data governance authority operational",
-            "Digital government transformation programme with AI components",
+            "Executive Decree 36 (May 2026) created a National Commission for Critical and Emerging Technologies with a Senacyt-led AI Subcommission; comprehensive AI bill (Draft Bill 14) still pending",
             "International finance hub status driving sophisticated financial AI regulation"
           ]
         },
@@ -5101,7 +5101,7 @@
           "score": 5,
           "reasons": [
             "Data Protection Act in development; personal data privacy law being drafted",
-            "Digital Belize strategy with basic e-government components",
+            "National Digital Agenda 2026-2030 endorsed by Cabinet (May 2026), superseding the prior digital agenda — focused on digital government and connectivity, not a dedicated AI strategy",
             "Common Law and English language provide business environment clarity"
           ]
         },
@@ -6223,7 +6223,7 @@
           "reasons": [
             "National AI Strategy published 2021 under Presidential decree",
             "Personal Data Protection Law enacted 2019; Agency for Personalised Data Protection operational",
-            "Government AI adoption active — AI used in customs, tax, education across ministries"
+            "Binding AI regulation now in force: Law No. LRU-1115 (signed Jan 2026) plus Ministry of Justice AI ethical-use rules in effect since June 17, 2026"
           ]
         },
         "investment": {
