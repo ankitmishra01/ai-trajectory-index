@@ -667,6 +667,30 @@ export function calculateScores(
         .reduce<number | null>((max, y) => (max === null || y > max ? y : max), null))
     : null;
 
+  // Raw indicator values behind the scores above — surfaced so narrative copy
+  // (template + AI prompt) can cite real figures instead of just 0-20 scores.
+  const rawIndicators = hasLiveData
+    ? {
+        internet_pct: internet,
+        mobile_per_100: mobile,
+        broadband_per_100: broadband,
+        electricity_pct: electricity,
+        tertiary_enrollment_pct: tertiary,
+        labor_productivity_ppp: laborProd,
+        rd_spend_pct_gdp: rd,
+        fdi_pct_gdp: fdi,
+        gov_effectiveness_wgi: govEff,
+        rule_of_law_wgi: ruleOfLaw,
+        regulatory_quality_wgi: regQuality,
+        gdp_per_capita_ppp: gdpPpp,
+        gdp_per_capita_usd: gdpCurrent,
+        private_credit_pct_gdp: privateCredit,
+        trade_openness_pct_gdp: tradeOpenness,
+        services_share_pct_gdp: servicesShare,
+        hightech_exports_pct: hightechCurrent,
+      }
+    : null;
+
   return {
     ...country,
     scores: {
@@ -688,5 +712,6 @@ export function calculateScores(
     imf_data: !!imf,
     oecd_data: !!oecd,
     anthropic_data: anthropicScore !== null,
+    raw_indicators: rawIndicators,
   };
 }

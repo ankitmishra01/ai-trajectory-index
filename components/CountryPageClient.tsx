@@ -16,7 +16,7 @@ import staticData from "@/data/countries.json";
 import adoptionData from "@/data/adoption.json";
 import { TIER_COLORS, DIM_LABELS as ADOPT_DIM_LABELS, DIM_COLORS as ADOPT_DIM_COLORS } from "@/lib/adoption";
 import type { AdoptionEntry } from "@/lib/adoption";
-import type { ScoredCountry, ScoresResponse } from "@/lib/types";
+import type { ScoredCountry, ScoresResponse, NarrativeSection } from "@/lib/types";
 
 const DIM_LABELS: Record<string, string> = {
   infrastructure:    "Infrastructure",
@@ -24,6 +24,21 @@ const DIM_LABELS: Record<string, string> = {
   governance:        "Governance",
   investment:        "Investment",
   economic_readiness:"Economic Readiness",
+};
+// Maps each narrative section heading to the DimensionBar label(s) shown
+// alongside it, and each of those labels back to its scores.* key.
+const SECTION_PILLAR_CHART: Record<string, string[]> = {
+  "Infrastructure & Talent": ["Infrastructure", "Talent"],
+  "Governance & Policy": ["Governance"],
+  "Investment & Capital": ["Investment"],
+  "Economic Readiness & Outlook": ["Economic Readiness"],
+};
+const DIM_KEY: Record<string, keyof ScoredCountry["scores"]> = {
+  Infrastructure: "infrastructure",
+  Talent: "talent",
+  Governance: "governance",
+  Investment: "investment",
+  "Economic Readiness": "economic_readiness",
 };
 const DIM_DESC: Record<string, string> = {
   infrastructure:    "Physical and digital infrastructure: data centres, connectivity, compute capacity.",
@@ -35,7 +50,8 @@ const DIM_DESC: Record<string, string> = {
 
 interface NarrativeState {
   status: "idle" | "loading" | "done" | "error";
-  paragraphs: string[];
+  sections: NarrativeSection[];
+  source?: "ai" | "template";
   generatedAt?: string;
   error?: string;
 }
@@ -57,7 +73,7 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
   const [allCountries, setAllCountries] = useState<ScoredCountry[]>(
     staticData.countries.map((c) => ({ ...c, data_source: "fallback" as const, wb_data_year: null, imf_data: false, oecd_data: false, anthropic_data: false }))
   );
-  const [narrative, setNarrative] = useState<NarrativeState>({ status: "idle", paragraphs: [] });
+  const [narrative, setNarrative] = useState<NarrativeState>({ status: "idle", sections: [] });
   const [copied, setCopied]       = useState(false);
   const [embedOpen, setEmbedOpen] = useState(false);
 
@@ -91,14 +107,14 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
   }, [slug]);
 
   const fetchNarrative = async () => {
-    setNarrative({ status: "loading", paragraphs: [] });
+    setNarrative({ status: "loading", sections: [] });
     try {
       const res  = await fetch(`/api/narrative/${slug}`);
       const data = await res.json();
-      if (data.error) setNarrative({ status: "error", paragraphs: [], error: data.error });
-      else setNarrative({ status: "done", paragraphs: data.paragraphs, generatedAt: data.generatedAt });
+      if (data.error) setNarrative({ status: "error", sections: [], error: data.error });
+      else setNarrative({ status: "done", sections: data.sections, source: data.source, generatedAt: data.generatedAt });
     } catch {
-      setNarrative({ status: "error", paragraphs: [], error: "Network error — please try again." });
+      setNarrative({ status: "error", sections: [], error: "Network error — please try again." });
     }
   };
 
@@ -255,6 +271,10 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
                     <span className="text-xs px-2 py-0.5 rounded-full"
                       style={{ background: "var(--raised)", color: "var(--text-3)", border: "1px solid var(--border)" }}>
                       #{globalRank} globally
+                    </span>
+                    <span className="text-xs px-2 py-0.5 rounded-full"
+                      style={{ background: "var(--raised)", color: "var(--text-3)", border: "1px solid var(--border)" }}>
+                      {country.projected_score_2028}/100 by 2028 ({delta >= 0 ? "+" : ""}{delta})
                     </span>
                   </div>
                   <div className="flex items-center gap-2 mt-1 flex-wrap">
@@ -587,15 +607,17 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <h2 className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-3)" }}>
-                  AI Analysis
+                  Country Brief
                 </h2>
-                <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold"
-                  style={{ background: "rgba(59,130,246,.10)", border: "1px solid rgba(59,130,246,.22)", color: "var(--accent)" }}>
-                  via OpenRouter
-                </span>
+                {narrative.status === "done" && (
+                  <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold"
+                    style={{ background: "rgba(59,130,246,.10)", border: "1px solid rgba(59,130,246,.22)", color: "var(--accent)" }}>
+                    {narrative.source === "ai" ? "AI-drafted" : "Structured overview"}
+                  </span>
+                )}
               </div>
               <p className="text-xs" style={{ color: "var(--text-3)" }}>
-                Current State · Trajectory · Outlook
+                Standing &amp; Trajectory · Infrastructure &amp; Talent · Governance &amp; Policy · Investment &amp; Capital · Economic Readiness &amp; Outlook
               </p>
             </div>
             {(narrative.status === "idle" || narrative.status === "error") && (
@@ -603,7 +625,7 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
-                Generate AI Analysis
+                Generate Brief
               </button>
             )}
             {narrative.status === "loading" && (
@@ -611,7 +633,7 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse [animation-delay:0.2s]" />
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse [animation-delay:0.4s]" />
-                <span className="ml-1">Analysing {country.name}…</span>
+                <span className="ml-1">Building {country.name}&apos;s brief…</span>
               </div>
             )}
           </div>
@@ -619,7 +641,7 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
           <div className="px-6 sm:px-8 py-6">
             {narrative.status === "idle" && (
               <p className="text-sm text-center py-4" style={{ color: "var(--text-3)" }}>
-                Click &ldquo;Generate AI Analysis&rdquo; for a strategic assessment of {country.name}&apos;s AI trajectory.
+                Click &ldquo;Generate Brief&rdquo; for a five-section written brief on {country.name}&apos;s AI readiness and trajectory.
               </p>
             )}
             {narrative.status === "loading" && (
@@ -633,39 +655,39 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
               <div className="flex items-start gap-3 p-4 rounded-xl"
                 style={{ background: "rgba(245,158,11,.06)", border: "1px solid rgba(245,158,11,.22)" }}>
                 <span className="text-amber-400 mt-0.5">⚠</span>
-                <div>
-                  <p className="text-sm text-amber-400/90 mb-1">
-                    {narrative.error?.includes("not configured")
-                      ? "OpenRouter API key is not set — add OPENROUTER_API_KEY to your Vercel environment variables."
-                      : narrative.error?.includes("All models")
-                      ? "All free AI models are currently rate-limited. Try again in a few minutes."
-                      : (narrative.error ?? "Analysis temporarily unavailable.")}
-                  </p>
-                  {narrative.error && !narrative.error.includes("not configured") && (
-                    <p className="text-[10px] text-amber-400/50">Detail: {narrative.error}</p>
-                  )}
-                </div>
+                <p className="text-sm text-amber-400/90">
+                  {narrative.error ?? "Brief temporarily unavailable — please try again."}
+                </p>
               </div>
             )}
-            {narrative.status === "done" && narrative.paragraphs.length > 0 && (
+            {narrative.status === "done" && narrative.sections.length > 0 && (
               <div className="space-y-6 fade-up">
-                {[
-                  { label: "Current State", i: 0 },
-                  { label: "Trajectory",    i: 1 },
-                  { label: "Outlook",       i: 2 },
-                ]
-                  .filter(({ i }) => narrative.paragraphs[i])
-                  .map(({ label, i }) => (
-                    <div key={label} className="pl-4" style={{ borderLeft: "2px solid rgba(59,130,246,.40)" }}>
-                      <p className="text-[10px] font-bold uppercase tracking-widest mb-2"
-                        style={{ color: "rgba(96,165,250,.7)" }}>{label}</p>
-                      <p className="text-sm leading-relaxed" style={{ color: "var(--text-2)" }}>
-                        {narrative.paragraphs[i]}
-                      </p>
+                {narrative.sections.map((section) => {
+                  const pillarLabel = SECTION_PILLAR_CHART[section.heading];
+                  return (
+                    <div key={section.heading} className="brief-section-row">
+                      <div className="brief-section-text">
+                        <p className="text-[10px] font-bold uppercase tracking-widest mb-2"
+                          style={{ color: "rgba(96,165,250,.7)" }}>{section.heading}</p>
+                        <p className="text-sm leading-relaxed" style={{ color: "var(--text-2)" }}>
+                          {section.body}
+                        </p>
+                      </div>
+                      {pillarLabel && (
+                        <div className="brief-section-chart">
+                          {pillarLabel.map((label) => (
+                            <DimensionBar key={label} label={label} score={country.scores[DIM_KEY[label]].score} />
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  ))}
+                  );
+                })}
                 <p className="text-[11px] pt-2" style={{ borderTop: "1px solid var(--border)", color: "var(--text-3)" }}>
-                  Analysis generated by AI based on World Bank and OECD data. Updated weekly.
+                  {narrative.source === "ai"
+                    ? "Brief drafted by AI, grounded in this page's own scores and live World Bank data."
+                    : "Structured overview generated from this page's own scores and live World Bank data."}
+                  {" "}Cached weekly.
                   {narrative.generatedAt && (
                     <> · Generated {new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" })
                       .format(new Date(narrative.generatedAt))}</>

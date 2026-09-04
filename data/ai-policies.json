@@ -1,5 +1,5 @@
 {
-  "usa":                      { "has_national_ai_strategy": true,  "strategy_year": 2019, "has_ai_regulation": false, "oecd_member": true  },
+  "usa":                      { "has_national_ai_strategy": true,  "strategy_year": 2025, "has_ai_regulation": false, "oecd_member": true  },
   "china":                    { "has_national_ai_strategy": true,  "strategy_year": 2017, "has_ai_regulation": true,  "oecd_member": false },
   "uk":                       { "has_national_ai_strategy": true,  "strategy_year": 2021, "has_ai_regulation": false, "oecd_member": true  },
   "germany":                  { "has_national_ai_strategy": true,  "strategy_year": 2018, "has_ai_regulation": true,  "oecd_member": true  },

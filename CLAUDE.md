@@ -43,7 +43,13 @@ npm run lint       # ESLint only
 - `/` — filterable grid, fetches `/api/scores` on mount, static data shown instantly then replaced
 - `/country/[slug]` — detail page, same pattern (static → live upgrade)
 - `/api/scores` — GET, returns `{ countries, last_updated, using_live_data }`
-- `/api/narrative` — stub, returns 501
+- `/api/narrative/[country]` — GET, returns `{ sections: {heading, body}[], source: "ai" | "template", generatedAt }` (see Narrative below)
+
+**Narrative (per-country written brief):**
+- `lib/narrativeTemplate.ts` — `buildFactPack()` assembles one shared fact pack per country (scores + evidence bullets, rank, trajectory, policy metadata, live World Bank `raw_indicators` when present). `generateStructuredNarrative()` deterministically stitches that fact pack into 5 headed sections (Standing & Trajectory / Infrastructure & Talent / Governance & Policy / Investment & Capital / Economic Readiness & Outlook), citing real numbers — no network call, no cost, always succeeds. `summarizeFactPack()` renders the same facts as a compact bullet list for the AI prompt.
+- `lib/openrouter.ts` — `generateStructuredNarrative()` (AI version) sends `summarizeFactPack()`'s output to a chain of free OpenRouter models and asks for the same 5 `### `-headed sections, parsed back into `{heading, body}[]`. Model IDs go stale — free-tier availability changes; re-check `https://openrouter.ai/api/v1/models` (no key needed) if the chain starts 404ing.
+- `app/api/narrative/[country]/route.ts` — tries the AI path first (if `OPENROUTER_API_KEY` is set); on any failure (all models down, or output doesn't parse into exactly 5 sections) it silently falls back to the deterministic template. Response is tagged `source: "ai" | "template"` so the UI can label it. 7-day in-memory cache either way.
+- `components/CountryPageClient.tsx` renders the 5 sections as alternating text/`DimensionBar` rows (`.brief-section-row` in `globals.css`), regardless of which source produced them.
 
 **Components:**
 - `CountryCard` — card with mini dimension bars, trajectory badge, accelerator/risk
@@ -53,9 +59,12 @@ npm run lint       # ESLint only
 - `TrajectoryArrow` — pill badge mapping trajectory_label to ↑↑/↑/→/↓/↓↓ with colour
 - `FilterBar` — search input, region pills, sort dropdown
 
-**Types:** `lib/types.ts` — `Country`, `ScoredCountry` (adds `data_source: "live" | "fallback"`), `ScoresResponse`
+**Types:** `lib/types.ts` — `Country`, `ScoredCountry` (adds `data_source: "live" | "fallback"`, optional `raw_indicators`), `ScoresResponse`, `NarrativeSection`
 
-**Styling:** Dark navy `#0a0f1e` background, electric blue `#3b82f6` accent, green `#22c55e` positive, red `#ef4444` negative. Inter font via Google Fonts import in `globals.css`.
+**Styling:** Two token systems, both live, used deliberately (not a leftover from the redesign):
+- Homepage, region pages, and most cards use the ivory/ink **editorial** theme (`--ed-*` tokens in `globals.css`) — background `#FBF9F4`, serif `Fraunces` display type, `Inter Tight` body, signal-red accent `#D64528`.
+- `/country/[slug]` (`CountryPageClient.tsx`) stays on the darker **data-terminal** theme (`--dt-*` tokens, mapped through legacy `--bg`/`--accent`/etc. compat vars) — a deliberate dark-hero-then-panels contrast, not a migration gap.
+- Both scales share the 5 pillar colours (`--pillar-infra` etc.) so charts read consistently across themes.
 
 ## Adding a country
 
@@ -63,4 +72,4 @@ Add to `/data/countries.json` and `/data/ai-policies.json`, and add the slug→I
 
 ## Deployment
 
-Deployed to Vercel. `OPENROUTER_API_KEY` needed only for Phase 3 (AI narratives). `NEXT_PUBLIC_SITE_URL` should be set to `https://ai-index.ankitmishra.ca`.
+Deployed to Vercel. `OPENROUTER_API_KEY` is optional — without it, `/api/narrative` serves the deterministic template directly (`source: "template"`); with it, AI-drafted briefs are tried first and fall back to the template automatically. `NEXT_PUBLIC_SITE_URL` should be set to `https://ai-trajectory-index.vercel.app` (the custom domain referenced in older docs, `ai-index.ankitmishra.ca`, is not configured — don't reintroduce it without setting up DNS first).

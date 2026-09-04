@@ -250,6 +250,40 @@ body {
   footer > div:first-child { grid-template-columns: 1fr 1fr !important; gap: 24px !important; }
 }
 
+/* ── Country brief — alternating text/chart section rows ──────────────── */
+/* Used by the 5-section AI/structured narrative on the country page.
+   Text on the left with a border separator, a small dimension chart on the
+   right — collapses to a single column on narrow screens. */
+.brief-section-row {
+  display: grid;
+  grid-template-columns: 60fr 40fr;
+  gap: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+.brief-section-row:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.brief-section-text {
+  min-width: 0;
+}
+.brief-section-chart {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--raised);
+  border: 1px solid var(--border);
+}
+@media (max-width: 640px) {
+  .brief-section-row {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ── Print ────────────────────────────────────────── */
 @media print {
   -webkit-print-color-adjust: exact;

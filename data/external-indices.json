@@ -5,7 +5,7 @@
     "stanford_hai":    { "year": 2025, "url": "https://hai.stanford.edu/ai-index" },
     "tortoise":        { "year": 2024, "url": "https://www.tortoisemedia.com/data/global-ai" },
     "wipo_gii":        { "year": 2024, "url": "https://www.wipo.int/gii-ranking/en/" },
-    "wef_gci":         { "year": 2019, "url": "https://www.weforum.org/publications/the-global-competitiveness-report-2019/" },
+    "wef_gci":         { "year": 2019, "url": "https://www.weforum.org/publications/the-global-competitiveness-report-2019/", "discontinued": "WEF stopped publishing the Global Competitiveness Report after the 2019 edition — this figure is permanently frozen at 2019, not a missed refresh." },
     "itu_idi":         { "year": 2023, "url": "https://datahub.itu.int/" }
   },
   "countries": {

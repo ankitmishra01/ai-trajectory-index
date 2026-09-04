@@ -1,6 +1,6 @@
 # AI Trajectory Index
 
-**Live:** [ai-index.ankitmishra.ca](https://ai-index.ankitmishra.ca)
+**Live:** [ai-trajectory-index.vercel.app](https://ai-trajectory-index.vercel.app)
 
 An interactive index scoring **186 countries** on their current AI readiness and 3–5 year trajectory — built for investors, policymakers, and researchers who need to understand which nations are winning the AI race and why.
 
@@ -23,7 +23,7 @@ An interactive index scoring **186 countries** on their current AI readiness and
 
 - Scores 186 economies across **5 pillars**: Infrastructure, Talent, Governance, Investment, Economic Readiness (each 0–20, total 0–100)
 - Shows **forward trajectory** — which countries are accelerating, plateauing, or falling behind, with projected 2028 scores
-- Generates **AI-powered country narratives** explaining the drivers behind each score (via OpenRouter, free tier)
+- Generates a **five-section country brief** per economy (Standing & Trajectory, Infrastructure & Talent, Governance & Policy, Investment & Capital, Economic Readiness & Outlook), AI-drafted via OpenRouter (free tier) with an automatic deterministic-template fallback if every model is unavailable — the brief always renders, never a bare error
 - **Interactive world map** with country selection and AI-powered comparison chat
 - **Country comparison tool** — side-by-side radar charts and pillar breakdowns (up to 4 countries)
 - **Region deep-dives** — Americas, Europe, Asia-Pacific, Middle East, Africa with sub-regional analysis
@@ -56,7 +56,7 @@ An interactive index scoring **186 countries** on their current AI readiness and
 | Framework | Next.js 14 (App Router) + TypeScript |
 | Styling | Tailwind CSS + CSS custom properties |
 | Charts | Recharts (radar, bar, scatter) + react-simple-maps |
-| AI Narratives | OpenRouter API (Gemini 2.0 Flash — free tier) |
+| AI Narratives | OpenRouter API (rotating free-tier models) + deterministic template fallback |
 | Live News | GDELT 2.0 Document API (free, no key) |
 | World Data | World Bank Open Data API (17 indicators, free) |
 | Policy Data | OECD AI Policy Observatory (static dataset) |
@@ -96,7 +96,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `OPENROUTER_API_KEY` | Yes | AI narrative generation + map chat |
+| `OPENROUTER_API_KEY` | No | Enables AI-drafted country briefs + map chat. Without it, briefs are served from the deterministic template (still complete, just not AI-drafted) |
 | `NEXT_PUBLIC_SITE_URL` | No | Canonical URL for OG meta tags |
 | `CRON_SECRET` | No | Protects `/api/news-cron` from unauthorised calls |
 
@@ -106,7 +106,7 @@ One-click Vercel deployment:
 
 1. Fork this repo
 2. Import to [Vercel](https://vercel.com)
-3. Add `OPENROUTER_API_KEY` as an environment variable
+3. (Optional) Add `OPENROUTER_API_KEY` for AI-drafted country briefs — omit it and briefs are served from the built-in template instead
 4. Deploy — World Bank data fetches automatically, no other setup needed
 
 ---
@@ -123,7 +123,7 @@ Five equally-weighted pillars, each scored 0–20:
 | **Investment** | Capital environment | R&D spend % GDP (GB.XPD.RSDV.GD.ZS), FDI net inflows (BX.KLT.DINV.WD.GD.ZS) |
 | **Economic Readiness** | Market conditions | GDP per capita PPP (NY.GDP.PCAP.PP.KD), private credit % GDP, trade openness, services share |
 
-Full methodology: [ai-index.ankitmishra.ca/methodology](https://ai-index.ankitmishra.ca/methodology)
+Full methodology: [ai-trajectory-index.vercel.app/methodology](https://ai-trajectory-index.vercel.app/methodology)
 
 ### Design Principles
 
@@ -164,7 +164,7 @@ Projected 2028 score = `clamp(total + trajectory × 1.5, 0, 100)`
 | [World Governance Indicators](https://info.worldbank.org/governance/wgi/) | Rule of Law, Govt Effectiveness, Regulatory Quality | Via World Bank API |
 | [OECD AI Policy Observatory](https://oecd.ai) | National AI strategies, regulation status | Static dataset |
 | [GDELT 2.0](https://www.gdeltproject.org) | Country-level AI news headlines | On-demand, 1h cache |
-| [OpenRouter](https://openrouter.ai) | AI country narratives, news signal analysis | On-demand, 7d/24h cache |
+| [OpenRouter](https://openrouter.ai) | AI-drafted country briefs, news signal analysis (falls back to a deterministic template if free models are unavailable) | On-demand, 7d/24h cache |
 
 World Bank indicators typically lag 1–2 years — most recent data is from 2023–2024.
 
@@ -184,7 +184,7 @@ World Bank indicators typically lag 1–2 years — most recent data is from 202
   /widget/[slug]/page.tsx   — Embeddable iframe widget (no client JS)
   /api/
     scores/route.ts         — Live scoring endpoint (24h cache)
-    narrative/[country]/    — OpenRouter narrative generation (7d cache)
+    narrative/[country]/    — Five-section country brief: AI-drafted via OpenRouter, template fallback (7d cache)
     news/[slug]/            — GDELT news feed (1h cache)
     news-signal/[slug]/     — AI signal analysis (24h cache)
     news-cron/route.ts      — Vercel Cron: warms top-50 news cache nightly
@@ -210,11 +210,12 @@ World Bank indicators typically lag 1–2 years — most recent data is from 202
 /lib
   worldbank.ts              — WB API client (17 indicators, parallel fetch, 24h cache)
   scoring.ts                — Score calculation engine (5 pillars + trajectory)
-  openrouter.ts             — OpenRouter client (narratives + news signal analysis)
+  openrouter.ts             — OpenRouter client (AI-drafted briefs + news signal analysis)
+  narrativeTemplate.ts      — Deterministic 5-section brief generator: fact pack + template + fallback
   gdelt.ts                  — GDELT news client (1h in-memory cache, disambiguation)
   slugToIso.ts              — 186 slug → ISO2 mappings
   regionConfigs.ts          — Region deep-dive configuration
-  types.ts                  — Country, ScoredCountry, ScoresResponse
+  types.ts                  — Country, ScoredCountry, ScoresResponse, NarrativeSection
 
 /data
   countries.json            — 186 countries: static baseline scores + evidence
@@ -240,7 +241,7 @@ Areas where contributions are especially welcome:
 
 If you reference this tool in research or journalism:
 
-> Mishra, A. (2026). *AI Trajectory Index: Scoring 186 Economies on AI Readiness and 3–5 Year Trajectory*. Retrieved from https://ai-index.ankitmishra.ca
+> Mishra, A. (2026). *AI Trajectory Index: Scoring 186 Economies on AI Readiness and 3–5 Year Trajectory*. Retrieved from https://ai-trajectory-index.vercel.app
 
 ---
 

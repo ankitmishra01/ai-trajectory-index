@@ -1,10 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
-import { generateNarrative } from "@/lib/openrouter";
+import { generateStructuredNarrative } from "@/lib/openrouter";
+import { buildFactPack, generateStructuredNarrative as generateTemplateNarrative, summarizeFactPack } from "@/lib/narrativeTemplate";
+import { calculateScores } from "@/lib/scoring";
+import { fetchWorldBankIndicators } from "@/lib/worldbank";
+import { fetchIMFData } from "@/lib/imf";
+import { fetchOECDData } from "@/lib/oecd";
+import { fetchAnthropicIndex } from "@/lib/anthropic-index";
+import { SLUG_TO_ISO2 } from "@/lib/slugToIso";
+import { SLUG_TO_ISO3 } from "@/lib/slugToIso3";
 import staticData from "@/data/countries.json";
 import policyData from "@/data/ai-policies.json";
+import externalIndicesJson from "@/data/external-indices.json";
+import type { PolicyData, ExternalIndices } from "@/lib/scoring";
+import type { IMFData } from "@/lib/imf";
+import type { OECDData } from "@/lib/oecd";
+import type { ScoredCountry, NarrativeSection } from "@/lib/types";
 
 interface CacheEntry {
-  paragraphs: string[];
+  sections: NarrativeSection[];
+  source: "ai" | "template";
   generatedAt: number;
 }
 
@@ -12,12 +26,27 @@ interface CacheEntry {
 const cache = new Map<string, CacheEntry>();
 const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
-function parseParagraphs(text: string): string[] {
-  return text
-    .split(/\n\n+/)
-    .map((p) => p.trim())
-    .filter((p) => p.length > 40)
-    .slice(0, 3);
+async function scoreAllCountries(): Promise<ScoredCountry[]> {
+  const policies = policyData as Record<string, PolicyData>;
+  const externalIndices = externalIndicesJson as unknown as ExternalIndices;
+
+  const [wbResult, imfResult, oecdResult, anthropicResult] = await Promise.allSettled([
+    fetchWorldBankIndicators(),
+    fetchIMFData(),
+    fetchOECDData(),
+    fetchAnthropicIndex(),
+  ]);
+
+  const wbData        = wbResult.status        === "fulfilled" ? wbResult.value        : {};
+  const imfData       = imfResult.status       === "fulfilled" ? imfResult.value       : ({} as IMFData);
+  const oecdData      = oecdResult.status      === "fulfilled" ? oecdResult.value      : ({} as OECDData);
+  const anthropicData = anthropicResult.status === "fulfilled" ? anthropicResult.value : {};
+
+  return staticData.countries.map((country) => {
+    const iso2 = SLUG_TO_ISO2[country.slug] ?? "";
+    const iso3 = SLUG_TO_ISO3[country.slug] ?? "";
+    return calculateScores(country, iso2, iso3, wbData, policies, imfData, oecdData, anthropicData, externalIndices);
+  });
 }
 
 export async function GET(
@@ -26,8 +55,8 @@ export async function GET(
 ) {
   const { country: slug } = await params;
 
-  const country = staticData.countries.find((c) => c.slug === slug);
-  if (!country) {
+  const staticCountry = staticData.countries.find((c) => c.slug === slug);
+  if (!staticCountry) {
     return NextResponse.json({ error: "Country not found" }, { status: 404 });
   }
 
@@ -35,56 +64,58 @@ export async function GET(
   const cached = cache.get(slug);
   if (cached && Date.now() - cached.generatedAt < CACHE_TTL_MS) {
     return NextResponse.json({
-      paragraphs: cached.paragraphs,
+      sections: cached.sections,
+      source: cached.source,
       generatedAt: new Date(cached.generatedAt).toISOString(),
       cached: true,
     });
   }
 
+  const allCountries = await scoreAllCountries();
+  const country = allCountries.find((c) => c.slug === slug) ?? {
+    ...staticCountry,
+    data_source: "fallback" as const,
+    wb_data_year: null,
+    imf_data: false,
+    oecd_data: false,
+    anthropic_data: false,
+    raw_indicators: null,
+  };
+  const policy = (policyData as Record<string, PolicyData>)[slug] ?? {
+    has_national_ai_strategy: false,
+    strategy_year: null,
+    has_ai_regulation: false,
+    oecd_member: false,
+  };
+
+  const factPack = buildFactPack(country, allCountries, policy);
+
+  let sections: NarrativeSection[];
+  let source: "ai" | "template";
+
   if (!process.env.OPENROUTER_API_KEY) {
-    return NextResponse.json(
-      { error: "OpenRouter API key not configured." },
-      { status: 503 }
-    );
+    sections = generateTemplateNarrative(factPack);
+    source = "template";
+  } else {
+    try {
+      sections = await generateStructuredNarrative(summarizeFactPack(factPack));
+      source = "ai";
+    } catch (err) {
+      // Every free model failed, or the output didn't parse into 5 sections —
+      // fall back to the deterministic template instead of surfacing an error.
+      console.warn(`Narrative AI generation failed for ${slug}, using template fallback:`, err);
+      sections = generateTemplateNarrative(factPack);
+      source = "template";
+    }
   }
 
-  try {
-    const policy = (policyData as unknown as Record<string, {
-      has_national_ai_strategy?: boolean;
-      strategy_year?: number | null;
-      has_ai_regulation?: boolean;
-      oecd_member?: boolean;
-    }>)[slug] ?? {};
+  const entry: CacheEntry = { sections, source, generatedAt: Date.now() };
+  cache.set(slug, entry);
 
-    const text = await generateNarrative({
-      countryName: country.name,
-      totalScore: country.total_score,
-      trajectoryLabel: country.trajectory_label,
-      trajectoryScore: country.trajectory_score,
-      projectedScore: country.projected_score_2028,
-      topAccelerator: country.top_accelerator,
-      topRisk: country.top_risk,
-      scores: {
-        infrastructure: country.scores.infrastructure.score,
-        talent: country.scores.talent.score,
-        governance: country.scores.governance.score,
-        investment: country.scores.investment.score,
-        economic_readiness: country.scores.economic_readiness.score,
-      },
-      hasAiStrategy: policy.has_national_ai_strategy,
-    });
-
-    const paragraphs = parseParagraphs(text);
-    const entry: CacheEntry = { paragraphs, generatedAt: Date.now() };
-    cache.set(slug, entry);
-
-    return NextResponse.json({
-      paragraphs,
-      generatedAt: new Date(entry.generatedAt).toISOString(),
-      cached: false,
-    });
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json({ error: message }, { status: 500 });
-  }
+  return NextResponse.json({
+    sections,
+    source,
+    generatedAt: new Date(entry.generatedAt).toISOString(),
+    cached: false,
+  });
 }

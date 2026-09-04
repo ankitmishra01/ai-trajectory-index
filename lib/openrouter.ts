@@ -1,40 +1,26 @@
-// OpenRouter client — model: google/gemini-2.0-flash-exp:free
+// OpenRouter client
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-// Tried in order until one succeeds.
-// Mix providers so rate limits don't cascade — Meta, Google, Mistral, Alibaba
-// all have independent free-tier quotas.
+// Tried in order until one succeeds. Mix providers so rate limits don't
+// cascade — each has an independent free-tier quota.
+// Verified live against https://openrouter.ai/api/v1/models on 2026-09-04;
+// re-check that endpoint (no key required) if this chain starts 404ing again
+// — free-tier model IDs get retired regularly.
 const MODELS = [
-  "meta-llama/llama-3.3-70b-instruct:free",
-  "google/gemma-3-27b-it:free",
-  "mistralai/mistral-small-3.1-24b-instruct:free",
-  "meta-llama/llama-3.1-8b-instruct:free",
-  "qwen/qwen-2.5-7b-instruct:free",
-  "qwen/qwen3-4b:free",
-  "microsoft/phi-3-mini-128k-instruct:free",
+  "google/gemma-4-31b-it:free",
+  "z-ai/glm-5.2:free",
+  "minimax/minimax-m3:free",
+  "nvidia/nemotron-3-super-120b-a12b:free",
+  "liquid/lfm-2.5-2.6b:free",
 ];
 
-export interface NarrativeRequest {
-  countryName: string;
-  totalScore: number;
-  trajectoryLabel: string;
-  trajectoryScore: number;
-  projectedScore: number;
-  topAccelerator: string;
-  topRisk: string;
-  scores: {
-    infrastructure: number;
-    talent: number;
-    governance: number;
-    investment: number;
-    economic_readiness: number;
-  };
-  // optional enrichment from policies / WB
-  internetPct?: number;
-  gdpPerCapita?: number;
-  rdSpendPct?: number;
-  hasAiStrategy?: boolean;
-}
+const SECTION_HEADINGS = [
+  "Standing & Trajectory",
+  "Infrastructure & Talent",
+  "Governance & Policy",
+  "Investment & Capital",
+  "Economic Readiness & Outlook",
+] as const;
 
 export interface CountryContext {
   name: string;
@@ -127,43 +113,50 @@ async function callOpenRouter(
   throw new Error(`All models unavailable. Last error: ${lastError}`);
 }
 
-export async function generateNarrative(
-  request: NarrativeRequest
-): Promise<string> {
-  const {
-    countryName,
-    totalScore,
-    trajectoryLabel,
-    trajectoryScore,
-    projectedScore,
-    topAccelerator,
-    topRisk,
-    scores,
-    internetPct,
-    gdpPerCapita,
-    rdSpendPct,
-    hasAiStrategy,
-  } = request;
+/**
+ * AI-drafted version of the same five sections the deterministic template in
+ * lib/narrativeTemplate.ts produces, grounded in the same fact pack, so the
+ * two sources render identically in the UI. Throws (via callOpenRouter) if
+ * every model in the chain fails — the API route catches that and falls back
+ * to the template.
+ */
+export async function generateStructuredNarrative(
+  factPackSummary: string
+): Promise<NarrativeSectionsRaw> {
+  const systemPrompt = `You are an expert in AI policy, technology economics, and emerging markets, writing for policymakers and investors. Tone: direct, factual, forward-looking, dense with the specific figures you're given — never filler, never generic. Ground every claim in the data provided; do not invent numbers.`;
 
-  const systemPrompt = `You are an expert in AI policy, technology economics, and emerging markets. You write concise, data-driven analysis for policymakers and investors. Your tone is direct, factual, and forward-looking. Never use filler phrases. Always ground analysis in specific indicators and policy decisions.`;
+  const userMessage = `Using only the facts below, write a five-section AI-readiness brief. Output exactly five sections in this order, each starting on its own line with "### " followed by the exact heading, then 3-4 sentences of prose (100-150 words) citing specific figures from the facts:
 
-  const userMessage = `Write a 3-paragraph analysis of ${countryName}'s AI trajectory.
+### Standing & Trajectory
+### Infrastructure & Talent
+### Governance & Policy
+### Investment & Capital
+### Economic Readiness & Outlook
 
-Current scores: Infrastructure ${scores.infrastructure}/20, Talent ${scores.talent}/20, Governance ${scores.governance}/20, Investment ${scores.investment}/20, Economic Readiness ${scores.economic_readiness}/20. Total: ${totalScore}/100.
-Trajectory: ${trajectoryLabel} (${trajectoryScore > 0 ? "+" : ""}${trajectoryScore}). Projected 2028 score: ${projectedScore}/100.
-Top accelerator: ${topAccelerator}. Top risk: ${topRisk}.${
-    internetPct !== undefined || gdpPerCapita !== undefined || rdSpendPct !== undefined || hasAiStrategy !== undefined
-      ? `\nKey data:${internetPct !== undefined ? ` Internet penetration ${internetPct}%,` : ""}${gdpPerCapita !== undefined ? ` GDP per capita $${Math.round(gdpPerCapita).toLocaleString()},` : ""}${rdSpendPct !== undefined ? ` R&D spend ${rdSpendPct}% of GDP,` : ""}${hasAiStrategy !== undefined ? ` National AI strategy: ${hasAiStrategy ? "yes" : "no"}.` : ""}`
-      : ""
+Facts:
+${factPackSummary}
+
+Do not add any other headings, preamble, or closing remarks — only the five "### " sections.`;
+
+  const raw = await callOpenRouter(systemPrompt, userMessage);
+  return parseSections(raw);
+}
+
+export type NarrativeSectionsRaw = { heading: string; body: string }[];
+
+function parseSections(raw: string): NarrativeSectionsRaw {
+  const parts = raw.split(/^###\s+/m).map((p) => p.trim()).filter(Boolean);
+  const sections: NarrativeSectionsRaw = [];
+  for (const part of parts) {
+    const [firstLine, ...rest] = part.split("\n");
+    const heading = firstLine.trim();
+    const body = rest.join("\n").trim();
+    if (heading && body) sections.push({ heading, body });
   }
-
-Paragraph 1 — Current State: What the scores reveal about where this country stands in the AI race and why.
-Paragraph 2 — Trajectory: What is driving acceleration or stagnation, with specific reference to policy, capital, and talent dynamics.
-Paragraph 3 — Outlook: What needs to happen for this country to improve its position, and what the realistic 2028 scenario looks like.
-
-Keep each paragraph to 3-4 sentences. Be specific. No generic statements. Do not use section headers or labels — just write the three paragraphs separated by blank lines.`;
-
-  return callOpenRouter(systemPrompt, userMessage);
+  if (sections.length !== SECTION_HEADINGS.length) {
+    throw new Error(`AI response did not parse into ${SECTION_HEADINGS.length} sections (got ${sections.length})`);
+  }
+  return sections;
 }
 
 export async function askAboutCountries(
