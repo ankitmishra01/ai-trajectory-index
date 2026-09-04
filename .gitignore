@@ -48,3 +48,4 @@ Thumbs.db
 *.csv
 *.xlsx
 /exports/
+.env*

@@ -12,6 +12,7 @@ import WhatIfSimulator from "@/components/WhatIfSimulator";
 import CountryChat from "@/components/CountryChat";
 import PolicyGapAnalyser from "@/components/PolicyGapAnalyser";
 import DualRadar from "@/components/DualRadar";
+import CountrySidebar from "@/components/CountrySidebar";
 import staticData from "@/data/countries.json";
 import adoptionData from "@/data/adoption.json";
 import { TIER_COLORS, DIM_LABELS as ADOPT_DIM_LABELS, DIM_COLORS as ADOPT_DIM_COLORS } from "@/lib/adoption";
@@ -76,6 +77,7 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
   const [narrative, setNarrative] = useState<NarrativeState>({ status: "idle", sections: [] });
   const [copied, setCopied]       = useState(false);
   const [embedOpen, setEmbedOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Read tab from URL on mount
   useEffect(() => {
@@ -146,13 +148,40 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
   const liveChanged    = country.data_source === "live" && liveScoreDelta !== 0;
 
   return (
-    <main className="min-h-screen" style={{ background: "var(--bg)" }}>
+    <main className="min-h-screen flex" style={{ background: "var(--bg)" }}>
       <div className="page-glow" />
+
+      {/* Desktop country switcher — persistent left sidebar */}
+      <aside className="hidden lg:block w-72 flex-shrink-0 sticky top-0 h-screen"
+        style={{ borderRight: "1px solid var(--border)", background: "var(--surface)" }}>
+        <CountrySidebar countries={allCountries} currentSlug={slug} />
+      </aside>
+
+      {/* Mobile country switcher — slide-in drawer */}
+      {sidebarOpen && (
+        <div className="lg:hidden fixed inset-0 z-[60] flex" style={{ background: "rgba(0,0,0,.6)" }}
+          onClick={(e) => { if (e.target === e.currentTarget) setSidebarOpen(false); }}>
+          <div className="w-80 max-w-[85vw] h-full" style={{ background: "var(--surface)", borderRight: "1px solid var(--border-mid)" }}>
+            <div className="flex items-center justify-between px-4 pt-4">
+              <span className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-3)" }}>Countries</span>
+              <button onClick={() => setSidebarOpen(false)} className="text-lg leading-none" style={{ color: "var(--text-3)" }}>×</button>
+            </div>
+            <CountrySidebar countries={allCountries} currentSlug={slug} onSelect={() => setSidebarOpen(false)} />
+          </div>
+        </div>
+      )}
+
+      <div className="flex-1 min-w-0">
 
       {/* Header */}
       <header className="sticky top-0 z-50 backdrop-blur-sm"
         style={{ borderBottom: "1px solid var(--border)", background: "rgba(6,11,20,.92)" }}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3.5 flex items-center gap-4">
+          <button onClick={() => setSidebarOpen(true)}
+            className="lg:hidden text-sm flex items-center gap-1.5 transition-colors hover:text-white"
+            style={{ color: "var(--text-3)" }} aria-label="Browse countries">
+            ☰
+          </button>
           <Link href="/" className="text-sm flex items-center gap-1.5 transition-colors hover:text-white"
             style={{ color: "var(--text-3)" }}>
             ← Index
@@ -749,6 +778,7 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
             className="hover:text-blue-400 transition-colors">Ankit Mishra</a>
         </p>
       </footer>
+      </div>
     </main>
   );
 }

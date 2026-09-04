@@ -89,7 +89,12 @@ export default function CountryPage({ params }: { params: { slug: string } }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <CountryPageClient slug={params.slug} initialCountry={initialCountry} />
+      {/* key={params.slug} forces a full remount on navigation between country
+          pages (e.g. clicking another country in the sidebar or "Most Similar
+          Countries") so every piece of client state — narrative, active tab,
+          expanded pillar — resets for the new country instead of carrying
+          over stale state from the previous one. */}
+      <CountryPageClient key={params.slug} slug={params.slug} initialCountry={initialCountry} />
     </>
   );
 }

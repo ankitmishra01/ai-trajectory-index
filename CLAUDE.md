@@ -52,6 +52,7 @@ npm run lint       # ESLint only
 - `components/CountryPageClient.tsx` renders the 5 sections as alternating text/`DimensionBar` rows (`.brief-section-row` in `globals.css`), regardless of which source produced them.
 
 **Components:**
+- `CountrySidebar` — persistent left country switcher on `/country/[slug]` (search + region-grouped list of all 186, auto-scrolls to the active country). Desktop: sticky column. Mobile: slide-in drawer opened via the header's ☰ button. `app/country/[slug]/page.tsx` renders `<CountryPageClient key={slug} .../>` — the `key` forces a full remount on navigation so switching countries via the sidebar (or any same-route Link) can't leak stale narrative/tab/UI state from the previous country.
 - `CountryCard` — card with mini dimension bars, trajectory badge, accelerator/risk
 - `SkeletonCard` — animated pulse placeholder shown during `/api/scores` fetch
 - `ScoreGauge` — SVG semicircle gauge (arc from -210° to 30°, 240° sweep)
