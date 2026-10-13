@@ -3,6 +3,40 @@ export interface DimensionScore {
   reasons: string[];
 }
 
+export type PillarKey = keyof Country["scores"];
+
+export type ProvenanceStatus = "live" | "enriched" | "fallback" | "policy";
+
+export interface ScoreComponentProvenance {
+  key: string;
+  label: string;
+  pillar: PillarKey;
+  source: string;
+  sourceUrl: string;
+  indicatorCode: string | null;
+  value: number | boolean | null;
+  unit: string | null;
+  year: number | null;
+  pointsEarned: number;
+  pointsAvailable: number;
+  status: ProvenanceStatus;
+  substitution: string | null;
+}
+
+export interface CountryCoverage {
+  label: "High" | "Medium" | "Limited";
+  liveIndicators: number;
+  expectedIndicators: number;
+  enrichedIndicators: number;
+  policyIndicators: number;
+  fallbackComponents: number;
+  fallbackShare: number;
+  oldestYear: number | null;
+  newestYear: number | null;
+}
+
+export type CountryProvenance = Record<PillarKey, ScoreComponentProvenance[]>;
+
 export interface Country {
   id: string;
   slug: string;
