@@ -8,6 +8,7 @@ import type {
   CountryCoverage,
   CountryProvenance,
   ScoreComponentProvenance,
+  ScoredCountry,
 } from "./types";
 
 export function buildCoverage(provenance: CountryProvenance): CountryCoverage {
@@ -89,4 +90,19 @@ export function buildStaticProvenance(country: Country): CountryProvenance {
       return [pillar, components];
     }),
   ) as CountryProvenance;
+}
+
+export function asFallbackScoredCountry(country: Country): ScoredCountry {
+  const provenance = buildStaticProvenance(country);
+  return {
+    ...country,
+    data_source: "fallback",
+    wb_data_year: null,
+    imf_data: false,
+    oecd_data: false,
+    anthropic_data: false,
+    raw_indicators: null,
+    provenance,
+    coverage: buildCoverage(provenance),
+  };
 }

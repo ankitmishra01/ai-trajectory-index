@@ -14,6 +14,7 @@ import countriesRaw from "@/data/countries.json";
 import { enrichAdoption } from "@/lib/adoption";
 import type { EnrichedAdoption } from "@/lib/adoption";
 import type { ScoredCountry } from "@/lib/types";
+import { asFallbackScoredCountry } from "@/lib/provenance";
 
 type SortKey = "adoption_total" | "adoption_gap" | "gap_negative" | "government" | "consumer";
 type Region = "All" | "Americas" | "Europe" | "Asia-Pacific" | "Middle East & Africa";
@@ -65,7 +66,7 @@ export default function AdoptionPage() {
   const gridRef = useRef<HTMLDivElement>(null);
 
   const countries = useMemo(
-    () => countriesRaw.countries.map((c) => ({ ...c, data_source: "fallback" as const, wb_data_year: null, imf_data: false, oecd_data: false, anthropic_data: false })) as ScoredCountry[],
+    () => countriesRaw.countries.map(asFallbackScoredCountry) as ScoredCountry[],
     []
   );
   const enriched: EnrichedAdoption[] = useMemo(

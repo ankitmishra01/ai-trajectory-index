@@ -12,7 +12,7 @@ import externalIndicesJson from "@/data/external-indices.json";
 import type { PolicyData, ExternalIndices } from "@/lib/scoring";
 import type { IMFData } from "@/lib/imf";
 import type { OECDData } from "@/lib/oecd";
-import type { ScoredCountry } from "@/lib/types";
+import type { ScoredCountry, ScoresResponse } from "@/lib/types";
 
 export const revalidate = 86400; // 24 hours
 
@@ -50,7 +50,7 @@ export async function GET() {
     );
   });
 
-  return NextResponse.json({
+  const response = {
     countries: scored,
     last_updated: new Date().toISOString(),
     using_live_data: usingLiveData,
@@ -60,5 +60,7 @@ export async function GET() {
       oecd:       oecdResult.status === "fulfilled",
       anthropic:  anthropicResult.status === "fulfilled",
     },
-  });
+  } satisfies ScoresResponse;
+
+  return NextResponse.json(response);
 }

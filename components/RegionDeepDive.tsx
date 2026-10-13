@@ -14,6 +14,7 @@ import type { EnrichedAdoption } from "@/lib/adoption";
 import type { ScoredCountry, ScoresResponse } from "@/lib/types";
 import type { RegionConfig } from "@/lib/regionConfigs";
 import SiteHeader from "@/components/SiteHeader";
+import { asFallbackScoredCountry } from "@/lib/provenance";
 
 const PILLARS = [
   { key: "infrastructure",    label: "Infrastructure",   short: "Infra",  color: "#3B5BA5" },
@@ -44,7 +45,7 @@ const ADOPT_DIM_SHORT: Record<string, string> = { government: "Gov", enterprise:
 
 export default function RegionDeepDive({ config }: Props) {
   const [countries, setCountries] = useState<ScoredCountry[]>(() =>
-    staticData.countries.map((c) => ({ ...c, data_source: "fallback" as const, wb_data_year: null, imf_data: false, oecd_data: false, anthropic_data: false }))
+    staticData.countries.map(asFallbackScoredCountry)
   );
   const [loading, setLoading] = useState(true);
   const [lens, setLens] = useState<"readiness" | "adoption">("readiness");

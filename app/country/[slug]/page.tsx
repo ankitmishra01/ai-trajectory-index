@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import staticData from "@/data/countries.json";
 import CountryPageClient from "@/components/CountryPageClient";
 import type { ScoredCountry } from "@/lib/types";
+import { asFallbackScoredCountry } from "@/lib/provenance";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ai-trajectory-index.vercel.app";
 
@@ -67,7 +68,7 @@ export default function CountryPage({ params }: { params: { slug: string } }) {
   const staticCountry = staticData.countries.find((c) => c.slug === params.slug);
   if (!staticCountry) notFound();
 
-  const initialCountry: ScoredCountry = { ...staticCountry, data_source: "fallback" as const, wb_data_year: null, imf_data: false, oecd_data: false, anthropic_data: false };
+  const initialCountry: ScoredCountry = asFallbackScoredCountry(staticCountry);
 
   const ranked = [...staticData.countries].sort((a, b) => b.total_score - a.total_score);
   const rank   = ranked.findIndex((c) => c.slug === params.slug) + 1;

@@ -86,6 +86,8 @@ export interface ScoredCountry extends Country {
   oecd_data: boolean;
   anthropic_data: boolean;
   raw_indicators?: RawIndicators | null;
+  coverage: CountryCoverage;
+  provenance: CountryProvenance;
 }
 
 export interface NarrativeSection {
@@ -97,4 +99,10 @@ export interface ScoresResponse {
   countries: ScoredCountry[];
   last_updated: string;
   using_live_data: boolean;
+  sources: {
+    world_bank: boolean;
+    imf: boolean;
+    oecd: boolean;
+    anthropic: boolean;
+  };
 }

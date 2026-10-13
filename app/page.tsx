@@ -14,6 +14,7 @@ import SiteHeader from "@/components/SiteHeader";
 import staticData from "@/data/countries.json";
 import type { ScoredCountry, ScoresResponse } from "@/lib/types";
 import { copyText } from "@/lib/copyText";
+import { asFallbackScoredCountry } from "@/lib/provenance";
 
 type ViewMode = "grid" | "table";
 
@@ -93,7 +94,7 @@ export default function Home() {
   const [compareToast, setCompareToast]   = useState(false);
 
   const [countries, setCountries] = useState<ScoredCountry[]>(() =>
-    staticData.countries.map((c) => ({ ...c, data_source: "fallback" as const, wb_data_year: null, imf_data: false, oecd_data: false, anthropic_data: false }))
+    staticData.countries.map(asFallbackScoredCountry)
   );
   const [loading, setLoading]     = useState(true);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);

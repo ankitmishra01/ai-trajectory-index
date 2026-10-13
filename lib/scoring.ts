@@ -767,10 +767,7 @@ export function calculateScores(
     economic_readiness: economicCalculation.components,
   };
 
-  const scoredCountry: ScoredCountry & {
-    provenance: CountryProvenance;
-    coverage: ReturnType<typeof buildCoverage>;
-  } = {
+  const scoredCountry: ScoredCountry = {
     ...country,
     scores: {
       infrastructure: { ...country.scores.infrastructure, score: infraScore },

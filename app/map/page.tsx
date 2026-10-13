@@ -9,6 +9,7 @@ import type { ScoredCountry, ScoresResponse } from "@/lib/types";
 import type { CountryContext } from "@/lib/openrouter";
 import type { MapMode } from "@/components/WorldMap";
 import SiteHeader from "@/components/SiteHeader";
+import { asFallbackScoredCountry } from "@/lib/provenance";
 
 // Dynamic import — react-simple-maps uses browser APIs
 const WorldMap = dynamic(() => import("@/components/WorldMap"), {
@@ -43,14 +44,7 @@ const DIM_LABELS: Record<string, string> = {
 
 export default function MapPage() {
   const [countries, setCountries] = useState<ScoredCountry[]>(() =>
-    staticData.countries.map((c) => ({
-      ...c,
-      data_source: "fallback" as const,
-      wb_data_year: null,
-      imf_data: false,
-      oecd_data: false,
-      anthropic_data: false,
-    }))
+    staticData.countries.map(asFallbackScoredCountry)
   );
   const [selectedSlugs, setSelectedSlugs] = useState<Set<string>>(new Set());
   const [mode, setMode] = useState<MapMode>("view");

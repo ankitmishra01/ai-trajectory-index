@@ -20,6 +20,7 @@ import { TIER_COLORS, DIM_LABELS as ADOPT_DIM_LABELS, DIM_COLORS as ADOPT_DIM_CO
 import type { AdoptionEntry } from "@/lib/adoption";
 import type { ScoredCountry, ScoresResponse, NarrativeSection } from "@/lib/types";
 import { copyText } from "@/lib/copyText";
+import { asFallbackScoredCountry } from "@/lib/provenance";
 
 const DIM_LABELS: Record<string, string> = {
   infrastructure:    "Infrastructure",
@@ -74,7 +75,7 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
 
   const adoption = (adoptionData.countries as AdoptionEntry[]).find((a) => a.slug === slug) ?? null;
   const [allCountries, setAllCountries] = useState<ScoredCountry[]>(
-    staticData.countries.map((c) => ({ ...c, data_source: "fallback" as const, wb_data_year: null, imf_data: false, oecd_data: false, anthropic_data: false }))
+    staticData.countries.map(asFallbackScoredCountry)
   );
   const [narrative, setNarrative] = useState<NarrativeState>({ status: "idle", sections: [] });
   const [copied, setCopied]       = useState(false);

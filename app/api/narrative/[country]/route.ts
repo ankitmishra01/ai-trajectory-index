@@ -15,6 +15,7 @@ import type { PolicyData, ExternalIndices } from "@/lib/scoring";
 import type { IMFData } from "@/lib/imf";
 import type { OECDData } from "@/lib/oecd";
 import type { ScoredCountry, NarrativeSection } from "@/lib/types";
+import { asFallbackScoredCountry } from "@/lib/provenance";
 
 interface CacheEntry {
   sections: NarrativeSection[];
@@ -72,15 +73,7 @@ export async function GET(
   }
 
   const allCountries = await scoreAllCountries();
-  const country = allCountries.find((c) => c.slug === slug) ?? {
-    ...staticCountry,
-    data_source: "fallback" as const,
-    wb_data_year: null,
-    imf_data: false,
-    oecd_data: false,
-    anthropic_data: false,
-    raw_indicators: null,
-  };
+  const country = allCountries.find((c) => c.slug === slug) ?? asFallbackScoredCountry(staticCountry);
   const policy = (policyData as Record<string, PolicyData>)[slug] ?? {
     has_national_ai_strategy: false,
     strategy_year: null,

@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import { METHODOLOGY_COMPONENTS, PILLAR_KEYS } from "@/lib/methodology";
-import { buildCoverage } from "@/lib/provenance";
+import { asFallbackScoredCountry, buildCoverage } from "@/lib/provenance";
+import countriesData from "@/data/countries.json";
 import type {
   CountryProvenance,
   PillarKey,
@@ -151,5 +152,22 @@ describe("buildCoverage", () => {
     ];
 
     expect(buildCoverage(provenance).label).toBe("Limited");
+  });
+});
+
+describe("asFallbackScoredCountry", () => {
+  it("creates a complete Limited-coverage object for immediate rendering", () => {
+    const fallback = asFallbackScoredCountry(countriesData.countries[0]);
+
+    expect(fallback.data_source).toBe("fallback");
+    expect(fallback.wb_data_year).toBeNull();
+    expect(fallback.coverage).toMatchObject({
+      label: "Limited",
+      liveIndicators: 0,
+      oldestYear: null,
+      newestYear: null,
+      fallbackShare: 100,
+    });
+    expect(Object.keys(fallback.provenance)).toEqual(PILLAR_KEYS);
   });
 });

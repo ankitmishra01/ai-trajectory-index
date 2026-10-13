@@ -238,5 +238,15 @@ describe("calculateScores provenance", () => {
       oldestYear: 2023,
       newestYear: 2024,
     });
+    expect(result).toMatchObject({
+      data_source: "live",
+      wb_data_year: 2024,
+      imf_data: true,
+      oecd_data: true,
+      anthropic_data: true,
+      raw_indicators: expect.any(Object),
+      scores: expect.any(Object),
+    });
+    expect(JSON.stringify(result)).not.toContain("undefined");
   });
 });
