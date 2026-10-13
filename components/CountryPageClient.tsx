@@ -13,11 +13,13 @@ import CountryChat from "@/components/CountryChat";
 import PolicyGapAnalyser from "@/components/PolicyGapAnalyser";
 import DualRadar from "@/components/DualRadar";
 import CountrySidebar from "@/components/CountrySidebar";
+import SiteHeader from "@/components/SiteHeader";
 import staticData from "@/data/countries.json";
 import adoptionData from "@/data/adoption.json";
 import { TIER_COLORS, DIM_LABELS as ADOPT_DIM_LABELS, DIM_COLORS as ADOPT_DIM_COLORS } from "@/lib/adoption";
 import type { AdoptionEntry } from "@/lib/adoption";
 import type { ScoredCountry, ScoresResponse, NarrativeSection } from "@/lib/types";
+import { copyText } from "@/lib/copyText";
 
 const DIM_LABELS: Record<string, string> = {
   infrastructure:    "Infrastructure",
@@ -78,6 +80,8 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
   const [copied, setCopied]       = useState(false);
   const [embedOpen, setEmbedOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+  const [usingLive, setUsingLive] = useState(false);
 
   // Read tab from URL on mount
   useEffect(() => {
@@ -102,6 +106,8 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
       .then((r) => r.json())
       .then((data: ScoresResponse) => {
         setAllCountries(data.countries);
+        setLastUpdated(data.last_updated);
+        setUsingLive(data.using_live_data);
         const live = data.countries.find((c) => c.slug === slug);
         if (live) setCountry(live);
       })
@@ -120,11 +126,11 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
     }
   };
 
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(window.location.href).then(() => {
+  const handleCopyLink = async () => {
+    if (await copyText(window.location.href)) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    });
+    }
   };
 
   // Dynamic comparable countries by 5-dimension Euclidean distance
@@ -173,30 +179,18 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
 
       <div className="flex-1 min-w-0">
 
-      {/* Header */}
-      <header className="sticky top-0 z-50 backdrop-blur-sm"
-        style={{ borderBottom: "1px solid var(--border)", background: "rgba(6,11,20,.92)" }}>
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3.5 flex items-center gap-4">
+      <SiteHeader usingLive={usingLive} lastFetched={lastUpdated} citation={`Mishra, A. (2026). ${country.name}: AI readiness country profile. AI Trajectory Index. https://ai-trajectory-index.vercel.app/country/${slug}`} />
+      <div className="no-print" style={{ borderBottom: "1px solid var(--border)", background: "var(--ed-raised)" }}>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-2 flex items-center gap-3">
           <button onClick={() => setSidebarOpen(true)}
             className="lg:hidden text-sm flex items-center gap-1.5 transition-colors hover:text-white"
             style={{ color: "var(--text-3)" }} aria-label="Browse countries">
             ☰
           </button>
-          <Link href="/" className="text-sm flex items-center gap-1.5 transition-colors hover:text-white"
-            style={{ color: "var(--text-3)" }}>
-            ← Index
-          </Link>
-          <span style={{ color: "var(--border)" }}>|</span>
           <span className="text-xs font-medium uppercase tracking-wider" style={{ color: "var(--text-3)" }}>
             Country Profile
           </span>
           <div className="ml-auto flex items-center gap-3">
-            {country.data_source === "live" && (
-              <span className="flex items-center gap-1 text-xs" style={{ color: "rgba(74,222,128,.7)" }}>
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                Live data
-              </span>
-            )}
             <Link href={`/compare/${slug}/usa`}
               className="no-print hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
               style={{ background: "var(--raised)", color: "var(--text-2)", border: "1px solid var(--border)" }}>
@@ -238,7 +232,7 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
             </button>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* Embed modal */}
       {embedOpen && (

@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import Link from "next/link";
 import {
   ScatterChart, Scatter, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, ReferenceLine,
 } from "recharts";
 import staticData from "@/data/countries.json";
+import SiteHeader from "@/components/SiteHeader";
 
 const AXES = [
   { key: "total_score",       label: "Total Readiness Score", max: 100 },
@@ -91,21 +91,10 @@ export default function ExplorePage() {
 
   return (
     <main className="min-h-screen" style={{ background: "var(--bg)" }}>
-      <div className="page-glow" />
-
-      {/* Header */}
-      <header className="sticky top-0 z-50 backdrop-blur-sm"
-        style={{ borderBottom: "1px solid var(--border)", background: "rgba(6,11,20,.92)" }}>
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3.5 flex items-center gap-4">
-          <Link href="/" className="text-sm transition-colors hover:text-white" style={{ color: "var(--text-3)" }}>← Index</Link>
-          <span style={{ color: "var(--border)" }}>|</span>
-          <span className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-3)" }}>
-            Scatter Explorer
-          </span>
-        </div>
-      </header>
+      <SiteHeader activePage="explore" />
 
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-5">
+        <div><div className="eyebrow">SCATTER EXPLORER</div><h1 style={{ font: "450 clamp(34px,5vw,58px)/1 var(--font-display)", letterSpacing: "-.03em", margin: "8px 0 10px" }}>Explore relationships in the data.</h1><p style={{ color: "var(--ed-text-1)", maxWidth: 680 }}>Choose two readiness measures to see clusters, outliers and regional patterns across 186 economies.</p></div>
 
         {/* Controls */}
         <div className="card rounded-2xl p-5">
@@ -157,7 +146,7 @@ export default function ExplorePage() {
           <p className="text-xs mb-4 text-center" style={{ color: "var(--text-3)" }}>
             {data.length} countries · click a dot to open its profile
           </p>
-          <ResponsiveContainer width="100%" height={480}>
+          <ResponsiveContainer width="100%" height={480} minWidth={0}>
             <ScatterChart margin={{ top: 10, right: 20, bottom: 40, left: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,.05)" />
               <XAxis

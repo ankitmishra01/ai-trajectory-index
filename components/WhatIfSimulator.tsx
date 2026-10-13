@@ -4,11 +4,11 @@ import { useState, useMemo, useEffect } from "react";
 import type { ScoredCountry } from "@/lib/types";
 
 const PILLARS = [
-  { key: "infrastructure",     label: "Infrastructure",     color: "#3b82f6", max: 20 },
-  { key: "talent",             label: "Talent",             color: "#8b5cf6", max: 20 },
-  { key: "governance",         label: "Governance",         color: "#06b6d4", max: 20 },
-  { key: "investment",         label: "Investment",         color: "#f59e0b", max: 20 },
-  { key: "economic_readiness", label: "Economic Readiness", color: "#22c55e", max: 20 },
+  { key: "infrastructure", label: "Infrastructure", color: "#3B5BA5", max: 20 },
+  { key: "talent", label: "Talent", color: "#7A4F8C", max: 20 },
+  { key: "governance", label: "Governance", color: "#3F7A4D", max: 20 },
+  { key: "investment", label: "Investment", color: "#B58A2E", max: 20 },
+  { key: "economic_readiness", label: "Economic Readiness", color: "#8B4A3F", max: 20 },
 ] as const;
 
 interface Props {

@@ -10,8 +10,10 @@ import ExportButton from "@/components/ExportButton";
 import ComparisonPanel from "@/components/ComparisonPanel";
 import KeyInsights from "@/components/KeyInsights";
 import FastestMovers from "@/components/FastestMovers";
+import SiteHeader from "@/components/SiteHeader";
 import staticData from "@/data/countries.json";
 import type { ScoredCountry, ScoresResponse } from "@/lib/types";
+import { copyText } from "@/lib/copyText";
 
 type ViewMode = "grid" | "table";
 
@@ -158,7 +160,7 @@ export default function Home() {
   const toggleCompare = useCallback((slug: string) => {
     setCompareList((prev) => {
       if (prev.includes(slug)) return prev.filter((s) => s !== slug);
-      if (prev.length >= 3) { setCompareToast(true); setTimeout(() => setCompareToast(false), 2500); return prev; }
+      if (prev.length >= 4) { setCompareToast(true); setTimeout(() => setCompareToast(false), 2500); return prev; }
       return [...prev, slug];
     });
   }, []);
@@ -211,14 +213,11 @@ export default function Home() {
     ? new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(new Date(lastUpdated))
     : null;
 
-  const now = new Date();
-  const dateStr = now.toLocaleDateString("en-US", { weekday: "long", day: "2-digit", month: "short", year: "numeric" }).toUpperCase();
-
   function scrollToGrid() { gridRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }); }
-  function shareView() {
-    navigator.clipboard.writeText(window.location.href).then(() => {
+  async function shareView() {
+    if (await copyText(window.location.href)) {
       setShareToast(true); setTimeout(() => setShareToast(false), 2500);
-    });
+    }
   }
 
   const liveCount = countries.filter((c) => c.data_source === "live").length;
@@ -227,59 +226,12 @@ export default function Home() {
   return (
     <main style={{ minHeight: "100vh" }}>
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          EDITORIAL HEADER
-      ══════════════════════════════════════════════════════════════════════ */}
-      <header style={{ background: "var(--ed-bg)", borderBottom: "1px solid var(--ed-border)" }}>
-        {/* Date strip */}
-        <div style={{ borderBottom: "1px solid var(--ed-border)", padding: "8px 48px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--ed-text-2)", letterSpacing: "0.04em" }}>
-            <span>{dateStr}</span>
-            <span style={{ color: "var(--ed-border-strong)" }}>·</span>
-            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-              <span style={{ width: 6, height: 6, borderRadius: 3, background: usingLive ? "var(--positive)" : "var(--ed-muted)" }} />
-              {usingLive ? `LIVE · WORLD BANK · 17 INDICATORS` : fmtDate ? `CACHED · ${fmtDate}` : "LOADING DATA…"}
-            </span>
-          </div>
-          <div style={{ display: "flex", gap: 20, fontFamily: "var(--font-sans)", fontSize: 12, color: "var(--ed-text-2)" }}>
-            <Link href="/methodology" style={{ color: "inherit", textDecoration: "none" }}>Methodology</Link>
-            <a href="https://ankitmishra.ca" target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "none" }}>Cite</a>
-            <Link href="/map" style={{ color: "inherit", textDecoration: "none" }}>Map</Link>
-          </div>
-        </div>
-        {/* Masthead */}
-        <div style={{ padding: "20px 48px", display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
-          <div>
-            <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--signal)", fontWeight: 600, letterSpacing: "0.12em", marginBottom: 4 }}>VOL. III · 2026 EDITION</div>
-            <h1 style={{ fontFamily: "var(--font-display)", fontSize: 38, fontWeight: 400, fontStyle: "italic", letterSpacing: "-0.02em", color: "var(--ed-text-0)", lineHeight: 1, margin: 0 }}>
-              The AI Trajectory Index
-            </h1>
-          </div>
-          <nav style={{ display: "flex", gap: 28, fontFamily: "var(--font-sans)", fontSize: 13, fontWeight: 500, color: "var(--ed-text-1)" }}>
-            {[
-              { label: "Index",       href: "/" },
-              { label: "Map",         href: "/map" },
-              { label: "Compare",     href: "/compare" },
-              { label: "Adoption",    href: "/adoption" },
-              { label: "Methodology", href: "/methodology" },
-            ].map((l, i) => (
-              <Link key={l.href} href={l.href}
-                style={{
-                  color: i === 0 ? "var(--ed-text-0)" : "var(--ed-text-1)",
-                  borderBottom: i === 0 ? "2px solid var(--signal)" : "2px solid transparent",
-                  paddingBottom: 4, textDecoration: "none",
-                }}>
-                {l.label}
-              </Link>
-            ))}
-          </nav>
-        </div>
-      </header>
+      <SiteHeader activePage="index" usingLive={usingLive} lastFetched={lastUpdated} />
 
       {/* ══════════════════════════════════════════════════════════════════════
           HERO — editorial 2-col: headline + leaderboard preview
       ══════════════════════════════════════════════════════════════════════ */}
-      <section style={{ background: "var(--ed-bg)", padding: "64px 48px 80px" }}>
+      <section data-hero style={{ background: "var(--ed-bg)", padding: "64px 48px 80px" }}>
         <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 64, alignItems: "end" }}>
           {/* Left: editorial headline */}
           <div>
@@ -288,9 +240,9 @@ export default function Home() {
               GLOBAL · {countries.length} ECONOMIES · FIVE PILLARS
             </div>
             <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(48px, 6vw, 88px)", fontWeight: 400, lineHeight: 0.95, letterSpacing: "-0.03em", color: "var(--ed-text-0)", margin: 0 }}>
-              Who is winning the<br />
-              <em style={{ fontStyle: "italic", color: "var(--signal)" }}>AI race</em> — and who<br />
-              is being left behind?
+              Where can economies<br />
+              <em style={{ fontStyle: "italic", color: "var(--signal)" }}>build and use AI</em><br />
+              most effectively?
             </h2>
             <p style={{ fontFamily: "var(--font-display)", fontSize: 20, fontStyle: "italic", fontWeight: 400, color: "var(--ed-text-1)", lineHeight: 1.45, marginTop: 28, maxWidth: 560 }}>
               A live index scoring {countries.length} economies on AI readiness today and trajectory through 2028 — built on World Bank, OECD and World Governance Indicator data.
@@ -385,7 +337,7 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════════════════════════
           TWO LENSES
       ══════════════════════════════════════════════════════════════════════ */}
-      <section style={{ background: "var(--ed-bg)", padding: "64px 48px", borderTop: "1px solid var(--ed-border)" }}>
+      <section data-lenses style={{ background: "var(--ed-bg)", padding: "64px 48px", borderTop: "1px solid var(--ed-border)" }}>
         <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--ed-text-2)", letterSpacing: "0.16em", fontWeight: 700, marginBottom: 12 }}>METHODOLOGY · TWO LENSES</div>
         <h3 style={{ fontFamily: "var(--font-display)", fontSize: 32, fontWeight: 400, color: "var(--ed-text-0)", margin: "0 0 28px", letterSpacing: "-0.02em" }}>
           Capacity to build AI, and capacity to <em style={{ fontStyle: "italic" }}>use it.</em>
@@ -439,21 +391,20 @@ export default function Home() {
       </section>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          DATA TERMINAL — dark section begins here
+          GLOBAL INDEX
       ══════════════════════════════════════════════════════════════════════ */}
       <div style={{ background: "var(--dt-bg)", borderTop: "8px solid var(--signal)", padding: "32px 48px 0" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", borderBottom: "1px solid var(--dt-border)", paddingBottom: 24 }}>
           <div>
-            <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, letterSpacing: "0.16em", color: "var(--signal)", marginBottom: 8 }}>SECTION II · DATA TERMINAL</div>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, letterSpacing: "0.16em", color: "var(--signal)", marginBottom: 8 }}>SECTION II · GLOBAL INDEX</div>
             <h3 style={{ fontFamily: "var(--font-display)", fontSize: 40, fontWeight: 400, letterSpacing: "-0.025em", color: "var(--dt-text-0)", margin: 0, lineHeight: 1 }}>
               Explore <em style={{ fontStyle: "italic", color: "var(--signal)" }}>{countries.length} economies.</em>
             </h3>
           </div>
           <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--dt-text-3)", letterSpacing: "0.06em", textAlign: "right" as const, lineHeight: 1.7 }}>
             {fmtDate && <div>LAST FETCH · {fmtDate.toUpperCase()}</div>}
-            <div>NEXT REFRESH · 24H · WORLD BANK API</div>
             <div style={{ color: usingLive ? "var(--positive)" : "var(--dt-text-3)" }}>
-              {usingLive ? "● LIVE" : "○ CACHED"} · 17 INDICATORS · 24H CACHE
+              {usingLive ? "● LIVE SOURCES" : "○ BASELINE FALLBACK"} · 17 INDICATORS
             </div>
           </div>
         </div>
@@ -466,7 +417,7 @@ export default function Home() {
       />
 
       {/* ── Filter bar ── */}
-      <section style={{ background: "var(--dt-bg)", padding: "0 48px 24px" }} ref={gridRef}>
+      <section data-filterbar style={{ background: "var(--dt-bg)", padding: "0 48px 24px" }} ref={gridRef}>
         <FilterBar
           search={search} region={region} sort={sort} tier={tier} trajectoryFilter={trajectoryFilter}
           onSearch={setSearch} onRegion={setRegion} onSort={setSort} onTier={setTier} onTrajectoryFilter={setTrajectory}
@@ -497,7 +448,7 @@ export default function Home() {
       </section>
 
       {/* ── Country Grid ── */}
-      <section style={{ background: "var(--dt-bg)", padding: "0 48px 40px" }}>
+      <section data-grid style={{ background: "var(--dt-bg)", padding: "0 48px 40px" }}>
         {loading ? (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
             {Array.from({ length: 12 }).map((_, i) => <SkeletonCard key={i} />)}
@@ -564,7 +515,7 @@ export default function Home() {
 
       {/* ── Regional Bands ── */}
       {!loading && (
-        <section style={{ background: "var(--dt-bg)", padding: "32px 48px 48px", borderTop: "1px solid var(--dt-border)" }}>
+        <section data-regional style={{ background: "var(--dt-bg)", padding: "32px 48px 48px", borderTop: "1px solid var(--dt-border)" }}>
           <div style={{ display: "grid", gridTemplateColumns: "240px 1fr", gap: 48 }}>
             <div>
               <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--signal)", letterSpacing: "0.16em", fontWeight: 700, marginBottom: 6 }}>REGIONAL AVERAGE</div>
@@ -602,19 +553,19 @@ export default function Home() {
               The AI Trajectory Index
             </h5>
             <p style={{ fontFamily: "var(--font-display)", fontSize: 15, fontStyle: "italic", color: "var(--ed-text-1)", margin: "0 0 16px", lineHeight: 1.5, maxWidth: 380 }}>
-              Tracking which nations are winning the AI race — and why. Built by Ankit Mishra, independent research at the intersection of AI governance and emerging markets.
+              Comparing national capacity to build and adopt AI. Built by Ankit Mishra as independent research on AI governance and emerging markets.
             </p>
             <div style={{ display: "flex", gap: 12 }}>
               <a href="https://ankitmishra.ca" target="_blank" rel="noopener noreferrer"
                 style={{ fontFamily: "var(--font-sans)", fontSize: 12, color: "var(--ed-text-1)", borderBottom: "1px solid var(--ed-text-1)", paddingBottom: 1, textDecoration: "none" }}>ankitmishra.ca ↗</a>
-              <a href="https://linkedin.com/in/ankitmishra01" target="_blank" rel="noopener noreferrer"
+              <a href="https://linkedin.com/in/ankitmishra3" target="_blank" rel="noopener noreferrer"
                 style={{ fontFamily: "var(--font-sans)", fontSize: 12, color: "var(--ed-text-1)", borderBottom: "1px solid var(--ed-text-1)", paddingBottom: 1, textDecoration: "none" }}>LinkedIn ↗</a>
             </div>
           </div>
           {[
             { title: "Sections", items: [{ label: "Index", href: "/" }, { label: "Map", href: "/map" }, { label: "Compare", href: "/compare" }, { label: "Adoption", href: "/adoption" }, { label: "Methodology", href: "/methodology" }] },
             { title: "Regions", items: [{ label: "Americas", href: "/americas" }, { label: "Europe", href: "/europe" }, { label: "Asia-Pacific", href: "/asia-pacific" }, { label: "Middle East", href: "/middle-east" }, { label: "Africa", href: "/africa" }] },
-            { title: "Sources", items: [{ label: "World Bank", href: "#" }, { label: "OECD AI Observatory", href: "#" }, { label: "World Governance Indicators", href: "#" }, { label: "OECD AI Policy", href: "#" }, { label: "Anthropic Index", href: "#" }] },
+            { title: "Sources", items: [{ label: "World Bank", href: "https://data.worldbank.org" }, { label: "OECD AI Observatory", href: "https://oecd.ai" }, { label: "World Governance Indicators", href: "https://www.worldbank.org/en/publication/worldwide-governance-indicators" }, { label: "GDELT", href: "https://www.gdeltproject.org" }, { label: "Anthropic Index", href: "https://www.anthropic.com/economic-index" }] },
           ].map((col) => (
             <div key={col.title}>
               <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--signal)", letterSpacing: "0.16em", fontWeight: 700, marginBottom: 14 }}>{col.title.toUpperCase()}</div>
@@ -666,7 +617,7 @@ export default function Home() {
           color: "var(--dt-text-0)", fontFamily: "var(--font-sans)", fontSize: 13,
           boxShadow: "0 4px 24px rgba(0,0,0,.6)", pointerEvents: "none",
         }}>
-          Max 3 countries in comparison.
+          Max 4 countries in comparison.
         </div>
       )}
     </main>

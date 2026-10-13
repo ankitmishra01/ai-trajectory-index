@@ -4,10 +4,9 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer,
+  RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer,
 } from "recharts";
 import staticData from "@/data/countries.json";
-import { useCountUp } from "@/hooks/useCountUp";
 import SiteHeader from "@/components/SiteHeader";
 
 const PILLARS = [
@@ -19,6 +18,11 @@ const PILLARS = [
 ] as const;
 
 const COLORS = ["#D64528", "#3F7A4D"] as const;
+const PILLAR_COLORS: Record<typeof PILLARS[number]["key"], string> = {
+  infrastructure: "var(--pillar-infra)", talent: "var(--pillar-talent)",
+  governance: "var(--pillar-gov)", investment: "var(--pillar-invest)",
+  economic_readiness: "var(--pillar-econ)",
+};
 
 function scoreColor(s: number) {
   if (s >= 80) return "var(--positive)";
@@ -28,8 +32,7 @@ function scoreColor(s: number) {
 }
 
 function ScoreNum({ value, color }: { value: number; color: string }) {
-  const animated = useCountUp(value, 800);
-  return <span style={{ color }}>{animated}</span>;
+  return <span className="score-nowrap" style={{ color }}>{value}<small style={{ fontSize: 11, color: "var(--ed-text-2)" }}> /100</small></span>;
 }
 
 function CountrySearch({ value, onChange, exclude }: {
@@ -102,10 +105,11 @@ export default function ComparePage({ params }: { params: { a: string; b: string
     <main style={{ minHeight: "100vh", background: "var(--dt-bg)" }}>
       <SiteHeader activePage="compare" />
 
-      <div style={{ maxWidth: 960, margin: "0 auto", padding: "32px 24px" }}>
+      <div className="page-shell" style={{ maxWidth: 1120 }}>
+        <div style={{ marginBottom: 28 }}><div className="eyebrow">SIDE-BY-SIDE ANALYSIS</div><h1 style={{ font: "450 clamp(34px,5vw,58px)/1 var(--font-display)", letterSpacing: "-.03em", margin: "8px 0 10px" }}>Compare AI readiness.</h1><p style={{ color: "var(--ed-text-1)", maxWidth: 650 }}>See overall standing, pillar strengths, trajectory and the 2028 outlook on one consistent scale.</p></div>
 
         {/* Country pickers */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 24 }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: 16, marginBottom: 24 }}>
           {([{ slug: slugA, setSlug: setSlugA, exclude: slugB, color: COLORS[0] },
              { slug: slugB, setSlug: setSlugB, exclude: slugA, color: COLORS[1] }] as const).map(
             ({ setSlug, exclude, color }, i) => {
@@ -149,10 +153,11 @@ export default function ComparePage({ params }: { params: { a: string; b: string
               <h2 style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", color: "var(--dt-text-3)", marginBottom: 16 }}>
                 5-PILLAR RADAR
               </h2>
-              <ResponsiveContainer width="100%" height={300}>
+              <ResponsiveContainer width="100%" height={300} minWidth={0}>
                 <RadarChart data={radarData}>
-                  <PolarGrid stroke="rgba(255,255,255,.06)" />
+                  <PolarGrid stroke="var(--ed-border-strong)" />
                   <PolarAngleAxis dataKey="subject" tick={{ fill: "var(--dt-text-3)", fontSize: 11, fontFamily: "var(--font-sans)" }} />
+                  <PolarRadiusAxis domain={[0, 20]} tick={false} axisLine={false} />
                   <Radar name={ca.name} dataKey="A" stroke={COLORS[0]} fill={COLORS[0]} fillOpacity={0.12} strokeWidth={2} />
                   <Radar name={cb.name} dataKey="B" stroke={COLORS[1]} fill={COLORS[1]} fillOpacity={0.12} strokeWidth={2} />
                 </RadarChart>
@@ -192,11 +197,11 @@ export default function ComparePage({ params }: { params: { a: string; b: string
                       </div>
                       <div style={{ display: "flex", gap: 2, alignItems: "center" }}>
                         <div style={{ flex: 1, display: "flex", justifyContent: "flex-end", height: 6, background: "var(--dt-raised)", overflow: "hidden" }}>
-                          <div style={{ width: `${(sA / 20) * 100}%`, background: COLORS[0] }} />
+                          <div style={{ width: `${(sA / 20) * 100}%`, background: PILLAR_COLORS[key] }} />
                         </div>
                         <div style={{ width: 1, height: 10, flexShrink: 0, background: "var(--dt-border-strong)" }} />
                         <div style={{ flex: 1, height: 6, background: "var(--dt-raised)", overflow: "hidden" }}>
-                          <div style={{ width: `${(sB / 20) * 100}%`, background: COLORS[1] }} />
+                          <div style={{ width: `${(sB / 20) * 100}%`, background: PILLAR_COLORS[key], opacity: .62 }} />
                         </div>
                       </div>
                     </div>
@@ -206,7 +211,7 @@ export default function ComparePage({ params }: { params: { a: string; b: string
             </div>
 
             {/* Trajectory + projection */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: 16 }}>
               {[{ c: ca, rank: rankA, color: COLORS[0] }, { c: cb, rank: rankB, color: COLORS[1] }].map(({ c, rank, color }) => {
                 const delta = c.projected_score_2028 - c.total_score;
                 return (

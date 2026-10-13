@@ -104,15 +104,23 @@ function triggerDownload(content: string, filename: string, type: string) {
 
 export default function ExportButton({ countries, globalRanks, pillarWeights }: Props) {
   const [open, setOpen] = useState(false);
+  const [downloaded, setDownloaded] = useState<"CSV" | "JSON" | null>(null);
+
+  function confirmDownload(format: "CSV" | "JSON") {
+    setDownloaded(format);
+    window.setTimeout(() => setDownloaded(null), 2200);
+  }
 
   function downloadCSV() {
     triggerDownload(buildCSV(countries, globalRanks, pillarWeights), "ai_trajectory_index_2026_data.csv", "text/csv");
     setOpen(false);
+    confirmDownload("CSV");
   }
 
   function downloadJSON() {
     triggerDownload(buildJSON(countries, globalRanks), "ai_trajectory_index_2026_data.json", "application/json");
     setOpen(false);
+    confirmDownload("JSON");
   }
 
   return (
@@ -125,8 +133,9 @@ export default function ExportButton({ countries, globalRanks, pillarWeights }: 
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
             d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
         </svg>
-        Export
+        {downloaded ? `${downloaded} downloaded ✓` : "Export"}
       </button>
+      <span className="sr-only" role="status" aria-live="polite">{downloaded ? `${downloaded} download started` : ""}</span>
 
       {open && (
         <>

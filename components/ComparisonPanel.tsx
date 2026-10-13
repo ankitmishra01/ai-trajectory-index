@@ -14,7 +14,7 @@ interface Props {
   onClear: () => void;
 }
 
-const PALETTE = ["#3b82f6", "#8b5cf6", "#22c55e"];
+const PALETTE = ["#3B5BA5", "#7A4F8C", "#3F7A4D", "#B58A2E"];
 
 const PILLAR_LABELS: Record<string, string> = {
   infrastructure:    "Infrastructure",
@@ -74,7 +74,7 @@ export default function ComparisonPanel({ selected, onRemove, onClear }: Props) 
             ))}
           </span>
           <span>
-            Comparing <span style={{ color: "var(--accent)" }}>{selected.length}</span>/3
+            Comparing <span style={{ color: "var(--accent)" }}>{selected.length}</span>/4
           </span>
           <svg className="w-3.5 h-3.5 shrink-0" style={{ color: "var(--text-3)" }}
             fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -102,7 +102,7 @@ export default function ComparisonPanel({ selected, onRemove, onClear }: Props) 
         style={{ borderBottom: "1px solid var(--border)" }}>
         <div className="flex items-center gap-2">
           <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--accent)" }}>
-            Comparing {selected.length}/3
+            Comparing {selected.length}/4
           </span>
           {selected.length < 2 && (
             <span className="text-xs" style={{ color: "var(--text-3)" }}>
@@ -159,7 +159,7 @@ export default function ComparisonPanel({ selected, onRemove, onClear }: Props) 
                 Pillar Comparison (0–20)
               </p>
               <div style={{ height: 240 }}>
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                   <RadarChart data={radarData} margin={{ top: 10, right: 30, bottom: 10, left: 30 }}>
                     <PolarGrid stroke="rgba(59,130,246,.15)" />
                     <PolarAngleAxis

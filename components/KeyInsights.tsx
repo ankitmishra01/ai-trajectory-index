@@ -71,7 +71,7 @@ export default function KeyInsights({ countries, onSortChange, onRegionChange, o
   ];
 
   return (
-    <section style={{ background: "var(--ed-raised)", padding: "64px 48px", borderTop: "1px solid var(--ed-border)" }}>
+    <section data-insights style={{ background: "var(--ed-raised)", padding: "64px 48px", borderTop: "1px solid var(--ed-border)" }}>
       <div style={{ display: "grid", gridTemplateColumns: "240px 1fr", gap: 48 }}>
         <div>
           <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--signal)", letterSpacing: "0.16em", fontWeight: 700, marginBottom: 12 }}>AT A GLANCE</div>

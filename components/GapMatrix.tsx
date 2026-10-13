@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import {
   ScatterChart, Scatter, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, ReferenceLine, Label,
+  Tooltip, ReferenceLine, Label,
 } from "recharts";
 import type { EnrichedAdoption } from "@/lib/adoption";
 
@@ -136,9 +136,11 @@ export default function GapMatrix({ data }: Props) {
       </div>
 
       {/* Chart */}
-      <div className="px-4 sm:px-6 pt-2 pb-6" style={{ height: 460 }}>
-        <ResponsiveContainer width="100%" height="100%">
+      <div className="px-4 sm:px-6 pt-2 pb-6" style={{ height: 460, overflow: "hidden" }}>
           <ScatterChart
+            width={1000}
+            height={430}
+            style={{ width: "100%", height: "100%" }}
             margin={{ top: 20, right: 30, bottom: 30, left: 10 }}
             onClick={handleClick}
             onMouseMove={handleMouseMove}
@@ -184,7 +186,6 @@ export default function GapMatrix({ data }: Props) {
               shape={(props: any) => <CustomDot {...props} activeSlug={activeSlug} />}
             />
           </ScatterChart>
-        </ResponsiveContainer>
       </div>
 
       {/* Quadrant summary pills */}

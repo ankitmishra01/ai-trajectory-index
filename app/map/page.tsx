@@ -60,6 +60,8 @@ export default function MapPage() {
   const [input, setInput] = useState("");
   const [thinking, setThinking] = useState(false);
   const [mobilePanelOpen, setMobilePanelOpen] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+  const [usingLive, setUsingLive] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   // Adoption score lookup
@@ -129,7 +131,11 @@ export default function MapPage() {
   useEffect(() => {
     fetch("/api/scores")
       .then((r) => r.json())
-      .then((data: ScoresResponse) => setCountries(data.countries))
+      .then((data: ScoresResponse) => {
+        setCountries(data.countries);
+        setLastUpdated(data.last_updated);
+        setUsingLive(data.using_live_data);
+      })
       .catch(() => {});
   }, []);
 
@@ -202,7 +208,12 @@ export default function MapPage() {
 
   return (
     <main style={{ minHeight: "100vh", background: "var(--dt-bg)", display: "flex", flexDirection: "column" }}>
-      <SiteHeader activePage="map" />
+      <SiteHeader activePage="map" usingLive={usingLive} lastFetched={lastUpdated} />
+      <div style={{ padding: "28px 48px 22px", borderBottom: "1px solid var(--ed-border)" }}>
+        <div className="eyebrow">GEOGRAPHIC VIEW</div>
+        <h1 style={{ font: "450 clamp(34px,5vw,58px)/1 var(--font-display)", letterSpacing: "-.03em", margin: "8px 0 10px" }}>AI readiness, mapped.</h1>
+        <p style={{ color: "var(--ed-text-1)", maxWidth: 720 }}>Switch between readiness, adoption and the five pillars. Select a country with a pointer or keyboard to inspect and compare it.</p>
+      </div>
 
       {/* Control bar */}
       <div style={{ background: "var(--dt-bg)", borderBottom: "1px solid var(--dt-border)", padding: "8px 16px", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" as const }}>
@@ -290,7 +301,7 @@ export default function MapPage() {
         {mobilePanelOpen ? "Close" : `Chat${selectedSlugs.size > 0 ? ` · ${selectedSlugs.size}` : ""}`}
       </button>
 
-      <div style={{ display: "flex", flex: 1, maxWidth: 1600, margin: "0 auto", width: "100%", flexDirection: "column" }} className="lg:flex-row">
+      <div style={{ flex: 1, maxWidth: 1600, margin: "0 auto", width: "100%" }} className="flex flex-col lg:flex-row">
         {/* Left: Map */}
         <div style={{ flex: 1, padding: 16 }}>
           {/* Mode hint */}

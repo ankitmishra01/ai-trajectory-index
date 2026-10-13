@@ -20,11 +20,8 @@ const DIMS = [
 ] as const;
 
 const DIM_COLORS: Record<string, string> = {
-  infrastructure:    "#3b82f6",
-  talent:            "#8b5cf6",
-  governance:        "#06b6d4",
-  investment:        "#f59e0b",
-  economic_readiness:"#22c55e",
+  infrastructure: "#3B5BA5", talent: "#7A4F8C", governance: "#3F7A4D",
+  investment: "#B58A2E", economic_readiness: "#8B4A3F",
 };
 
 type SortCol = "rank" | "total_score" | "trajectory_score" | "projected_score_2028"

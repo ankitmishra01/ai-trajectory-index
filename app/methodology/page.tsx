@@ -80,9 +80,9 @@ const PRIMARY_SOURCES = [
     coverage: "186 countries",
     color: "#22c55e",
     icon: "🏦",
-    whatItMeasures: "Six live indicators: internet users (% population), mobile subscriptions per 100, tertiary enrolment ratio, R&D expenditure (% GDP), GDP per capita (USD), electricity access (% population). Two most-recent data points per indicator for trend calculation.",
-    howWeUseIt: "Primary quantitative backbone. The most recent available indicator values drive Infrastructure, Talent, Investment, and Economic Readiness pillar scores. Year-over-year changes feed the trajectory calculation. Live data is fetched daily with a 24-hour server cache; static baseline serves as fallback.",
-    keyInsight: "R&D expenditure (% GDP) has the strongest correlation (r=0.74) with total AI readiness score of all six indicators — stronger than internet penetration or GDP per capita.",
+    whatItMeasures: "Seventeen live indicators spanning connectivity, electricity, tertiary enrolment, labour productivity, governance, R&D, FDI, GDP per capita at purchasing-power parity, private credit, trade, services and high-tech exports.",
+    howWeUseIt: "Primary quantitative backbone. The latest available values feed all five readiness pillars, while multi-year changes feed trajectory. Responses use a 24-hour server cache and country-level gaps fall back to the documented static baseline.",
+    keyInsight: "One source and one normalization pipeline keep comparable macroeconomic evidence consistent across all 186 economies.",
     dimensions: ["Infrastructure", "Talent", "Investment", "Economic Readiness"],
   },
   {
@@ -148,10 +148,11 @@ const PILLARS = [
     icon: "🔌",
     description: "The physical and digital foundation for AI deployment.",
     measures: [
-      "Internet users as % of population — World Bank IT.NET.USER.ZS (8 pts)",
-      "Mobile cellular subscriptions per 100 people — World Bank IT.CEL.SETS.P2 (5 pts)",
-      "Electricity access as % of population — World Bank EG.ELC.ACCS.ZS (5 pts)",
-      "Infrastructure quality proxy (2 pts) — derived from ITU IDI scores and qualitative data centre assessments",
+      "Fixed broadband subscriptions per 100 people — World Bank IT.NET.BBN.P2 (6 pts)",
+      "Internet users as % of population — World Bank IT.NET.USER.ZS (3 pts)",
+      "Mobile subscriptions per 100 people — World Bank IT.CEL.SETS.P2 (3 pts)",
+      "Electricity access — World Bank EG.ELC.ACCS.ZS (3 pts)",
+      "Static infrastructure-quality baseline (5 pts)",
     ],
     sources: ["World Bank", "ITU IDI"],
   },
@@ -163,9 +164,9 @@ const PILLARS = [
     icon: "🎓",
     description: "The human capital pipeline for AI development and deployment.",
     measures: [
-      "Gross tertiary enrolment ratio — World Bank SE.TER.ENRR (8 pts)",
-      "R&D expenditure as % of GDP — World Bank GB.XPD.RSDV.GD.ZS (8 pts)",
-      "Talent quality proxy (4 pts) — GII university ranking presence, Stanford HAI research output, WEF AI upskilling commitment",
+      "Gross tertiary enrolment ratio — World Bank SE.TER.ENRR (6 pts)",
+      "Labour productivity, GDP per person employed at PPP — World Bank SL.GDP.PCAP.EM.KD (6 pts)",
+      "Static talent-quality baseline (8 pts)",
     ],
     sources: ["World Bank", "Stanford HAI", "Global Innovation Index", "WEF Future of Jobs"],
   },
@@ -177,10 +178,11 @@ const PILLARS = [
     icon: "⚖️",
     description: "Policy maturity, regulatory frameworks, and government AI strategy.",
     measures: [
-      "National AI strategy adoption — OECD.AI Observatory (8 pts base; +2 bonus if post-2022)",
-      "AI-specific regulation or data protection law — OECD.AI / Oxford Insights (5 pts)",
-      "OECD membership — proxy for institutional regulatory capacity (3 pts)",
-      "Digital governance proxy (2 pts) — Oxford Insights Government AI Readiness, Stanford HAI legislative activity",
+      "Rule of Law WGI estimate (5 pts)",
+      "Government Effectiveness WGI estimate (4 pts)",
+      "Regulatory Quality WGI estimate (3 pts)",
+      "National AI strategy plus recency — OECD.AI policy data (3 + 2 pts)",
+      "AI regulation flag (1 pt) and static governance baseline (2 pts)",
     ],
     sources: ["OECD.AI Observatory", "Oxford Insights", "Stanford HAI"],
   },
@@ -193,8 +195,8 @@ const PILLARS = [
     description: "Capital flowing into AI — public R&D, private venture capital, and FDI.",
     measures: [
       "R&D expenditure as % of GDP — World Bank GB.XPD.RSDV.GD.ZS (6 pts)",
-      "GDP per capita USD — World Bank NY.GDP.PCAP.CD (6 pts, proxy for private capital availability)",
-      "VC and ecosystem proxy (8 pts) — OECD.AI VC data, Tortoise commercial activity, GII innovation output",
+      "FDI net inflows as % of GDP — World Bank BX.KLT.DINV.WD.GD.ZS (5 pts)",
+      "Static venture-capital ecosystem baseline (9 pts)",
     ],
     sources: ["World Bank", "OECD.AI Observatory", "Tortoise Global AI Index", "Global Innovation Index"],
   },
@@ -206,10 +208,11 @@ const PILLARS = [
     icon: "📊",
     description: "The economy's structural capacity to adopt and commercialise AI.",
     measures: [
-      "GDP per capita USD — World Bank NY.GDP.PCAP.CD (8 pts)",
-      "Electricity access — World Bank EG.ELC.ACCS.ZS (4 pts)",
-      "Internet and mobile penetration — World Bank composite (4 pts)",
-      "AI adoption readiness proxy (4 pts) — Anthropic Economic Index augmentation ratio, WEF employer AI adoption rates, IMF AIPI economic integration dimension",
+      "GDP per capita at constant PPP — World Bank NY.GDP.PCAP.PP.KD (6 pts)",
+      "Private credit as % of GDP (3 pts)",
+      "Trade openness (3 pts)",
+      "Services share of GDP (3 pts)",
+      "Static economic-readiness baseline (5 pts)",
     ],
     sources: ["World Bank", "Anthropic Economic Index", "IMF AIPI", "WEF Future of Jobs"],
   },
@@ -414,15 +417,17 @@ export default function MethodologyPage() {
             Trajectory Score &amp; 2028 Projection
           </p>
           <p style={{ fontFamily: "var(--font-sans)", fontSize: 14, lineHeight: 1.65, color: "var(--ed-text-2)", margin: "0 0 20px" }}>
-            The trajectory score (–10 to +10) reflects momentum. Four forward-looking components:
+            The trajectory score (–10 to +10) reflects momentum across seven documented signals:
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 24 }}>
             {[
-              { label: "GDP growth rate (3-year avg)", weight: "25%", source: "World Bank NY.GDP.MKTP.KD.ZG", note: "Structural proxy for economic capacity to fund AI investment. Compounding growth signals a broadening tax base and increasing government AI budget." },
-              { label: "Internet penetration growth",  weight: "20%", source: "World Bank IT.NET.USER.ZS (YoY delta)", note: "Captures digital adoption momentum. Accelerating internet growth predicts faster AI tool adoption cycles within 2–3 years." },
-              { label: "AI strategy recency",          weight: "25%", source: "OECD.AI Observatory", note: "Countries with post-2020 strategies receive a strong positive signal (reflecting active, not archival, government engagement). No strategy = negative weighting." },
-              { label: "R&D spending trend",           weight: "15%", source: "World Bank GB.XPD.RSDV.GD.ZS (YoY delta)", note: "Year-over-year change in R&D as % of GDP. Increasing R&D signals a structural commitment to innovation that produces compounding AI capability returns." },
-              { label: "AI adoption momentum proxy",   weight: "15%", source: "Anthropic Economic Index · Stanford HAI · WEF", note: "Incorporates AI augmentation adoption rates (Anthropic), employer upskilling commitments (WEF), and research output growth (Stanford HAI)." },
+              { label: "GDP growth", weight: "20%", source: "World Bank", note: "Measures broad economic momentum." },
+              { label: "R&D spending trend", weight: "15%", source: "World Bank GB.XPD.RSDV.GD.ZS", note: "Measures change in national research intensity." },
+              { label: "Labour productivity trend", weight: "15%", source: "World Bank SL.GDP.PCAP.EM.KD", note: "Tracks output growth per worker." },
+              { label: "High-tech exports trend", weight: "20%", source: "World Bank TX.VAL.TECH.MF.ZS", note: "Captures movement toward technology-intensive production." },
+              { label: "Fixed broadband growth", weight: "10%", source: "World Bank IT.NET.BBN.P2", note: "Tracks improvement in high-quality connectivity." },
+              { label: "National AI strategy", weight: "10%", source: "OECD.AI policy data", note: "Adds a forward policy signal where an active strategy exists." },
+              { label: "Static trajectory baseline", weight: "10%", source: "Curated baseline", note: "Retains country context not represented in the live indicators." },
             ].map((item) => (
               <div key={item.label} style={{
                 background: "var(--ed-bg)",

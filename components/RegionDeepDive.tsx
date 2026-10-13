@@ -13,13 +13,14 @@ import { TIER_COLORS, DIM_COLORS } from "@/lib/adoption";
 import type { EnrichedAdoption } from "@/lib/adoption";
 import type { ScoredCountry, ScoresResponse } from "@/lib/types";
 import type { RegionConfig } from "@/lib/regionConfigs";
+import SiteHeader from "@/components/SiteHeader";
 
 const PILLARS = [
-  { key: "infrastructure",    label: "Infrastructure",   short: "Infra",  color: "#3b82f6" },
-  { key: "talent",            label: "Talent",           short: "Talent", color: "#8b5cf6" },
-  { key: "governance",        label: "Governance",       short: "Gov",    color: "#06b6d4" },
-  { key: "investment",        label: "Investment",       short: "Invest", color: "#f59e0b" },
-  { key: "economic_readiness",label: "Econ. Readiness",  short: "Econ",   color: "#22c55e" },
+  { key: "infrastructure",    label: "Infrastructure",   short: "Infra",  color: "#3B5BA5" },
+  { key: "talent",            label: "Talent",           short: "Talent", color: "#7A4F8C" },
+  { key: "governance",        label: "Governance",       short: "Gov",    color: "#3F7A4D" },
+  { key: "investment",        label: "Investment",       short: "Invest", color: "#B58A2E" },
+  { key: "economic_readiness",label: "Econ. Readiness",  short: "Econ",   color: "#8B4A3F" },
 ] as const;
 
 function avg(nums: number[]): number {
@@ -154,15 +155,11 @@ export default function RegionDeepDive({ config }: Props) {
   return (
     <main className="min-h-screen" style={{ background: "var(--bg)" }}>
       <div className="page-glow" />
+      <SiteHeader />
 
       {/* Header */}
-      <header className="sticky top-0 z-50 backdrop-blur-sm"
-        style={{ borderBottom: "1px solid var(--border)", background: "rgba(6,11,20,.94)" }}>
+      <header style={{ borderBottom: "1px solid var(--border)", background: "var(--ed-raised)" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center gap-3 flex-wrap">
-          <Link href="/" className="text-sm transition-colors hover:text-white" style={{ color: "var(--text-3)" }}>
-            ← Index
-          </Link>
-          <span style={{ color: "var(--border)" }}>|</span>
           <h1 className="text-sm font-black font-display" style={{ color: "var(--text-1)" }}>
             {config.emoji} {config.name} AI Deep-Dive
           </h1>
@@ -443,7 +440,7 @@ export default function RegionDeepDive({ config }: Props) {
               <div className="h-56 skeleton rounded-xl" />
             ) : (
               <div style={{ height: 280 }}>
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                   <BarChart
                     data={gapData}
                     layout="vertical"

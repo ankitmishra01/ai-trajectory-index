@@ -2,7 +2,7 @@
 
 import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis,
-  ResponsiveContainer, Legend, Tooltip,
+  Legend, Tooltip,
 } from "recharts";
 import type { ScoredCountry } from "@/lib/types";
 import type { AdoptionEntry } from "@/lib/adoption";
@@ -53,9 +53,8 @@ export default function DualRadar({ country, adoption }: Props) {
           Blue = readiness capacity · Green = active adoption · Each axis pairs the closest dimension from each framework
         </p>
       </div>
-      <div style={{ height: 280 }}>
-        <ResponsiveContainer width="100%" height="100%">
-          <RadarChart data={data} margin={{ top: 10, right: 30, bottom: 10, left: 30 }}>
+      <div style={{ height: 280, overflow: "hidden" }}>
+          <RadarChart width={700} height={280} style={{ width: "100%", height: "100%" }} data={data} margin={{ top: 10, right: 30, bottom: 10, left: 30 }}>
             <PolarGrid stroke="rgba(59,130,246,.12)" />
             <PolarAngleAxis
               dataKey="subject"
@@ -91,7 +90,6 @@ export default function DualRadar({ country, adoption }: Props) {
               }}
             />
           </RadarChart>
-        </ResponsiveContainer>
       </div>
     </div>
   );

@@ -1,7 +1,5 @@
 "use client";
 
-import { useCountUp } from "@/hooks/useCountUp";
-
 interface ScoreGaugeProps {
   score: number;
   size?: number;
@@ -19,21 +17,20 @@ function arc(cx: number, cy: number, r: number, a1: number, a2: number) {
 }
 
 function colors(score: number) {
-  if (score >= 80) return { stroke: "#22c55e", glow: "rgba(34,197,94,.55)",  text: "#4ade80" };
-  if (score >= 60) return { stroke: "#3b82f6", glow: "rgba(59,130,246,.55)", text: "#93c5fd" };
-  if (score >= 40) return { stroke: "#f59e0b", glow: "rgba(245,158,11,.55)", text: "#fcd34d" };
-  return               { stroke: "#ef4444", glow: "rgba(239,68,68,.55)",  text: "#fca5a5" };
+  if (score >= 80) return { stroke: "#3F7A4D", glow: "rgba(63,122,77,.22)", text: "#3F7A4D" };
+  if (score >= 60) return { stroke: "#3B5BA5", glow: "rgba(59,91,165,.22)", text: "#3B5BA5" };
+  if (score >= 40) return { stroke: "#B58A2E", glow: "rgba(181,138,46,.22)", text: "#8D691B" };
+  return { stroke: "#A8513D", glow: "rgba(168,81,61,.22)", text: "#A8513D" };
 }
 
 export default function ScoreGauge({ score, size = 200 }: ScoreGaugeProps) {
-  const animated = useCountUp(score, 900);
   const cx = size / 2;
   const cy = size / 2 + 10;
   const r  = size * 0.38;
   const sw = size * 0.075;
   const a1 = -210, a2 = 30;
-  const filled = a1 + (animated / 100) * (a2 - a1);
-  const { stroke, glow, text } = colors(animated);
+  const filled = a1 + (score / 100) * (a2 - a1);
+  const { stroke, glow, text } = colors(score);
 
   return (
     <div className="flex flex-col items-center">
@@ -58,7 +55,7 @@ export default function ScoreGauge({ score, size = 200 }: ScoreGaugeProps) {
           fill={text} fontSize={size * 0.22} fontWeight="900"
           fontFamily="Inter, system-ui, sans-serif"
           style={{ filter: `drop-shadow(0 0 8px ${glow})` }}>
-          {animated}
+          {score}
         </text>
         <text x={cx} y={cy + size * 0.17} textAnchor="middle" dominantBaseline="middle"
           fill="var(--text-3)" fontSize={size * 0.08} fontFamily="Inter, system-ui, sans-serif">

@@ -160,8 +160,11 @@ function MapContent({
                 key={geo.rsmKey}
                 geography={geo}
                 fill={fill}
-                stroke="#0a0f1e"
+                stroke="#FBF9F4"
                 strokeWidth={0.4}
+                tabIndex={slug && mode === "view" ? 0 : -1}
+                role={slug && mode === "view" ? "button" : undefined}
+                aria-label={slug ? `${countryNames[slug] ?? slug}: ${score ?? "no"} AI readiness score. Select country.` : undefined}
                 style={{
                   default: { outline: "none" },
                   hover: {
@@ -174,6 +177,12 @@ function MapContent({
                 }}
                 onClick={() => {
                   if (slug && mode === "view") onCountryClick(slug);
+                }}
+                onKeyDown={(e: React.KeyboardEvent) => {
+                  if (slug && mode === "view" && (e.key === "Enter" || e.key === " ")) {
+                    e.preventDefault();
+                    onCountryClick(slug);
+                  }
                 }}
                 onMouseEnter={(e: React.MouseEvent) => {
                   if (!slug) return;
@@ -238,6 +247,7 @@ export default function WorldMap({
   return (
     <div className="relative w-full select-none">
       <ComposableMap
+        aria-label="World map of AI readiness scores. Countries are keyboard selectable."
         width={900}
         height={460}
         projection="geoEqualEarth"
@@ -256,7 +266,7 @@ export default function WorldMap({
       </ComposableMap>
 
       {/* Score legend */}
-      <div className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-[#0a0f1e]/90 border border-[#1c2847] rounded-lg px-3 py-2 pointer-events-none">
+      <div className="absolute bottom-3 left-3 flex flex-wrap items-center gap-1.5 px-3 py-2 pointer-events-none" style={{ background: "rgba(255,254,250,.94)", border: "1px solid var(--ed-border-strong)", color: "var(--ed-text-1)" }}>
         {[
           { color: "#dc2626", label: "0–20" },
           { color: "#ea580c", label: "20–40" },
@@ -269,10 +279,10 @@ export default function WorldMap({
               className="w-3 h-3 rounded-sm"
               style={{ backgroundColor: color }}
             />
-            <span className="text-[10px] text-slate-400">{label}</span>
+            <span className="text-[10px]">{label}</span>
           </div>
         ))}
-        <span className="text-[10px] text-slate-600 ml-1">AI Score</span>
+        <span className="text-[10px] ml-1">AI Score</span>
       </div>
 
       {/* Tooltip */}

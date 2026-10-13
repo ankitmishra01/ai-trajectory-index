@@ -41,7 +41,7 @@ export default function FastestMovers({ countries, onSortClick }: FastestMoversP
     : null;
 
   return (
-    <section style={{ background: "var(--dt-bg)", padding: "40px 48px" }}>
+    <section data-movers style={{ background: "var(--dt-bg)", padding: "40px 48px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 20 }}>
         <div>
           <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--signal)", letterSpacing: "0.16em", fontWeight: 700, marginBottom: 4 }}>↑ TRAJECTORY</div>

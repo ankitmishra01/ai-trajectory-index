@@ -12,11 +12,11 @@ type PolicyData = {
 };
 
 const PILLARS = [
-  { key: "infrastructure",     label: "Infrastructure",     color: "#3b82f6" },
-  { key: "talent",             label: "Talent",             color: "#8b5cf6" },
-  { key: "governance",         label: "Governance",         color: "#06b6d4" },
-  { key: "investment",         label: "Investment",         color: "#f59e0b" },
-  { key: "economic_readiness", label: "Economic Readiness", color: "#22c55e" },
+  { key: "infrastructure", label: "Infrastructure", color: "#3B5BA5" },
+  { key: "talent", label: "Talent", color: "#7A4F8C" },
+  { key: "governance", label: "Governance", color: "#3F7A4D" },
+  { key: "investment", label: "Investment", color: "#B58A2E" },
+  { key: "economic_readiness", label: "Economic Readiness", color: "#8B4A3F" },
 ] as const;
 
 type PillarKey = typeof PILLARS[number]["key"];

@@ -15,7 +15,7 @@ interface Props {
   onClear: () => void;
 }
 
-const PALETTE = ["#22c55e", "#8b5cf6", "#f59e0b"];
+const PALETTE = ["#3F7A4D", "#7A4F8C", "#B58A2E", "#3B5BA5"];
 
 const DIM_LABELS: Record<string, string> = {
   government:    "Government",
@@ -60,7 +60,7 @@ export default function AdoptionComparisonPanel({ selected, onRemove, onClear }:
           <span className="flex gap-0.5">
             {selected.map((c) => <span key={c.slug} className="text-lg leading-none">{c.flag}</span>)}
           </span>
-          <span>Comparing <span style={{ color: "#4ade80" }}>{selected.length}</span>/3</span>
+          <span>Comparing <span style={{ color: "#3F7A4D" }}>{selected.length}</span>/4</span>
           <svg className="w-3.5 h-3.5 shrink-0" style={{ color: "var(--text-3)" }}
             fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
@@ -84,7 +84,7 @@ export default function AdoptionComparisonPanel({ selected, onRemove, onClear }:
         style={{ borderBottom: "1px solid var(--border)" }}>
         <div className="flex items-center gap-2">
           <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "#4ade80" }}>
-            Comparing {selected.length}/3
+            Comparing {selected.length}/4
           </span>
           {selected.length < 2 && (
             <span className="text-xs" style={{ color: "var(--text-3)" }}>
@@ -131,7 +131,7 @@ export default function AdoptionComparisonPanel({ selected, onRemove, onClear }:
                 Dimension Comparison (0–20)
               </p>
               <div style={{ height: 240 }}>
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                   <RadarChart data={radarData} margin={{ top: 10, right: 30, bottom: 10, left: 30 }}>
                     <PolarGrid stroke="rgba(34,197,94,.15)" />
                     <PolarAngleAxis dataKey="dim" tick={{ fill: "rgba(184,204,228,.8)", fontSize: 10 }} />

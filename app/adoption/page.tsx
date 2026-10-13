@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
+import { copyText } from "@/lib/copyText";
 import AdoptionCard from "@/components/AdoptionCard";
 import AdoptionTable from "@/components/AdoptionTable";
 import AdoptionInsights from "@/components/AdoptionInsights";
@@ -55,7 +56,7 @@ export default function AdoptionPage() {
   const [sort, setSort]             = useState<SortKey>("adoption_total");
   const [search, setSearch]         = useState("");
   const [tier, setTier]             = useState<TierFilter>("All");
-  const [view, setView]             = useState<ViewMode>("grid");
+  const [view, setView]             = useState<ViewMode>("table");
   const [shareToast, setShareToast] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const [compareList, setCompareList] = useState<string[]>([]);
@@ -98,7 +99,7 @@ export default function AdoptionPage() {
     const t = p.get("tier");   if (t) setTier(decodeURIComponent(t) as TierFilter);
     const s = p.get("sort");   if (s) setSort(s as SortKey);
     const q = p.get("q");      if (q) setSearch(decodeURIComponent(q));
-    const v = p.get("view");   if (v === "table") setView("table");
+    const v = p.get("view");   if (v === "grid") setView("grid");
   }, []);
 
   useEffect(() => {
@@ -108,7 +109,7 @@ export default function AdoptionPage() {
     if (tier !== "All")            p.set("tier", tier);
     if (sort !== "adoption_total") p.set("sort", sort);
     if (search)                    p.set("q", search);
-    if (view !== "grid")           p.set("view", view);
+    if (view !== "table")          p.set("view", view);
     const qs = p.toString();
     window.history.replaceState({}, "", qs ? `?${qs}` : window.location.pathname);
   }, [region, tier, sort, search, view]);
@@ -116,16 +117,16 @@ export default function AdoptionPage() {
   const toggleCompare = useCallback((slug: string) => {
     setCompareList((prev) => {
       if (prev.includes(slug)) return prev.filter((s) => s !== slug);
-      if (prev.length >= 3) { setCompareToast(true); setTimeout(() => setCompareToast(false), 2500); return prev; }
+      if (prev.length >= 4) { setCompareToast(true); setTimeout(() => setCompareToast(false), 2500); return prev; }
       return [...prev, slug];
     });
   }, []);
 
-  function shareView() {
-    navigator.clipboard.writeText(window.location.href).then(() => {
+  async function shareView() {
+    if (await copyText(window.location.href)) {
       setShareToast(true);
       setTimeout(() => setShareToast(false), 2500);
-    });
+    }
   }
 
   const topCountry      = sorted[0];
@@ -372,7 +373,7 @@ export default function AdoptionPage() {
           </div>
 
           {compareToast && (
-            <p style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "#B58A2E" }}>Max 3 countries — remove one first.</p>
+            <p style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "#B58A2E" }}>Max 4 countries. Remove one first.</p>
           )}
         </div>
 
@@ -383,7 +384,7 @@ export default function AdoptionPage() {
           </h2>
           <p style={{ fontFamily: "var(--font-sans)", fontSize: 12, color: "var(--dt-text-3)" }}>
             {view === "grid"
-              ? "Click any card to see the full country profile. Use the + button to compare up to 3 countries side by side."
+              ? "Click any card to see the full country profile. Use the + button to compare up to 4 countries side by side."
               : "Click any column header to sort. Click a country name to see its full profile."}
           </p>
         </div>

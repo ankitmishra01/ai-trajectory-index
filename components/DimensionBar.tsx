@@ -9,11 +9,11 @@ interface DimensionBarProps {
 }
 
 const COLORS: Record<string, { fill: string; glow: string }> = {
-  Infrastructure:     { fill: "#3b82f6", glow: "rgba(59,130,246,.50)"  },
-  Talent:             { fill: "#8b5cf6", glow: "rgba(139,92,246,.50)"  },
-  Governance:         { fill: "#06b6d4", glow: "rgba(6,182,212,.50)"   },
-  Investment:         { fill: "#f59e0b", glow: "rgba(245,158,11,.50)"  },
-  "Economic Readiness":{ fill: "#22c55e", glow: "rgba(34,197,94,.50)"  },
+  Infrastructure:     { fill: "#3B5BA5", glow: "rgba(59,91,165,.24)"  },
+  Talent:             { fill: "#7A4F8C", glow: "rgba(122,79,140,.24)"  },
+  Governance:         { fill: "#3F7A4D", glow: "rgba(63,122,77,.24)"   },
+  Investment:         { fill: "#B58A2E", glow: "rgba(181,138,46,.24)"  },
+  "Economic Readiness":{ fill: "#8B4A3F", glow: "rgba(139,74,63,.24)"  },
 };
 
 export default function DimensionBar({
