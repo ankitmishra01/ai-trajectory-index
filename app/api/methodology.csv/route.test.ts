@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import { METHODOLOGY_COMPONENTS } from "@/lib/methodology";
-import { csvCell, GET } from "./route";
+import { csvCell } from "@/lib/csv";
+import { GET } from "./route";
 
 const HEADER =
   "pillar,component_key,component,source,source_url,indicator_code,unit,points_available,source_kind,threshold_rule,fallback_rule,notes";

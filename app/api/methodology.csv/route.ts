@@ -1,4 +1,5 @@
 import { METHODOLOGY_COMPONENTS } from "@/lib/methodology";
+import { csvCell } from "@/lib/csv";
 
 const HEADERS = [
   "pillar",
@@ -14,11 +15,6 @@ const HEADERS = [
   "fallback_rule",
   "notes",
 ] as const;
-
-export const csvCell = (value: unknown) => {
-  const text = String(value ?? "");
-  return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
-};
 
 export async function GET() {
   const rows = METHODOLOGY_COMPONENTS.map((item) =>
