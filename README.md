@@ -191,6 +191,25 @@ The static baseline ensures coverage for all 186 economies. Live and external da
 
 The API calculates every source independently with `Promise.allSettled`. A failed IMF, OECD, or Anthropic request does not prevent World Bank scoring or the static fallback. In `/api/scores`, `using_live_data` reports whether the World Bank fetch succeeded; `sources` reports each supplemental source separately; and each country includes `data_source`, `wb_data_year`, source-availability flags, and the raw World Bank values used in scoring.
 
+### Score provenance and coverage
+
+Every country returned by `/api/scores` includes two required research fields:
+
+- `provenance`: five pillar arrays listing each input value, observation year, source organization and URL, points earned, points available, source status, and any missing-data substitution.
+- `coverage`: source availability summarized as live, enriched, policy, and fallback counts, the oldest and newest live observation years, the share of the 100-point allocation dependent on fallbacks, and a `High`, `Medium`, or `Limited` label.
+
+Coverage is not statistical confidence and does not measure a country's performance or data quality. It reports how much of the current score is supported by available source inputs.
+
+| Coverage label | Rule |
+|---|---|
+| **High** | At least 75% of expected inputs are live or enriched, and fallback allocation is at most 30% |
+| **Medium** | At least 50% of expected inputs are live or enriched, and fallback allocation is at most 55% |
+| **Limited** | All other source-availability profiles |
+
+The descriptive source registry lives in [`lib/methodology.ts`](lib/methodology.ts). The scorer remains the formula authority and records provenance at the same branches where it awards points. The Methodology page and the downloadable [`/api/methodology.csv`](https://ai-trajectory-index.vercel.app/api/methodology.csv) both use the shared registry, so component labels, official URLs, point budgets, and source roles stay aligned.
+
+The homepage renders all 186 static baseline rankings immediately. It then refreshes from `/api/scores` in the background without clearing filters, comparison state, watchlists, or the current view. If the refresh fails, the baseline ranking remains fully usable and exposes a retry control.
+
 ### World Bank indicator registry
 
 The API requests the two most recent observations for 17 indicators. The latest value supports Readiness and the prior value supports trend calculations where applicable.
@@ -346,6 +365,7 @@ The index does not treat all publications listed above as live scoring feeds. Th
   /widget/[slug]/page.tsx  : Compact, iframe-safe country widget
   /api/
     scores/route.ts        : Multi-source scoring endpoint (24h cache)
+    methodology.csv/       : Downloadable methodology data dictionary
     narrative/[country]/   : Five-section country brief: AI-drafted via OpenRouter, template fallback (7d cache)
     news/[slug]/           : Guardian and Google News RSS feed (1h cache)
     news-signal/[slug]/    : AI signal analysis (24h cache)
@@ -354,6 +374,8 @@ The index does not treat all publications listed above as live scoring feeds. Th
 /components
   CountryCard.tsx          : Card with mini dimension bars + trajectory badge
   CountryPageClient.tsx    : Country detail page (client component)
+  CoverageBadge.tsx        : Coverage label, source counts, year range, and fallback share
+  PillarProvenance.tsx     : Accessible per-pillar score-input table
   CountryNewsFeed.tsx      : Live news + AI signal panel
   ComparisonPanel.tsx      : Radar chart comparison (up to 4 countries)
   FilterBar.tsx            : Search + consolidated filter + sort (slide-out panel)
@@ -376,13 +398,16 @@ The index does not treat all publications listed above as live scoring feeds. Th
   oecd.ts                  : OECD SDMX client (R&D and researchers)
   anthropic-index.ts       : Anthropic Economic Index public-dataset client
   scoring.ts               : Score calculation engine (5 pillars + trajectory)
+  methodology.ts           : Shared descriptive indicator and source registry
+  provenance.ts            : Static provenance and coverage calculation
+  homeRefresh.ts           : Baseline-first homepage refresh state
   adoption.ts              : Adoption types, labels, and readiness enrichment
   openrouter.ts            : OpenRouter client (AI-drafted briefs + news signal analysis)
   narrativeTemplate.ts     : Deterministic 5-section brief generator: fact pack + template + fallback
   gdelt.ts                 : Multi-source Guardian and RSS news client (legacy filename)
   slugToIso.ts             : 186 slug → ISO2 mappings
   regionConfigs.ts         : Region deep-dive configuration
-  types.ts                 : Country, ScoredCountry, ScoresResponse, NarrativeSection
+  types.ts                 : Country, ScoredCountry, provenance, coverage, and API response types
 
 /data
   countries.json           : 186 countries: static baseline scores + evidence

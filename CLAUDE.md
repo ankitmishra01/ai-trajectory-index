@@ -24,6 +24,8 @@ npm run lint       # ESLint only
 - `lib/slugToIso.ts`: maps all 186 slugs to ISO2 codes for World Bank API
 - `lib/slugToIso3.ts`: maps all 186 slugs to ISO3 codes for IMF, OECD, and Anthropic data
 - `lib/scoring.ts`: `calculateScores()` combines live, maintained, and static inputs; missing values fall back proportionally to the static baseline
+- `lib/methodology.ts`: shared descriptive registry for component labels, official source links, point budgets, threshold copy, and the methodology CSV; it does not calculate scores
+- `lib/provenance.ts`: builds complete static provenance and calculates source-availability coverage
 - `app/api/scores/route.ts`: combines World Bank, IMF, OECD, Anthropic, policy, and external-index inputs; each network source fails independently through `Promise.allSettled`; `revalidate: 86400`
 
 **Score formula summary (v3: post-audit):**
@@ -44,11 +46,12 @@ npm run lint       # ESLint only
 `IT.NET.USER.ZS`, `IT.CEL.SETS.P2`, `IT.NET.BBN.P2`, `SE.TER.ENRR`, `SL.GDP.PCAP.EM.KD`, `GB.XPD.RSDV.GD.ZS`, `EG.ELC.ACCS.ZS`, `GE.EST`, `RL.EST`, `RQ.EST`, `BX.KLT.DINV.WD.GD.ZS`, `NY.GDP.PCAP.PP.KD`, `NY.GDP.PCAP.CD`, `FS.AST.PRVT.GD.ZS`, `NE.TRD.GNFS.ZS`, `NV.SRV.TOTL.ZS`, `TX.VAL.TECH.MF.ZS`
 
 **Routing:**
-- `/`: filterable grid, fetches `/api/scores` on mount, static data shown instantly then replaced
+- `/`: filterable grid, renders all static baseline rankings immediately, then refreshes `/api/scores` without clearing interaction state
 - `/adoption`: separate curated adoption lens; it does not change the Readiness score
 - `/compare/[a]/[b]`: shareable comparison route, expandable to four countries in the client
 - `/country/[slug]`: detail page, same pattern (static → live upgrade)
 - `/api/scores`: GET, returns `{ countries, last_updated, using_live_data, sources }`
+- `/api/methodology.csv`: GET, deterministic UTF-8 methodology dictionary generated from `lib/methodology.ts`
 - `/api/narrative/[country]`: GET, returns `{ sections: {heading, body}[], source: "ai" | "template", generatedAt }` (see Narrative below)
 
 **Narrative (per-country written brief):**
@@ -60,13 +63,14 @@ npm run lint       # ESLint only
 **Components:**
 - `CountrySidebar`: persistent left country switcher on `/country/[slug]` (search + region-grouped list of all 186, auto-scrolls to the active country). Desktop: sticky column. Mobile: slide-in drawer opened via the header's ☰ button. `app/country/[slug]/page.tsx` renders `<CountryPageClient key={slug} .../>`: the `key` forces a full remount on navigation so switching countries via the sidebar (or any same-route Link) can't leak stale narrative/tab/UI state from the previous country.
 - `CountryCard`: card with mini dimension bars, trajectory badge, accelerator/risk
-- `SkeletonCard`: animated pulse placeholder shown during `/api/scores` fetch
+- `CoverageBadge`: source-availability label, live count, observation-year range, and fallback allocation
+- `PillarProvenance`: accessible disclosure table for each pillar's inputs and point contributions
 - `ScoreGauge`: SVG semicircle gauge (arc from -210° to 30°, 240° sweep)
 - `DimensionBar`: labelled progress bar, each dimension has a distinct colour
 - `TrajectoryArrow`: pill badge mapping trajectory_label to ↑↑/↑/→/↓/↓↓ with colour
 - `FilterBar`: search input, region pills, sort dropdown
 
-**Types:** `lib/types.ts`: `Country`, `ScoredCountry` (adds `data_source: "live" | "fallback"`, optional `raw_indicators`), `ScoresResponse`, `NarrativeSection`
+**Types:** `lib/types.ts`: `Country`, `ScoredCountry` (including required `coverage` and `provenance`), `ScoreComponentProvenance`, `CountryCoverage`, `ScoresResponse`, `NarrativeSection`. Coverage measures source availability, not statistical confidence.
 
 **Styling:** One editorial research system is used across every route:
 - Warm ivory background `#FBF9F4`, paper surfaces, ink text, Fraunces display type, Inter Tight body, and signal-red actions (`--ed-*` and shared scale tokens in `globals.css`).
