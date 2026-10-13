@@ -62,10 +62,12 @@ npm run lint       # ESLint only
 
 **Types:** `lib/types.ts` — `Country`, `ScoredCountry` (adds `data_source: "live" | "fallback"`, optional `raw_indicators`), `ScoresResponse`, `NarrativeSection`
 
-**Styling:** Two token systems, both live, used deliberately (not a leftover from the redesign):
-- Homepage, region pages, and most cards use the ivory/ink **editorial** theme (`--ed-*` tokens in `globals.css`) — background `#FBF9F4`, serif `Fraunces` display type, `Inter Tight` body, signal-red accent `#D64528`.
-- `/country/[slug]` (`CountryPageClient.tsx`) stays on the darker **data-terminal** theme (`--dt-*` tokens, mapped through legacy `--bg`/`--accent`/etc. compat vars) — a deliberate dark-hero-then-panels contrast, not a migration gap.
-- Both scales share the 5 pillar colours (`--pillar-infra` etc.) so charts read consistently across themes.
+**Styling:** One editorial research system is used across every route:
+- Warm ivory background `#FBF9F4`, paper surfaces, ink text, Fraunces display type, Inter Tight body, and signal-red actions (`--ed-*` and shared scale tokens in `globals.css`).
+- Legacy `--dt-*`, `--bg`, `--surface`, and text variables remain as compatibility aliases, but resolve to the same light editorial palette. Do not create a separate dark page shell.
+- Analytical charts may use a contained deep-ink plotting surface only when it improves data contrast. Navigation, cards, controls, spacing, radii, feedback, and page shells stay editorial.
+- The five pillar colours (`--pillar-infra`, `--pillar-talent`, `--pillar-gov`, `--pillar-invest`, `--pillar-econ`) are canonical across charts, bars, tables and legends.
+- Shared spacing, radius, elevation and content-width tokens live in `globals.css` and `tailwind.config.ts`; avoid one-off values when a token exists.
 
 ## Adding a country
 

@@ -2,7 +2,7 @@
 
 **Live:** [ai-trajectory-index.vercel.app](https://ai-trajectory-index.vercel.app)
 
-An interactive index scoring **186 countries** on their current AI readiness and 3–5 year trajectory — built for investors, policymakers, and researchers who need to understand which nations are winning the AI race and why.
+An interactive index scoring **186 economies** on current AI readiness and 3–5 year trajectory, built for investors, policymakers, and researchers comparing national capacity to build and adopt AI.
 
 ---
 
@@ -13,8 +13,8 @@ An interactive index scoring **186 countries** on their current AI readiness and
 | 🇺🇸 **US leads overall** | 91/100 — highest score across all 186 economies |
 | 🇮🇳 **India has the strongest trajectory** | Current score 65 → projected 73 by 2028 (trajectory +8) |
 | 🇦🇪 **UAE fastest-rising advanced economy** | 73 → 79 projected by 2028 (trajectory +6) |
-| 🇷🇺 **Russia: biggest governance gap** | Average pillar 12.8 — governance score 8/20, gap of 4.8 pts |
-| 🌍 **Africa trailing in infrastructure** | Median infrastructure score 6.2/20 vs global median 11.4 |
+| 🇷🇺 **Russia has the largest governance gap** | Non-governance pillars average 14.0, compared with governance at 8/20, a 6.0-point gap |
+| 🌍 **Africa has an infrastructure constraint** | Median infrastructure score 5.5/20 vs global median 7.0 |
 | 🇪🇺 **Europe leads on governance** | EU avg 10.2/20 governance vs 9.2/20 investment — policy ahead of capital |
 
 ---
@@ -137,8 +137,8 @@ Full methodology: [ai-trajectory-index.vercel.app/methodology](https://ai-trajec
 
 | Score | Tier | Description |
 |-------|------|-------------|
-| 75–100 | 🟢 Leading | Frontier AI readiness |
-| 55–74 | 🔵 Advanced | Strong foundations |
+| 80–100 | 🟢 Leading | Frontier AI readiness |
+| 60–79 | 🔵 Advanced | Strong foundations |
 | 40–54 | 🟡 Developing | Building blocks in place |
 | 0–39 | 🔴 Nascent | Early stage |
 
