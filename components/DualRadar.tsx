@@ -2,7 +2,7 @@
 
 import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis,
-  Legend, Tooltip,
+  Legend, ResponsiveContainer, Tooltip,
 } from "recharts";
 import type { ScoredCountry } from "@/lib/types";
 import type { AdoptionEntry } from "@/lib/adoption";
@@ -42,19 +42,23 @@ export default function DualRadar({ country, adoption }: Props) {
       adoption: adoption.adoption_scores.consumer,
     },
   ];
+  const chartAvailable = data.every((item) => Number.isFinite(item.readiness) && Number.isFinite(item.adoption));
+  const chartLabel = `${country.name} readiness and adoption comparison. Readiness scores range from ${Math.min(...data.map((item) => item.readiness))} to ${Math.max(...data.map((item) => item.readiness))} out of 20. Adoption scores range from ${Math.min(...data.map((item) => item.adoption))} to ${Math.max(...data.map((item) => item.adoption))} out of 20.`;
 
   return (
     <div className="card rounded-2xl p-6">
       <div className="mb-4">
         <h3 className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-3)" }}>
-          Readiness vs Adoption — Radar
+          Readiness vs Adoption: Radar
         </h3>
         <p className="text-xs mt-0.5" style={{ color: "var(--text-3)" }}>
           Blue = readiness capacity · Green = active adoption · Each axis pairs the closest dimension from each framework
         </p>
       </div>
-      <div style={{ height: 280, overflow: "hidden" }}>
-          <RadarChart width={700} height={280} style={{ width: "100%", height: "100%" }} data={data} margin={{ top: 10, right: 30, bottom: 10, left: 30 }}>
+      <div className="dual-radar-frame" role="img" aria-label={chartLabel}>
+        {chartAvailable ? (
+          <ResponsiveContainer width="100%" height={280} minWidth={260} minHeight={280}>
+          <RadarChart data={data} margin={{ top: 10, right: 30, bottom: 10, left: 30 }}>
             <PolarGrid stroke="rgba(59,130,246,.12)" />
             <PolarAngleAxis
               dataKey="subject"
@@ -90,7 +94,16 @@ export default function DualRadar({ country, adoption }: Props) {
               }}
             />
           </RadarChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="dual-radar-unavailable">Radar data is not available. Use the table below for the published pillar values.</div>
+        )}
       </div>
+      <table className="sr-only">
+        <caption>{country.name} readiness and adoption comparison</caption>
+        <thead><tr><th scope="col">Dimension pair</th><th scope="col">Readiness</th><th scope="col">Adoption</th></tr></thead>
+        <tbody>{data.map((item) => <tr key={item.subject}><th scope="row">{item.subject}</th><td>{item.readiness}/20</td><td>{item.adoption}/20</td></tr>)}</tbody>
+      </table>
     </div>
   );
 }

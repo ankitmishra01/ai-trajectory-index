@@ -64,6 +64,8 @@ export default function CountrySidebar({ countries, currentSlug, onSelect }: Cou
           placeholder="Search 186 countries…"
           className="w-full px-3 py-2 rounded-lg text-xs outline-none"
           style={{ background: "var(--raised)", border: "1px solid var(--border)", color: "var(--text-1)" }}
+          aria-label="Search countries"
+          suppressHydrationWarning
         />
       </div>
       <div className="flex-1 overflow-y-auto px-2 py-3">

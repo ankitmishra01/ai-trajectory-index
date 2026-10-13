@@ -1,56 +1,41 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import ScoreGauge from "@/components/ScoreGauge";
-import DimensionBar from "@/components/DimensionBar";
-import TrajectoryArrow from "@/components/TrajectoryArrow";
+
+import CoverageBadge from "@/components/CoverageBadge";
+import CountryChat from "@/components/CountryChat";
 import CountryNewsFeed from "@/components/CountryNewsFeed";
 import CountryRoadmap from "@/components/CountryRoadmap";
-import ScoreSparkline from "@/components/ScoreSparkline";
-import WhatIfSimulator from "@/components/WhatIfSimulator";
-import CountryChat from "@/components/CountryChat";
-import PolicyGapAnalyser from "@/components/PolicyGapAnalyser";
-import DualRadar from "@/components/DualRadar";
+import CountrySection from "@/components/CountrySection";
 import CountrySidebar from "@/components/CountrySidebar";
+import DimensionBar from "@/components/DimensionBar";
+import DualRadar from "@/components/DualRadar";
+import PillarProvenance from "@/components/PillarProvenance";
+import PolicyGapAnalyser from "@/components/PolicyGapAnalyser";
+import ScoreGauge from "@/components/ScoreGauge";
+import ScoreSparkline from "@/components/ScoreSparkline";
 import SiteHeader from "@/components/SiteHeader";
-import staticData from "@/data/countries.json";
+import TrajectoryArrow from "@/components/TrajectoryArrow";
+import WhatIfSimulator from "@/components/WhatIfSimulator";
 import adoptionData from "@/data/adoption.json";
-import { TIER_COLORS, DIM_LABELS as ADOPT_DIM_LABELS, DIM_COLORS as ADOPT_DIM_COLORS } from "@/lib/adoption";
+import staticData from "@/data/countries.json";
+import { DIM_COLORS as ADOPT_DIM_COLORS, DIM_LABELS as ADOPT_DIM_LABELS } from "@/lib/adoption";
 import type { AdoptionEntry } from "@/lib/adoption";
-import type { ScoredCountry, ScoresResponse, NarrativeSection } from "@/lib/types";
 import { copyText } from "@/lib/copyText";
+import { PILLAR_KEYS } from "@/lib/methodology";
 import { asFallbackScoredCountry } from "@/lib/provenance";
+import type { NarrativeSection, ScoresResponse, ScoredCountry } from "@/lib/types";
 
-const DIM_LABELS: Record<string, string> = {
-  infrastructure:    "Infrastructure",
-  talent:            "Talent",
-  governance:        "Governance",
-  investment:        "Investment",
-  economic_readiness:"Economic Readiness",
-};
-// Maps each narrative section heading to the DimensionBar label(s) shown
-// alongside it, and each of those labels back to its scores.* key.
-const SECTION_PILLAR_CHART: Record<string, string[]> = {
-  "Infrastructure & Talent": ["Infrastructure", "Talent"],
-  "Governance & Policy": ["Governance"],
-  "Investment & Capital": ["Investment"],
-  "Economic Readiness & Outlook": ["Economic Readiness"],
-};
-const DIM_KEY: Record<string, keyof ScoredCountry["scores"]> = {
-  Infrastructure: "infrastructure",
-  Talent: "talent",
-  Governance: "governance",
-  Investment: "investment",
-  "Economic Readiness": "economic_readiness",
-};
-const DIM_DESC: Record<string, string> = {
-  infrastructure:    "Physical and digital infrastructure: data centres, connectivity, compute capacity.",
-  talent:            "AI talent pipeline: researchers, engineers, and the university ecosystem supplying them.",
-  governance:        "AI policy frameworks, regulatory clarity, and government strategy maturity.",
-  investment:        "Public and private capital flowing into AI — VC, government spending, and R&D.",
-  economic_readiness:"Economy's capacity to adopt and commercialise AI across sectors.",
-};
+const DIM_LABELS = {
+  infrastructure: "Infrastructure",
+  talent: "Talent",
+  governance: "Governance",
+  investment: "Investment",
+  economic_readiness: "Economic Readiness",
+} as const;
+
+type PageTab = "readiness" | "adoption" | "combined";
 
 interface NarrativeState {
   status: "idle" | "loading" | "done" | "error";
@@ -60,57 +45,51 @@ interface NarrativeState {
   error?: string;
 }
 
-type PageTab = "readiness" | "adoption" | "combined";
-
 interface Props {
   slug: string;
   initialCountry: ScoredCountry;
 }
 
 export default function CountryPageClient({ slug, initialCountry }: Props) {
-  const [openDim, setOpenDim]   = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<PageTab>("combined");
-  const [country, setCountry]   = useState<ScoredCountry>(initialCountry);
-  const urlInitRef = useRef(false);
-
-  const adoption = (adoptionData.countries as AdoptionEntry[]).find((a) => a.slug === slug) ?? null;
-  const [allCountries, setAllCountries] = useState<ScoredCountry[]>(
-    staticData.countries.map(asFallbackScoredCountry)
-  );
+  const [country, setCountry] = useState(initialCountry);
+  const [allCountries, setAllCountries] = useState<ScoredCountry[]>(() => staticData.countries.map(asFallbackScoredCountry));
   const [narrative, setNarrative] = useState<NarrativeState>({ status: "idle", sections: [] });
-  const [copied, setCopied]       = useState(false);
+  const [copied, setCopied] = useState(false);
   const [embedOpen, setEmbedOpen] = useState(false);
+  const [embedCopied, setEmbedCopied] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
   const [usingLive, setUsingLive] = useState(false);
+  const urlInitRef = useRef(false);
 
-  // Read tab from URL on mount
+  const adoption = (adoptionData.countries as AdoptionEntry[]).find((item) => item.slug === slug) ?? null;
+
   useEffect(() => {
     if (typeof window === "undefined" || urlInitRef.current) return;
     urlInitRef.current = true;
-    const t = new URLSearchParams(window.location.search).get("tab");
-    if (t === "readiness" || t === "adoption" || t === "combined") setActiveTab(t);
+    const tab = new URLSearchParams(window.location.search).get("tab");
+    if (tab === "readiness" || tab === "adoption" || tab === "combined") setActiveTab(tab);
   }, []);
 
-  // Write tab to URL on change
   useEffect(() => {
     if (!urlInitRef.current) return;
-    const p = new URLSearchParams(window.location.search);
-    if (activeTab === "combined") p.delete("tab");
-    else p.set("tab", activeTab);
-    const qs = p.toString();
-    window.history.replaceState({}, "", qs ? `?${qs}` : window.location.pathname);
+    const params = new URLSearchParams(window.location.search);
+    if (activeTab === "combined") params.delete("tab");
+    else params.set("tab", activeTab);
+    const query = params.toString();
+    window.history.replaceState({}, "", query ? `?${query}` : window.location.pathname);
   }, [activeTab]);
 
   useEffect(() => {
     fetch("/api/scores")
-      .then((r) => r.json())
+      .then((response) => response.json())
       .then((data: ScoresResponse) => {
         setAllCountries(data.countries);
         setLastUpdated(data.last_updated);
         setUsingLive(data.using_live_data);
-        const live = data.countries.find((c) => c.slug === slug);
-        if (live) setCountry(live);
+        const liveCountry = data.countries.find((item) => item.slug === slug);
+        if (liveCountry) setCountry(liveCountry);
       })
       .catch(() => {});
   }, [slug]);
@@ -118,60 +97,50 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
   const fetchNarrative = async () => {
     setNarrative({ status: "loading", sections: [] });
     try {
-      const res  = await fetch(`/api/narrative/${slug}`);
-      const data = await res.json();
+      const response = await fetch(`/api/narrative/${slug}`);
+      const data = await response.json();
       if (data.error) setNarrative({ status: "error", sections: [], error: data.error });
       else setNarrative({ status: "done", sections: data.sections, source: data.source, generatedAt: data.generatedAt });
     } catch {
-      setNarrative({ status: "error", sections: [], error: "Network error — please try again." });
+      setNarrative({ status: "error", sections: [], error: "Network error. Please try again." });
     }
   };
 
   const handleCopyLink = async () => {
     if (await copyText(window.location.href)) {
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      window.setTimeout(() => setCopied(false), 2000);
     }
   };
 
-  // Dynamic comparable countries by 5-dimension Euclidean distance
+  const embedCode = `<iframe\n  src="https://ai-trajectory-index.vercel.app/widget/${slug}"\n  width="320"\n  height="280"\n  frameborder="0"\n  style="border-radius:12px;"\n  title="${country.name} AI Trajectory Index"\n></iframe>`;
+
   const comparables = useMemo(() => {
-    const keys = ["infrastructure", "talent", "governance", "investment", "economic_readiness"] as const;
-    function dist(a: ScoredCountry, b: ScoredCountry) {
-      return Math.sqrt(keys.reduce((sum, k) => sum + (a.scores[k].score - b.scores[k].score) ** 2, 0));
+    function distance(a: ScoredCountry, b: ScoredCountry) {
+      return Math.sqrt(PILLAR_KEYS.reduce((sum, key) => sum + (a.scores[key].score - b.scores[key].score) ** 2, 0));
     }
-    return [...allCountries]
-      .filter((c) => c.slug !== slug)
-      .sort((a, b) => dist(country, a) - dist(country, b))
-      .slice(0, 4);
+    return allCountries.filter((item) => item.slug !== slug).sort((a, b) => distance(country, a) - distance(country, b)).slice(0, 4);
   }, [allCountries, country, slug]);
 
-  const ranked       = [...allCountries].sort((a, b) => b.total_score - a.total_score);
-  const globalRank   = ranked.findIndex((c) => c.slug === slug) + 1;
-  const regionPeers  = ranked.filter((c) => c.region === country.region);
-  const regionRank   = regionPeers.findIndex((c) => c.slug === slug) + 1;
-  const delta        = country.projected_score_2028 - country.total_score;
+  const ranked = [...allCountries].sort((a, b) => b.total_score - a.total_score);
+  const globalRank = ranked.findIndex((item) => item.slug === slug) + 1;
+  const regionPeers = ranked.filter((item) => item.region === country.region);
+  const regionRank = regionPeers.findIndex((item) => item.slug === slug) + 1;
+  const delta = country.projected_score_2028 - country.total_score;
   const liveScoreDelta = country.data_source === "live" ? country.total_score - initialCountry.total_score : 0;
-  const liveChanged    = country.data_source === "live" && liveScoreDelta !== 0;
 
   return (
-    <main className="min-h-screen flex" style={{ background: "var(--bg)" }}>
-      <div className="page-glow" />
-
-      {/* Desktop country switcher — persistent left sidebar */}
-      <aside className="hidden lg:block w-72 flex-shrink-0 sticky top-0 h-screen"
-        style={{ borderRight: "1px solid var(--border)", background: "var(--surface)" }}>
+    <main className="country-layout min-h-screen flex">
+      <aside className="hidden lg:block w-72 flex-shrink-0 sticky top-0 h-screen country-sidebar-shell">
         <CountrySidebar countries={allCountries} currentSlug={slug} />
       </aside>
 
-      {/* Mobile country switcher — slide-in drawer */}
       {sidebarOpen && (
-        <div className="lg:hidden fixed inset-0 z-[60] flex" style={{ background: "rgba(0,0,0,.6)" }}
-          onClick={(e) => { if (e.target === e.currentTarget) setSidebarOpen(false); }}>
-          <div className="w-80 max-w-[85vw] h-full" style={{ background: "var(--surface)", borderRight: "1px solid var(--border-mid)" }}>
+        <div className="lg:hidden fixed inset-0 z-[60] flex country-drawer-backdrop" onClick={(event) => { if (event.target === event.currentTarget) setSidebarOpen(false); }}>
+          <div className="w-80 max-w-[85vw] h-full country-drawer-panel">
             <div className="flex items-center justify-between px-4 pt-4">
-              <span className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-3)" }}>Countries</span>
-              <button onClick={() => setSidebarOpen(false)} className="text-lg leading-none" style={{ color: "var(--text-3)" }}>×</button>
+              <span className="text-xs font-bold uppercase tracking-wider">Countries</span>
+              <button onClick={() => setSidebarOpen(false)} className="country-icon-button" aria-label="Close country browser">×</button>
             </div>
             <CountrySidebar countries={allCountries} currentSlug={slug} onSelect={() => setSidebarOpen(false)} />
           </div>
@@ -179,601 +148,89 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
       )}
 
       <div className="flex-1 min-w-0">
-
-      <SiteHeader usingLive={usingLive} lastFetched={lastUpdated} citation={`Mishra, A. (2026). ${country.name}: AI readiness country profile. AI Trajectory Index. https://ai-trajectory-index.vercel.app/country/${slug}`} />
-      <div className="no-print" style={{ borderBottom: "1px solid var(--border)", background: "var(--ed-raised)" }}>
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-2 flex items-center gap-3">
-          <button onClick={() => setSidebarOpen(true)}
-            className="lg:hidden text-sm flex items-center gap-1.5 transition-colors hover:text-white"
-            style={{ color: "var(--text-3)" }} aria-label="Browse countries">
-            ☰
-          </button>
-          <span className="text-xs font-medium uppercase tracking-wider" style={{ color: "var(--text-3)" }}>
-            Country Profile
-          </span>
-          <div className="ml-auto flex items-center gap-3">
-            <Link href={`/compare/${slug}/usa`}
-              className="no-print hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
-              style={{ background: "var(--raised)", color: "var(--text-2)", border: "1px solid var(--border)" }}>
-              ⚔ Compare
-            </Link>
-            <button
-              onClick={() => window.print()}
-              className="no-print hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
-              style={{ background: "var(--raised)", color: "var(--text-2)", border: "1px solid var(--border)" }}
-              title="Print / Export PDF"
-            >
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                  d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-              </svg>
-              Print
-            </button>
-            <button
-              onClick={() => setEmbedOpen((o) => !o)}
-              className="no-print hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
-              style={{ background: "var(--raised)", color: "var(--text-2)", border: "1px solid var(--border)" }}
-            >
-              {"</>"}  Embed
-            </button>
-            <button
-              onClick={handleCopyLink}
-              className="no-print flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
-              style={
-                copied
-                  ? { background: "rgba(34,197,94,.12)", color: "#4ade80", border: "1px solid rgba(34,197,94,.25)" }
-                  : { background: "var(--raised)", color: "var(--text-2)", border: "1px solid var(--border)" }
-              }
-            >
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-              </svg>
-              {copied ? "Copied!" : "Share"}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Embed modal */}
-      {embedOpen && (
-        <div className="no-print fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: "rgba(0,0,0,.7)" }}
-          onClick={(e) => { if (e.target === e.currentTarget) setEmbedOpen(false); }}>
-          <div className="w-full max-w-lg rounded-2xl p-6 shadow-2xl"
-            style={{ background: "var(--surface)", border: "1px solid var(--border-mid)" }}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-bold" style={{ color: "var(--text-1)" }}>Embed Widget</h3>
-              <button onClick={() => setEmbedOpen(false)} className="text-sm transition-colors hover:text-white"
-                style={{ color: "var(--text-3)" }}>×</button>
-            </div>
-            <p className="text-xs mb-3" style={{ color: "var(--text-3)" }}>
-              Copy this code to embed the {country.name} live scorecard on any webpage.
-            </p>
-            <div className="rounded-xl p-3 mb-4 font-mono text-xs overflow-x-auto"
-              style={{ background: "var(--raised)", border: "1px solid var(--border)", color: "#93c5fd", whiteSpace: "pre-wrap" }}>
-              {`<iframe\n  src="https://ai-trajectory-index.vercel.app/widget/${slug}"\n  width="320"\n  height="280"\n  frameborder="0"\n  style="border-radius:12px;"\n  title="${country.name} — AI Trajectory Index"\n></iframe>`}
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => {
-                  navigator.clipboard.writeText(`<iframe\n  src="https://ai-trajectory-index.vercel.app/widget/${slug}"\n  width="320"\n  height="280"\n  frameborder="0"\n  style="border-radius:12px;"\n  title="${country.name} — AI Trajectory Index"\n></iframe>`);
-                  setEmbedOpen(false);
-                }}
-                className="flex-1 py-2 rounded-xl text-xs font-semibold transition-all"
-                style={{ background: "var(--accent)", color: "#fff" }}>
-                Copy code
-              </button>
-              <a href={`/widget/${slug}`} target="_blank" rel="noopener noreferrer"
-                className="px-4 py-2 rounded-xl text-xs font-semibold transition-all"
-                style={{ background: "var(--raised)", color: "var(--text-2)", border: "1px solid var(--border)" }}>
-                Preview ↗
-              </a>
+        <SiteHeader usingLive={usingLive} lastFetched={lastUpdated} citation={`Mishra, A. (2026). ${country.name}: AI readiness country profile. AI Trajectory Index. https://ai-trajectory-index.vercel.app/country/${slug}`} />
+        <div className="country-profile-bar no-print">
+          <div className="country-content-width">
+            <button onClick={() => setSidebarOpen(true)} className="lg:hidden country-bar-action" aria-label="Browse countries">☰ <span>Countries</span></button>
+            <span className="country-profile-label">Country profile</span>
+            <div className="ml-auto flex items-center gap-2">
+              <Link href={`/compare/${slug}/usa`} className="country-bar-action">Compare</Link>
+              <button onClick={handleCopyLink} className="country-bar-action" aria-live="polite">{copied ? "Link copied" : "Share"}</button>
             </div>
           </div>
         </div>
-      )}
 
-      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-10 space-y-5">
-
-        {/* Hero */}
-        <div className="card shine-on-hover rounded-2xl p-6 sm:p-8 overflow-hidden relative">
-          <div className="absolute inset-x-0 top-0 h-px"
-            style={{ background: "linear-gradient(90deg, transparent, rgba(59,130,246,.3), transparent)" }} />
-          <div className="absolute inset-0 pointer-events-none"
-            style={{ background: "radial-gradient(ellipse 60% 50% at 50% 0%, rgba(59,130,246,.07) 0%, transparent 70%)" }} />
-
-          <div className="relative flex flex-col sm:flex-row gap-6 items-start sm:items-center">
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-3">
-                <span className="text-6xl">{country.flag}</span>
+        <div className="country-content-width country-page-stack">
+          <CountrySection id="executive-summary" number="01" title="Executive summary" description="Current standing, trajectory, and source coverage.">
+            <div className="country-hero card">
+              <div className="country-hero-identity">
+                <span className="country-flag" aria-hidden="true">{country.flag}</span>
                 <div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h1 className="text-3xl font-black font-serif-display" style={{ color: "var(--text-1)" }}>
-                      {country.name}
-                    </h1>
-                    <span className="text-xs px-2 py-0.5 rounded-full"
-                      style={{ background: "var(--raised)", color: "var(--text-3)", border: "1px solid var(--border)" }}>
-                      #{globalRank} globally
-                    </span>
-                    <span className="text-xs px-2 py-0.5 rounded-full"
-                      style={{ background: "var(--raised)", color: "var(--text-3)", border: "1px solid var(--border)" }}>
-                      {country.projected_score_2028}/100 by 2028 ({delta >= 0 ? "+" : ""}{delta})
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 mt-1 flex-wrap">
-                    <p className="text-sm" style={{ color: "var(--text-3)" }}>{country.region}</p>
-                    {regionRank > 0 && (
-                      <>
-                        <span style={{ color: "var(--border)" }}>·</span>
-                        <p className="text-sm" style={{ color: "var(--text-3)" }}>
-                          #{regionRank} in {country.region}
-                        </p>
-                      </>
-                    )}
-                  </div>
+                  <p className="eyebrow">{country.region} · #{regionRank} in region</p>
+                  <h1>{country.name}</h1>
+                  <div className="country-hero-meta"><span>#{globalRank} globally</span><TrajectoryArrow label={country.trajectory_label} score={country.trajectory_score} size="md" /><span>{country.projected_score_2028}/100 by 2028</span></div>
                 </div>
               </div>
-              <TrajectoryArrow label={country.trajectory_label} score={country.trajectory_score} size="md" />
+              <div className="country-hero-score"><ScoreGauge score={country.total_score} size={180} /><p>AI Readiness Score</p></div>
+              <CoverageBadge coverage={country.coverage} />
             </div>
-            <div className="flex-shrink-0">
-              <ScoreGauge score={country.total_score} size={180} />
-              <p className="text-center text-xs mt-1" style={{ color: "var(--text-3)" }}>AI Readiness Score</p>
+            {liveScoreDelta !== 0 && <div className="country-live-change" role="status">Live sources changed the baseline score from {initialCountry.total_score} to {country.total_score} ({liveScoreDelta > 0 ? "+" : ""}{liveScoreDelta} points).</div>}
+          </CountrySection>
+
+          <CountrySection id="readiness-adoption" number="02" title="Readiness and Adoption" description="Capacity to build AI compared with evidence of AI use today.">
+            {adoption && <div className="country-lens-tabs" role="group" aria-label="Country data lens">{([{ key: "combined", label: "Combined" }, { key: "readiness", label: "Readiness" }, { key: "adoption", label: "Adoption" }] as { key: PageTab; label: string }[]).map((item) => <button key={item.key} onClick={() => setActiveTab(item.key)} aria-pressed={activeTab === item.key}>{item.label}</button>)}</div>}
+            <div className="country-score-grid">
+              {(!adoption || activeTab !== "adoption") && <article className="research-score-card"><p>Readiness</p><strong>{country.total_score}<small>/100</small></strong><span>Capacity across five enabling pillars</span></article>}
+              {adoption && activeTab !== "readiness" && <article className="research-score-card"><p>Adoption</p><strong>{adoption.adoption_total}<small>/100</small></strong><span>{adoption.adoption_tier}</span></article>}
+              {(!adoption || activeTab !== "adoption") && <article className="research-score-card"><p>Trajectory</p><strong>{country.trajectory_score > 0 ? "+" : ""}{country.trajectory_score}<small>/10</small></strong><span>{country.trajectory_label}</span></article>}
             </div>
-          </div>
+            {adoption && activeTab === "combined" && <DualRadar country={country} adoption={adoption} />}
+            {adoption && activeTab !== "readiness" && <div className="card country-adoption-bars"><h3>Adoption dimensions</h3>{Object.entries(adoption.adoption_scores).map(([key, score]) => <div key={key}><div><span>{ADOPT_DIM_LABELS[key as keyof typeof ADOPT_DIM_LABELS]}</span><strong>{score}/20</strong></div><div className="country-mini-track"><span style={{ width: `${(score / 20) * 100}%`, background: ADOPT_DIM_COLORS[key as keyof typeof ADOPT_DIM_COLORS] }} /></div></div>)}</div>}
+          </CountrySection>
+
+          <CountrySection id="pillar-evidence" number="03" title="Pillar evidence" description="Scores, supporting evidence, and the exact inputs behind each contribution.">
+            <div className="pillar-evidence-list">
+              {PILLAR_KEYS.map((key) => {
+                const score = country.scores[key];
+                return <article key={key} className="pillar-evidence-row card"><div className="pillar-evidence-head"><div><h3>{DIM_LABELS[key]}</h3><p>{score.reasons[0] ?? "No evidence note reported."}</p></div><strong>{score.score}<small>/20</small></strong></div><DimensionBar label={DIM_LABELS[key]} score={score.score} height={8} showScore={false} /><ul>{score.reasons.slice(1).map((reason) => <li key={reason}>{reason}</li>)}</ul><PillarProvenance pillar={key} components={country.provenance[key]} /></article>;
+              })}
+            </div>
+          </CountrySection>
+
+          <CountrySection id="outlook-policy" number="04" title="Outlook and policy gaps" description="Forward direction, constraints, and a structured country brief.">
+            <div className="country-outlook-grid">
+              <article className="card country-projection"><div><p>Projected 2028</p><strong>{country.projected_score_2028}<small>/100</small></strong><span>{delta > 0 ? "+" : ""}{delta} points from today</span></div><ScoreSparkline score={country.total_score} trajectory={country.trajectory_score} width={104} height={38} /></article>
+              <article className="country-signal-card signal-positive"><p>Top accelerator</p><strong>{country.top_accelerator}</strong></article>
+              <article className="country-signal-card signal-risk"><p>Top risk</p><strong>{country.top_risk}</strong></article>
+            </div>
+            <PolicyGapAnalyser country={country} allCountries={allCountries} />
+            <article className="card country-brief-card">
+              <header><div><p className="eyebrow">Five-section brief</p><h3>Country research brief</h3></div>{(narrative.status === "idle" || narrative.status === "error") && <button onClick={fetchNarrative} className="button-primary">Generate brief</button>}</header>
+              {narrative.status === "loading" && <div className="country-brief-loading" role="status"><span /><span /><span /><p>Building the brief</p></div>}
+              {narrative.status === "error" && <p className="country-inline-error">{narrative.error ?? "Brief temporarily unavailable. Please try again."}</p>}
+              {narrative.status === "idle" && <p className="country-brief-intro">Generate a concise review of standing, infrastructure and talent, governance, investment, and economic outlook.</p>}
+              {narrative.status === "done" && <div className="country-brief-sections">{narrative.sections.map((section) => <section key={section.heading}><h4>{section.heading}</h4><p>{section.body}</p></section>)}</div>}
+            </article>
+          </CountrySection>
+
+          <CountrySection id="news-tools" number="05" title="News and supporting tools" description="Recent signals, comparable economies, and optional analysis controls.">
+            <CountryNewsFeed slug={slug} countryName={country.name} />
+            <article className="card country-comparables"><header><h3>Comparable countries</h3><p>Nearest neighbours across the five readiness pillars.</p></header><div>{comparables.map((item) => <Link key={item.slug} href={`/country/${item.slug}`}><span>{item.flag}</span><div><strong>{item.name}</strong><small>{item.total_score}/100 · {item.trajectory_label}</small></div><span aria-hidden="true">→</span></Link>)}</div></article>
+            <details className="analysis-tools card">
+              <summary><div><strong>Analysis tools</strong><span>What-if model, roadmap, AI Q&amp;A, embed, and print controls</span></div><span aria-hidden="true">+</span></summary>
+              <div className="analysis-tools-actions no-print"><button onClick={() => window.print()} className="button-secondary">Print or save PDF</button><button onClick={() => setEmbedOpen(true)} className="button-secondary">Embed this profile</button><Link href={`/compare/${slug}/usa`} className="button-secondary">Open comparison</Link></div>
+              <WhatIfSimulator country={country} allCountries={allCountries} />
+              <CountryRoadmap country={country} />
+              <CountryChat country={country} />
+            </details>
+          </CountrySection>
         </div>
 
-        {/* What changed banner */}
-        {liveChanged && (
-          <div className="rounded-2xl px-4 py-3 flex items-center gap-3 text-sm fade-up"
-            style={{
-              background: liveScoreDelta > 0 ? "rgba(34,197,94,.06)" : "rgba(245,158,11,.06)",
-              border: `1px solid ${liveScoreDelta > 0 ? "rgba(34,197,94,.22)" : "rgba(245,158,11,.22)"}`,
-            }}>
-            <span className="text-base flex-shrink-0" style={{ color: liveScoreDelta > 0 ? "#4ade80" : "#f59e0b" }}>
-              {liveScoreDelta > 0 ? "▲" : "▼"}
-            </span>
-            <span style={{ color: "var(--text-2)" }}>
-              Live World Bank data refreshed this score:{" "}
-              <span className="font-semibold" style={{ color: "var(--text-1)" }}>
-                {initialCountry.total_score} → {country.total_score}
-              </span>{" "}
-              <span className="font-bold" style={{ color: liveScoreDelta > 0 ? "#4ade80" : "#f59e0b" }}>
-                ({liveScoreDelta > 0 ? "+" : ""}{liveScoreDelta} pts)
-              </span>
-            </span>
-          </div>
-        )}
-
-        {/* Tab toggle */}
-        {adoption && (
-          <div className="flex flex-col items-center gap-2">
-            <div className="inline-flex rounded-2xl p-1 gap-1"
-              style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-              {([
-                { key: "combined",  label: "Combined View" },
-                { key: "readiness", label: "Readiness" },
-                { key: "adoption",  label: "Adoption" },
-              ] as { key: PageTab; label: string }[]).map(({ key, label }) => (
-                <button key={key} onClick={() => setActiveTab(key)}
-                  className="px-4 py-1.5 rounded-xl text-xs font-semibold transition-all"
-                  style={activeTab === key
-                    ? { background: "var(--accent)", color: "#fff" }
-                    : { color: "var(--text-3)", background: "transparent" }
-                  }>
-                  {label}
-                </button>
-              ))}
-            </div>
-            <p className="text-[10px]" style={{ color: "var(--text-3)" }}>
-              {activeTab === "combined"  && "Readiness = capacity to build AI · Adoption = AI actually in use today"}
-              {activeTab === "readiness" && "Infrastructure, talent, governance, investment & economic capacity"}
-              {activeTab === "adoption"  && "Government deployment, enterprise, consumer usage, talent demand & R&D pipeline"}
-            </p>
-          </div>
-        )}
-
-        {/* Combined view: side-by-side score cards */}
-        {adoption && (activeTab === "combined") && (() => {
-          const gap = adoption.adoption_gap;
-          const tierStyle = TIER_COLORS[adoption.adoption_tier] ?? TIER_COLORS["Nascent Adoption"];
-          const gapStatement = Math.abs(gap) <= 2
-            ? `${country.name} is deploying AI roughly in line with its readiness capacity.`
-            : gap > 0
-            ? `${country.name}'s adoption score (${adoption.adoption_total}) is ${gap} points above its readiness score (${country.total_score}) — deploying AI faster than its capacity would predict.`
-            : `${country.name}'s adoption score (${adoption.adoption_total}) is ${Math.abs(gap)} points below its readiness score (${country.total_score}) — significant untapped capacity not yet being deployed.`;
-          return (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Readiness card */}
-                <div className="card rounded-2xl p-5">
-                  <div className="flex items-center gap-1.5 mb-1">
-                    <span className="text-xs">📊</span>
-                    <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--text-3)" }}>Readiness Score</p>
-                  </div>
-                  <p className="text-xs mb-3" style={{ color: "var(--text-3)" }}>Can this country build AI?</p>
-                  <div className="flex items-end gap-2 mb-2">
-                    <span className="text-4xl font-black" style={{ color: "var(--accent)" }}>{country.total_score}</span>
-                    <span className="text-sm pb-1" style={{ color: "var(--text-3)" }}>/100</span>
-                  </div>
-                  <TrajectoryArrow label={country.trajectory_label} score={country.trajectory_score} size="sm" />
-                </div>
-                {/* Adoption card */}
-                <div className="card rounded-2xl p-5">
-                  <div className="flex items-center gap-1.5 mb-1">
-                    <span className="text-xs">🚀</span>
-                    <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--text-3)" }}>Adoption Score</p>
-                  </div>
-                  <p className="text-xs mb-3" style={{ color: "var(--text-3)" }}>Is this country using AI now?</p>
-                  <div className="flex items-end gap-2 mb-2">
-                    <span className="text-4xl font-black" style={{ color: tierStyle.color }}>{adoption.adoption_total}</span>
-                    <span className="text-sm pb-1" style={{ color: "var(--text-3)" }}>/100</span>
-                  </div>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg"
-                    style={{ background: tierStyle.bg, color: tierStyle.color, border: `1px solid ${tierStyle.border}` }}>
-                    {adoption.adoption_tier}
-                  </span>
-                </div>
-              </div>
-              {/* Gap statement */}
-              <div className="rounded-2xl p-4"
-                style={{
-                  background: Math.abs(gap) <= 2 ? "rgba(148,163,184,.05)" : gap > 0 ? "rgba(74,222,128,.05)" : "rgba(245,158,11,.05)",
-                  border: `1px solid ${Math.abs(gap) <= 2 ? "rgba(148,163,184,.18)" : gap > 0 ? "rgba(74,222,128,.22)" : "rgba(245,158,11,.22)"}`,
-                }}>
-                <p className="text-sm leading-relaxed" style={{ color: "var(--text-2)" }}>{gapStatement}</p>
-              </div>
-              <DualRadar country={country} adoption={adoption} />
-            </div>
-          );
-        })()}
-
-        {/* Score Breakdown — hidden on pure adoption tab */}
-        {(!adoption || activeTab !== "adoption") && (
-          <div className="card rounded-2xl p-6 sm:p-8">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-3)" }}>
-                Pillar Scores
-              </h2>
-              {country.wb_data_year && (
-                <span className="text-[10px] px-2 py-0.5 rounded-full"
-                  style={{ background: "var(--raised)", color: "var(--text-3)", border: "1px solid var(--border)" }}>
-                  WB data through {country.wb_data_year}
-                </span>
-              )}
-            </div>
-            <div className="space-y-5">
-              {Object.entries(country.scores).map(([key, val]) => (
-                <DimensionBar key={key} label={DIM_LABELS[key]} score={val.score} height={12} showScore />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Adoption dimension breakdown — shown on adoption + combined tabs */}
-        {adoption && activeTab !== "readiness" && (() => {
-          const dims = Object.entries(adoption.adoption_scores) as [keyof typeof adoption.adoption_scores, number][];
-          const tierStyle = TIER_COLORS[adoption.adoption_tier] ?? TIER_COLORS["Nascent Adoption"];
-          const maxScore = Math.max(...dims.map(([, v]) => v));
-          const minScore = Math.min(...dims.map(([, v]) => v));
-          return (
-            <div className="card rounded-2xl p-6 sm:p-8">
-              <div className="flex items-center justify-between mb-5">
-                <h2 className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-3)" }}>
-                  Adoption Dimension Breakdown
-                </h2>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg"
-                  style={{ background: tierStyle.bg, color: tierStyle.color, border: `1px solid ${tierStyle.border}` }}>
-                  {adoption.adoption_tier}
-                </span>
-              </div>
-              <div className="space-y-4">
-                {dims.map(([key, score]) => {
-                  const isMax = score === maxScore;
-                  const isMin = score === minScore;
-                  const color = ADOPT_DIM_COLORS[key];
-                  return (
-                    <div key={key}>
-                      <div className="flex justify-between items-center mb-1">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium" style={{ color: "var(--text-2)" }}>
-                            {ADOPT_DIM_LABELS[key]}
-                          </span>
-                          {isMax && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded"
-                            style={{ background: "rgba(74,222,128,.10)", color: "#4ade80", border: "1px solid rgba(74,222,128,.25)" }}>Strongest</span>}
-                          {isMin && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded"
-                            style={{ background: "rgba(245,158,11,.10)", color: "#f59e0b", border: "1px solid rgba(245,158,11,.25)" }}>Weakest</span>}
-                        </div>
-                        <span className="text-sm font-black" style={{ color: "var(--text-1)" }}>{score}/20</span>
-                      </div>
-                      <div className="h-2.5 rounded-full overflow-hidden" style={{ background: "var(--raised)" }}>
-                        <div className="h-full rounded-full transition-all"
-                          style={{ width: `${(score / 20) * 100}%`, background: color }} />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-              <p className="text-[11px] mt-4 pt-3" style={{ borderTop: "1px solid var(--border)", color: "var(--text-3)" }}>
-                {adoption.top_adoption_driver}
-              </p>
-            </div>
-          );
-        })()}
-
-        {/* Trajectory + Accelerator/Risk — hidden on pure adoption tab */}
-        {(!adoption || activeTab !== "adoption") && <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="card rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-3)" }}>
-                Trajectory Outlook
-              </h2>
-              <ScoreSparkline score={country.total_score} trajectory={country.trajectory_score} width={72} height={24} />
-            </div>
-            <div className="flex items-baseline gap-2 mb-3">
-              <span className="text-5xl font-black leading-none" style={{ color: "var(--accent)" }}>
-                {country.projected_score_2028}
-              </span>
-              <div>
-                <span className="text-sm" style={{ color: "var(--text-3)" }}>/100</span>
-                <p className="text-xs" style={{ color: "var(--text-3)" }}>by 2028</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 text-sm">
-              <span style={{ color: "var(--text-3)" }}>{country.total_score} now</span>
-              <span style={{ color: "var(--accent)" }}>→</span>
-              <span className="text-xs font-semibold px-2 py-0.5 rounded-full"
-                style={
-                  delta > 0
-                    ? { background: "rgba(34,197,94,.10)", color: "#4ade80", border: "1px solid rgba(34,197,94,.25)" }
-                    : delta < 0
-                    ? { background: "rgba(239,68,68,.10)", color: "#f87171", border: "1px solid rgba(239,68,68,.25)" }
-                    : { background: "var(--raised)", color: "var(--text-3)", border: "1px solid var(--border)" }
-                }>
-                {delta > 0 ? "+" : ""}{delta} pts
-              </span>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <div className="rounded-2xl p-5" style={{ background: "rgba(34,197,94,.05)", border: "1px solid rgba(34,197,94,.20)" }}>
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-emerald-400">▲</span>
-                <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-400">Top Accelerator</h3>
-              </div>
-              <p className="text-sm leading-relaxed" style={{ color: "rgba(134,239,172,.85)" }}>
-                {country.top_accelerator}
-              </p>
-            </div>
-            <div className="rounded-2xl p-5" style={{ background: "rgba(239,68,68,.05)", border: "1px solid rgba(239,68,68,.20)" }}>
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-red-400">▼</span>
-                <h3 className="text-xs font-bold uppercase tracking-wider text-red-400">Top Risk</h3>
-              </div>
-              <p className="text-sm leading-relaxed" style={{ color: "rgba(252,165,165,.85)" }}>
-                {country.top_risk}
-              </p>
-            </div>
-          </div>
-        </div>}
-
-        {/* Dimension Detail — hidden on adoption tab */}
-        {(!adoption || activeTab !== "adoption") &&
-        <div className="card rounded-2xl overflow-hidden">
-          <div className="px-6 sm:px-8 py-5" style={{ borderBottom: "1px solid var(--border)" }}>
-            <h2 className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-3)" }}>
-              Pillar Detail
-            </h2>
-            <p className="text-xs mt-1" style={{ color: "var(--text-3)" }}>
-              Click any pillar to see supporting indicators and evidence
-            </p>
-          </div>
-          <div>
-            {Object.entries(country.scores).map(([key, val]) => {
-              const isOpen = openDim === key;
-              return (
-                <div key={key} style={{ borderBottom: "1px solid var(--border)" }}>
-                  <button
-                    className="w-full px-6 sm:px-8 py-4 flex items-center gap-4 text-left transition-colors"
-                    style={{ background: isOpen ? "rgba(59,130,246,.04)" : "transparent" }}
-                    onMouseEnter={(e) => { if (!isOpen) (e.currentTarget as HTMLElement).style.background = "var(--raised)"; }}
-                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = isOpen ? "rgba(59,130,246,.04)" : "transparent"; }}
-                    onClick={() => setOpenDim(isOpen ? null : key)}
-                  >
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-semibold" style={{ color: "var(--text-1)" }}>
-                          {DIM_LABELS[key]}
-                        </span>
-                        <span className="text-sm font-bold mr-8" style={{ color: "var(--accent)" }}>
-                          {val.score}/20
-                        </span>
-                      </div>
-                      <DimensionBar label={DIM_LABELS[key]} score={val.score} height={6} showScore={false} />
-                    </div>
-                    <span className={`text-sm flex-shrink-0 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
-                      style={{ color: "var(--text-3)" }}>↓</span>
-                  </button>
-                  {isOpen && (
-                    <div className="px-6 sm:px-8 pb-5" style={{ background: "rgba(6,11,20,.5)" }}>
-                      <p className="text-xs italic mb-3" style={{ color: "var(--text-3)" }}>{DIM_DESC[key]}</p>
-                      <ul className="space-y-2">
-                        {val.reasons.map((r, i) => (
-                          <li key={i} className="flex gap-3 items-start text-sm" style={{ color: "var(--text-2)" }}>
-                            <span className="mt-0.5 flex-shrink-0" style={{ color: "var(--accent)" }}>·</span>
-                            {r}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>}
-
-        {/* What-If Simulator — hidden on adoption tab */}
-        {(!adoption || activeTab !== "adoption") && (
-          <WhatIfSimulator country={country} allCountries={allCountries} />
-        )}
-
-        {/* Policy Gap Analyser — hidden on adoption tab */}
-        {(!adoption || activeTab !== "adoption") && (
-          <PolicyGapAnalyser country={country} allCountries={allCountries} />
-        )}
-
-        {/* AI Narrative — hidden on adoption tab */}
-        {(!adoption || activeTab !== "adoption") &&
-        <div className="card rounded-2xl overflow-hidden">
-          <div className="px-6 sm:px-8 py-5 flex items-center justify-between"
-            style={{ borderBottom: "1px solid var(--border)" }}>
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <h2 className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-3)" }}>
-                  Country Brief
-                </h2>
-                {narrative.status === "done" && (
-                  <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold"
-                    style={{ background: "rgba(59,130,246,.10)", border: "1px solid rgba(59,130,246,.22)", color: "var(--accent)" }}>
-                    {narrative.source === "ai" ? "AI-drafted" : "Structured overview"}
-                  </span>
-                )}
-              </div>
-              <p className="text-xs" style={{ color: "var(--text-3)" }}>
-                Standing &amp; Trajectory · Infrastructure &amp; Talent · Governance &amp; Policy · Investment &amp; Capital · Economic Readiness &amp; Outlook
-              </p>
-            </div>
-            {(narrative.status === "idle" || narrative.status === "error") && (
-              <button onClick={fetchNarrative} className="btn-primary flex items-center gap-2 px-4 py-2 text-xs rounded-xl">
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                Generate Brief
-              </button>
-            )}
-            {narrative.status === "loading" && (
-              <div className="flex items-center gap-1.5 text-xs px-3 py-2" style={{ color: "var(--accent)" }}>
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse [animation-delay:0.2s]" />
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse [animation-delay:0.4s]" />
-                <span className="ml-1">Building {country.name}&apos;s brief…</span>
-              </div>
-            )}
-          </div>
-
-          <div className="px-6 sm:px-8 py-6">
-            {narrative.status === "idle" && (
-              <p className="text-sm text-center py-4" style={{ color: "var(--text-3)" }}>
-                Click &ldquo;Generate Brief&rdquo; for a five-section written brief on {country.name}&apos;s AI readiness and trajectory.
-              </p>
-            )}
-            {narrative.status === "loading" && (
-              <div className="space-y-3 animate-pulse">
-                <div className="h-4 rounded-full w-full skeleton" />
-                <div className="h-4 rounded-full w-5/6 skeleton" />
-                <div className="h-4 rounded-full w-4/5 skeleton" />
-              </div>
-            )}
-            {narrative.status === "error" && (
-              <div className="flex items-start gap-3 p-4 rounded-xl"
-                style={{ background: "rgba(245,158,11,.06)", border: "1px solid rgba(245,158,11,.22)" }}>
-                <span className="text-amber-400 mt-0.5">⚠</span>
-                <p className="text-sm text-amber-400/90">
-                  {narrative.error ?? "Brief temporarily unavailable — please try again."}
-                </p>
-              </div>
-            )}
-            {narrative.status === "done" && narrative.sections.length > 0 && (
-              <div className="space-y-6 fade-up">
-                {narrative.sections.map((section) => {
-                  const pillarLabel = SECTION_PILLAR_CHART[section.heading];
-                  return (
-                    <div key={section.heading} className="brief-section-row">
-                      <div className="brief-section-text">
-                        <p className="text-[10px] font-bold uppercase tracking-widest mb-2"
-                          style={{ color: "rgba(96,165,250,.7)" }}>{section.heading}</p>
-                        <p className="text-sm leading-relaxed" style={{ color: "var(--text-2)" }}>
-                          {section.body}
-                        </p>
-                      </div>
-                      {pillarLabel && (
-                        <div className="brief-section-chart">
-                          {pillarLabel.map((label) => (
-                            <DimensionBar key={label} label={label} score={country.scores[DIM_KEY[label]].score} />
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-                <p className="text-[11px] pt-2" style={{ borderTop: "1px solid var(--border)", color: "var(--text-3)" }}>
-                  {narrative.source === "ai"
-                    ? "Brief drafted by AI, grounded in this page's own scores and live World Bank data."
-                    : "Structured overview generated from this page's own scores and live World Bank data."}
-                  {" "}Cached weekly.
-                  {narrative.generatedAt && (
-                    <> · Generated {new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" })
-                      .format(new Date(narrative.generatedAt))}</>
-                  )}
-                </p>
-              </div>
-            )}
-          </div>
-        </div>}
-
-        {/* AI Development Roadmap — hidden on adoption tab */}
-        {(!adoption || activeTab !== "adoption") && <CountryRoadmap country={country} />}
-
-        {/* Live News Feed */}
-        <CountryNewsFeed slug={slug} countryName={country.name} />
-
-        {/* AI Q&A Chat */}
-        <CountryChat country={country} />
-
-        {/* Comparable Countries */}
-        {comparables.length > 0 && (
-          <div className="card rounded-2xl p-6 sm:p-8">
-            <h2 className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: "var(--text-3)" }}>
-              Most Similar Countries
-            </h2>
-            <p className="text-xs mb-5" style={{ color: "var(--text-3)" }}>
-              Nearest neighbours by 5-pillar Euclidean distance
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {comparables.map((comp) => (
-                <Link key={comp.slug} href={`/country/${comp.slug}`}
-                  className="card shine-on-hover flex items-center gap-4 p-4 rounded-xl group transition-all duration-200">
-                  <span className="text-3xl">{comp.flag}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold truncate transition-colors group-hover:text-blue-300"
-                      style={{ color: "var(--text-1)" }}>
-                      {comp.name}
-                    </p>
-                    <p className="text-xs mt-0.5" style={{ color: "var(--text-3)" }}>
-                      {comp.total_score}/100 · {comp.trajectory_label}
-                    </p>
-                  </div>
-                  <span className="text-sm transition-colors group-hover:text-blue-400" style={{ color: "var(--text-3)" }}>→</span>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
+        <footer className="country-footer"><p>World Bank · IMF · OECD · OECD.AI · WGI · Oxford Insights · WIPO</p><p>AI Trajectory Index · Version 3 · 2026 edition</p></footer>
       </div>
 
-      <footer className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-8 mt-4 text-center space-y-1"
-        style={{ borderTop: "1px solid var(--border)" }}>
-        <p className="text-xs" style={{ color: "var(--text-3)" }}>
-          Data: World Bank API · OECD AI Policy Observatory · Scores updated daily.
-        </p>
-        <p className="text-xs" style={{ color: "var(--text-3)" }}>
-          AI Trajectory Index · Built by{" "}
-          <a href="https://ankitmishra.ca" target="_blank" rel="noopener noreferrer"
-            className="hover:text-blue-400 transition-colors">Ankit Mishra</a>
-        </p>
-      </footer>
-      </div>
+      {embedOpen && <div className="country-modal-backdrop no-print" onClick={(event) => { if (event.target === event.currentTarget) setEmbedOpen(false); }}><div className="country-embed-modal" role="dialog" aria-modal="true" aria-labelledby="embed-title"><header><h2 id="embed-title">Embed {country.name}</h2><button onClick={() => setEmbedOpen(false)} className="country-icon-button" aria-label="Close embed dialog">×</button></header><p>Use the compact, iframe-safe country widget.</p><pre>{embedCode}</pre><div><button className="button-primary" onClick={async () => { if (await copyText(embedCode)) setEmbedCopied(true); }}>{embedCopied ? "Code copied" : "Copy embed code"}</button><a className="button-secondary" href={`/widget/${slug}`} target="_blank" rel="noopener noreferrer">Preview widget</a></div></div></div>}
+      {copied && <div className="status-toast" role="status">Share link copied</div>}
     </main>
   );
 }
