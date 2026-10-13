@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 
 import { METHODOLOGY_COMPONENTS, PILLAR_KEYS } from "@/lib/methodology";
+import { buildCoverage } from "@/lib/provenance";
+import type {
+  CountryProvenance,
+  PillarKey,
+  ProvenanceStatus,
+  ScoreComponentProvenance,
+} from "@/lib/types";
 
 const WORLD_BANK_CODES = [
   "IT.NET.USER.ZS",
@@ -51,5 +58,98 @@ describe("methodology registry", () => {
     for (const code of WORLD_BANK_CODES) {
       expect(registeredCodes.has(code), `Missing World Bank series ${code}`).toBe(true);
     }
+  });
+});
+
+const emptyProvenance = (): CountryProvenance => ({
+  infrastructure: [],
+  talent: [],
+  governance: [],
+  investment: [],
+  economic_readiness: [],
+});
+
+const coverageComponent = (
+  key: string,
+  status: ProvenanceStatus,
+  pointsAvailable: number,
+  year: number | null = null,
+): ScoreComponentProvenance => ({
+  key,
+  label: key,
+  pillar: "infrastructure" as PillarKey,
+  source: "Test source",
+  sourceUrl: "https://example.com",
+  indicatorCode: null,
+  value: status === "fallback" ? null : 1,
+  unit: null,
+  year,
+  pointsEarned: 0,
+  pointsAvailable,
+  status,
+  substitution: status === "fallback" ? "Test substitution" : null,
+});
+
+describe("buildCoverage", () => {
+  it("uses the inclusive High boundary and reports live observation years", () => {
+    const provenance = emptyProvenance();
+    provenance.infrastructure = [
+      coverageComponent("fixed_broadband", "live", 10, 2022),
+      coverageComponent("internet_users", "live", 10, 2024),
+      coverageComponent("mobile_subscriptions", "enriched", 10),
+      coverageComponent("electricity_access", "fallback", 0),
+      coverageComponent("infrastructure_quality", "fallback", 30),
+    ];
+
+    expect(buildCoverage(provenance)).toEqual({
+      label: "High",
+      liveIndicators: 2,
+      expectedIndicators: 4,
+      enrichedIndicators: 1,
+      policyIndicators: 0,
+      fallbackComponents: 1,
+      fallbackShare: 30,
+      oldestYear: 2022,
+      newestYear: 2024,
+    });
+  });
+
+  it("uses the inclusive Medium boundary and leaves absent years null", () => {
+    const provenance = emptyProvenance();
+    provenance.infrastructure = [
+      coverageComponent("fixed_broadband", "live", 10),
+      coverageComponent("internet_users", "enriched", 10),
+      coverageComponent("mobile_subscriptions", "fallback", 25),
+      coverageComponent("electricity_access", "fallback", 0),
+      coverageComponent("infrastructure_quality", "fallback", 30),
+    ];
+    provenance.governance = [
+      coverageComponent("national_ai_strategy", "policy", 0),
+    ];
+    provenance.talent = [coverageComponent("oecd_researchers", "enriched", 0)];
+
+    expect(buildCoverage(provenance)).toEqual({
+      label: "Medium",
+      liveIndicators: 1,
+      expectedIndicators: 6,
+      enrichedIndicators: 2,
+      policyIndicators: 1,
+      fallbackComponents: 2,
+      fallbackShare: 55,
+      oldestYear: null,
+      newestYear: null,
+    });
+  });
+
+  it("returns Limited when observed coverage falls below half", () => {
+    const provenance = emptyProvenance();
+    provenance.infrastructure = [
+      coverageComponent("fixed_broadband", "live", 10),
+      coverageComponent("internet_users", "fallback", 10),
+      coverageComponent("mobile_subscriptions", "fallback", 10),
+      coverageComponent("electricity_access", "fallback", 10),
+    ];
+
+    expect(buildCoverage(provenance).label).toBe("Limited");
   });
 });

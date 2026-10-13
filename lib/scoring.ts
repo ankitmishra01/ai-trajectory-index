@@ -1,5 +1,13 @@
-import type { Country, ScoredCountry } from "./types";
-import type { WorldBankData } from "./worldbank";
+import { METHODOLOGY_BY_KEY } from "./methodology";
+import { buildCoverage } from "./provenance";
+import type {
+  Country,
+  CountryProvenance,
+  ProvenanceStatus,
+  ScoreComponentProvenance,
+  ScoredCountry,
+} from "./types";
+import type { IndicatorValues, WorldBankData } from "./worldbank";
 import type { IMFData } from "./imf";
 import type { OECDData } from "./oecd";
 
@@ -27,6 +35,64 @@ function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
 }
 
+interface PillarCalculation {
+  score: number;
+  rawPoints: number;
+  components: ScoreComponentProvenance[];
+}
+
+interface ComponentOptions {
+  value: number | boolean | null;
+  year: number | null;
+  pointsEarned: number;
+  status: ProvenanceStatus;
+  substitution?: string | null;
+  source?: string;
+  sourceUrl?: string;
+  indicatorCode?: string | null;
+}
+
+function component(key: string, options: ComponentOptions): ScoreComponentProvenance {
+  const metadata = METHODOLOGY_BY_KEY.get(key);
+  if (!metadata) throw new Error(`Missing methodology metadata for ${key}`);
+  return {
+    key,
+    label: metadata.label,
+    pillar: metadata.pillar,
+    source: options.source ?? metadata.source,
+    sourceUrl: options.sourceUrl ?? metadata.sourceUrl,
+    indicatorCode: options.indicatorCode ?? metadata.indicatorCode,
+    value: options.value,
+    unit: metadata.unit,
+    year: options.year,
+    pointsEarned: options.pointsEarned,
+    pointsAvailable: metadata.pointsAvailable,
+    status: options.status,
+    substitution: options.substitution ?? null,
+  };
+}
+
+function fallbackComponent(
+  key: string,
+  staticScore: number,
+  reason: string,
+): ScoreComponentProvenance {
+  const metadata = METHODOLOGY_BY_KEY.get(key);
+  if (!metadata) throw new Error(`Missing methodology metadata for ${key}`);
+  return component(key, {
+    value: null,
+    year: null,
+    pointsEarned: (staticScore / 20) * metadata.pointsAvailable,
+    status: "fallback",
+    substitution: `${reason}; used ${metadata.pointsAvailable}/20 of the static ${metadata.pillar === "economic_readiness" ? "Economic Readiness" : metadata.pillar[0].toUpperCase() + metadata.pillar.slice(1)} baseline.`,
+  });
+}
+
+const current = (values: IndicatorValues | undefined): number | null =>
+  values?.current ?? null;
+
+const year = (values: IndicatorValues | undefined): number | null => values?.year ?? null;
+
 // ─── Infrastructure (0-20) ──────────────────────────────────────────────────
 //
 // Audit fix: previous formula only used consumer-access proxies (internet %, mobile, electricity)
@@ -42,65 +108,56 @@ function clamp(n: number, min: number, max: number) {
 //   Max:                               20 pts
 
 function scoreInfrastructure(
-  internet: number | null,
-  mobile: number | null,
-  electricity: number | null,
-  broadband: number | null,
+  internetValues: IndicatorValues | undefined,
+  mobileValues: IndicatorValues | undefined,
+  electricityValues: IndicatorValues | undefined,
+  broadbandValues: IndicatorValues | undefined,
   staticScore: number
-): number {
-  const hasAny =
-    internet !== null || mobile !== null || electricity !== null || broadband !== null;
-  if (!hasAny) return staticScore;
-
-  let points = 0;
+): PillarCalculation {
+  const internet = current(internetValues);
+  const mobile = current(mobileValues);
+  const electricity = current(electricityValues);
+  const broadband = current(broadbandValues);
+  const components: ScoreComponentProvenance[] = [];
 
   // Fixed broadband (6 pts) — best available proxy for digital infrastructure quality
   if (broadband !== null) {
-    if (broadband > 35) points += 6;       // High quality: US, UK, Germany, S. Korea
-    else if (broadband > 20) points += 4.5; // Good: Poland, Brazil, Turkey
-    else if (broadband > 8) points += 3;   // Developing: India, Nigeria
-    else if (broadband > 2) points += 1.5; // Low penetration
-    else points += 0.5;
+    const points = broadband > 35 ? 6 : broadband > 20 ? 4.5 : broadband > 8 ? 3 : broadband > 2 ? 1.5 : 0.5;
+    components.push(component("fixed_broadband", { value: broadband, year: year(broadbandValues), pointsEarned: points, status: "live" }));
   } else {
-    points += (staticScore / 20) * 6;
+    components.push(fallbackComponent("fixed_broadband", staticScore, "World Bank fixed-broadband value unavailable"));
   }
 
   // Internet users % (3 pts) — access signal, limited discriminatory power above 80%
   if (internet !== null) {
-    if (internet > 85) points += 3;
-    else if (internet > 65) points += 2.2;
-    else if (internet > 40) points += 1.5;
-    else if (internet > 15) points += 0.8;
-    else points += 0.3;
+    const points = internet > 85 ? 3 : internet > 65 ? 2.2 : internet > 40 ? 1.5 : internet > 15 ? 0.8 : 0.3;
+    components.push(component("internet_users", { value: internet, year: year(internetValues), pointsEarned: points, status: "live" }));
   } else {
-    points += (staticScore / 20) * 3;
+    components.push(fallbackComponent("internet_users", staticScore, "World Bank internet-use value unavailable"));
   }
 
   // Mobile subscriptions/100 (3 pts) — counts SIMs not people, less meaningful above 100
   if (mobile !== null) {
-    if (mobile > 120) points += 3;
-    else if (mobile > 80) points += 2.2;
-    else if (mobile > 40) points += 1.5;
-    else points += 0.5;
+    const points = mobile > 120 ? 3 : mobile > 80 ? 2.2 : mobile > 40 ? 1.5 : 0.5;
+    components.push(component("mobile_subscriptions", { value: mobile, year: year(mobileValues), pointsEarned: points, status: "live" }));
   } else {
-    points += (staticScore / 20) * 3;
+    components.push(fallbackComponent("mobile_subscriptions", staticScore, "World Bank mobile-subscription value unavailable"));
   }
 
   // Electricity access % (3 pts) — critical for AI compute; saturated for OECD
   if (electricity !== null) {
-    if (electricity > 97) points += 3;
-    else if (electricity > 80) points += 2;
-    else if (electricity > 50) points += 1;
-    else points += 0.3;
+    const points = electricity > 97 ? 3 : electricity > 80 ? 2 : electricity > 50 ? 1 : 0.3;
+    components.push(component("electricity_access", { value: electricity, year: year(electricityValues), pointsEarned: points, status: "live" }));
   } else {
-    points += (staticScore / 20) * 3;
+    components.push(fallbackComponent("electricity_access", staticScore, "World Bank electricity-access value unavailable"));
   }
 
   // Static quality proxy (5 pts) — server infrastructure, cloud regions, grid reliability
-  points += (staticScore / 20) * 5;
+  components.push(fallbackComponent("infrastructure_quality", staticScore, "Designed infrastructure-quality residual"));
 
   // Max raw = 20
-  return clamp(Math.round(points), 0, 20);
+  const rawPoints = components.reduce((sum, item) => sum + item.pointsEarned, 0);
+  return { score: clamp(Math.round(rawPoints), 0, 20), rawPoints, components };
 }
 
 // ─── Talent (0-20) ──────────────────────────────────────────────────────────
@@ -128,56 +185,51 @@ function scoreLaborProductivity(laborProd: number | null): number {
 }
 
 function scoreTalent(
-  tertiary: number | null,
-  laborProd: number | null,
+  tertiaryValues: IndicatorValues | undefined,
+  laborProdValues: IndicatorValues | undefined,
   staticScore: number,
-  oecdResearchers: number | null,
+  oecdResearchersValues: IndicatorValues | undefined,
   wipoGii: number | null
-): number {
-  const hasAny = tertiary !== null || laborProd !== null;
-  if (!hasAny) return staticScore;
-
-  let points = 0;
+): PillarCalculation {
+  const tertiary = current(tertiaryValues);
+  const laborProd = current(laborProdValues);
+  const oecdResearchers = current(oecdResearchersValues);
+  const components: ScoreComponentProvenance[] = [];
 
   // Tertiary enrollment % (6 pts) — volume of talent pipeline
   if (tertiary !== null) {
-    if (tertiary > 70) points += 6;
-    else if (tertiary > 50) points += 4.5;
-    else if (tertiary > 30) points += 3;
-    else if (tertiary > 15) points += 1.8;
-    else points += 0.8;
+    const points = tertiary > 70 ? 6 : tertiary > 50 ? 4.5 : tertiary > 30 ? 3 : tertiary > 15 ? 1.8 : 0.8;
+    components.push(component("tertiary_enrollment", { value: tertiary, year: year(tertiaryValues), pointsEarned: points, status: "live" }));
   } else {
-    points += (staticScore / 20) * 6;
+    components.push(fallbackComponent("tertiary_enrollment", staticScore, "World Bank tertiary-enrolment value unavailable"));
   }
 
   // Labor productivity (6 pts) — GDP per employed person (constant 2017 PPP$)
   if (laborProd !== null) {
-    points += scoreLaborProductivity(laborProd);
+    components.push(component("labor_productivity", { value: laborProd, year: year(laborProdValues), pointsEarned: scoreLaborProductivity(laborProd), status: "live" }));
   } else {
-    points += (staticScore / 20) * 6;
+    components.push(fallbackComponent("labor_productivity", staticScore, "World Bank labour-productivity value unavailable"));
   }
 
   // Static talent quality proxy — 8pts, partially replaced by live sources when available
   // OECD researchers/1000 employed (−2pts from static, +2pts live)
   // WIPO GII innovation score (−1pt from static, +1pt live)
-  let staticAlloc = 8;
   if (oecdResearchers !== null) {
-    staticAlloc -= 2;
-    if (oecdResearchers > 10)      points += 2;
-    else if (oecdResearchers > 6)  points += 1.5;
-    else if (oecdResearchers > 3)  points += 1;
-    else                           points += 0.5;
+    const points = oecdResearchers > 10 ? 2 : oecdResearchers > 6 ? 1.5 : oecdResearchers > 3 ? 1 : 0.5;
+    components.push(component("oecd_researchers", { value: oecdResearchers, year: year(oecdResearchersValues), pointsEarned: points, status: "live" }));
+  } else {
+    components.push(fallbackComponent("oecd_researchers", staticScore, "OECD researcher-density value unavailable"));
   }
   if (wipoGii !== null) {
-    staticAlloc -= 1;
-    if (wipoGii > 55)      points += 1;
-    else if (wipoGii > 40) points += 0.7;
-    else if (wipoGii > 25) points += 0.4;
-    else                   points += 0.2;
+    const points = wipoGii > 55 ? 1 : wipoGii > 40 ? 0.7 : wipoGii > 25 ? 0.4 : 0.2;
+    components.push(component("wipo_gii", { value: wipoGii, year: 2024, pointsEarned: points, status: "enriched" }));
+  } else {
+    components.push(fallbackComponent("wipo_gii", staticScore, "WIPO Global Innovation Index value unavailable"));
   }
-  points += (staticScore / 20) * staticAlloc;
+  components.push(fallbackComponent("talent_quality", staticScore, "Designed talent-quality residual"));
 
-  return clamp(Math.round(points), 0, 20);
+  const rawPoints = components.reduce((sum, item) => sum + item.pointsEarned, 0);
+  return { score: clamp(Math.round(rawPoints), 0, 20), rawPoints, components };
 }
 
 // ─── Governance (0-20) ──────────────────────────────────────────────────────
@@ -208,50 +260,59 @@ function normalizeWGI(estimate: number | null, maxPts: number): number | null {
 }
 
 function scoreGovernance(
-  govEff: number | null,
-  ruleOfLaw: number | null,
-  regQuality: number | null,
+  govEffValues: IndicatorValues | undefined,
+  ruleOfLawValues: IndicatorValues | undefined,
+  regQualityValues: IndicatorValues | undefined,
   policy: PolicyData,
   staticScore: number,
   oxfordInsights: number | null
-): number {
-  let points = 0;
+): PillarCalculation {
+  const govEff = current(govEffValues);
+  const ruleOfLaw = current(ruleOfLawValues);
+  const regQuality = current(regQualityValues);
+  const components: ScoreComponentProvenance[] = [];
 
   // Rule of Law (5 pts) — continuous WGI signal
   const rolPts = normalizeWGI(ruleOfLaw, 5);
-  points += rolPts !== null ? rolPts : (staticScore / 20) * 5;
+  components.push(rolPts !== null
+    ? component("rule_of_law", { value: ruleOfLaw, year: year(ruleOfLawValues), pointsEarned: rolPts, status: "live" })
+    : fallbackComponent("rule_of_law", staticScore, "World Bank Rule of Law estimate unavailable"));
 
   // Government Effectiveness (4 pts)
   const gePts = normalizeWGI(govEff, 4);
-  points += gePts !== null ? gePts : (staticScore / 20) * 4;
+  components.push(gePts !== null
+    ? component("government_effectiveness", { value: govEff, year: year(govEffValues), pointsEarned: gePts, status: "live" })
+    : fallbackComponent("government_effectiveness", staticScore, "World Bank Government Effectiveness estimate unavailable"));
 
   // Regulatory Quality (3 pts)
   const rqPts = normalizeWGI(regQuality, 3);
-  points += rqPts !== null ? rqPts : (staticScore / 20) * 3;
+  components.push(rqPts !== null
+    ? component("regulatory_quality", { value: regQuality, year: year(regQualityValues), pointsEarned: rqPts, status: "live" })
+    : fallbackComponent("regulatory_quality", staticScore, "World Bank Regulatory Quality estimate unavailable"));
 
   // AI strategy (3 pts base + 2 bonus for recency)
-  if (policy.has_national_ai_strategy) {
-    points += 3;
-    if (policy.strategy_year && policy.strategy_year >= 2022) points += 2;
-    else if (policy.strategy_year && policy.strategy_year >= 2019) points += 1;
-  }
+  const strategyPoints = policy.has_national_ai_strategy ? 3 : 0;
+  components.push(component("national_ai_strategy", { value: policy.has_national_ai_strategy, year: policy.strategy_year, pointsEarned: strategyPoints, status: "policy" }));
+  const recencyPoints = policy.has_national_ai_strategy && policy.strategy_year
+    ? policy.strategy_year >= 2022 ? 2 : policy.strategy_year >= 2019 ? 1 : 0
+    : 0;
+  components.push(component("strategy_recency", { value: policy.strategy_year, year: policy.strategy_year, pointsEarned: recencyPoints, status: "policy" }));
   // No negative penalty for lacking strategy — absence is already scored via WGI
 
   // AI regulation (1 pt) — existence only, not quality
-  if (policy.has_ai_regulation) points += 1;
+  components.push(component("ai_regulation", { value: policy.has_ai_regulation, year: null, pointsEarned: policy.has_ai_regulation ? 1 : 0, status: "policy" }));
 
   // Static institutional proxy (2 pts) — replaced by Oxford Insights when available
   if (oxfordInsights !== null) {
-    if (oxfordInsights >= 65)      points += 2;
-    else if (oxfordInsights >= 45) points += 1.5;
-    else if (oxfordInsights >= 30) points += 1;
-    else                           points += 0.5;
+    const points = oxfordInsights >= 65 ? 2 : oxfordInsights >= 45 ? 1.5 : oxfordInsights >= 30 ? 1 : 0.5;
+    components.push(component("oxford_readiness", { value: oxfordInsights, year: 2024, pointsEarned: points, status: "enriched" }));
   } else {
-    points += (staticScore / 20) * 2;
+    components.push(fallbackComponent("oxford_readiness", staticScore, "Oxford Insights readiness value unavailable"));
   }
 
   // Max raw = 20
-  return clamp(Math.round(points), 0, 20);
+  const rawPoints = components.reduce((sum, item) => sum + item.pointsEarned, 0);
+  return { score: clamp(Math.round(rawPoints), 0, 20), rawPoints, components };
 }
 
 // ─── Investment (0-20) ──────────────────────────────────────────────────────
@@ -266,53 +327,58 @@ function scoreGovernance(
 //   Max:                     20 pts
 
 function scoreInvestment(
-  rd: number | null,
-  fdi: number | null,
+  rdValues: IndicatorValues | undefined,
+  fdiValues: IndicatorValues | undefined,
   staticScore: number,
-  imfGovtExpenditure: number | null,
-  oecdRd: number | null
-): number {
+  imfGovtExpenditureValues: IndicatorValues | undefined,
+  oecdRdValues: IndicatorValues | undefined
+): PillarCalculation {
+  const rd = current(rdValues);
+  const fdi = current(fdiValues);
+  const imfGovtExpenditure = current(imfGovtExpenditureValues);
+  const oecdRd = current(oecdRdValues);
   const hasAny = rd !== null || fdi !== null || imfGovtExpenditure !== null || oecdRd !== null;
-  if (!hasAny) return staticScore;
-
-  let points = 0;
+  const components: ScoreComponentProvenance[] = [];
 
   // R&D spend % GDP (6 pts) — prefer OECD business R&D when available, else WB total R&D
   const effectiveRd = oecdRd ?? rd;
   if (effectiveRd !== null) {
-    if (effectiveRd > 3.5)      points += 6;
-    else if (effectiveRd > 2)   points += 4.5;
-    else if (effectiveRd > 1)   points += 3;
-    else if (effectiveRd > 0.3) points += 1.5;
-    else                        points += 0.5;
+    const points = effectiveRd > 3.5 ? 6 : effectiveRd > 2 ? 4.5 : effectiveRd > 1 ? 3 : effectiveRd > 0.3 ? 1.5 : 0.5;
+    const usesOecd = oecdRd !== null;
+    components.push(component("rd_expenditure", {
+      value: effectiveRd,
+      year: usesOecd ? year(oecdRdValues) : year(rdValues),
+      pointsEarned: points,
+      status: "live",
+      source: usesOecd ? "OECD Data Explorer" : "World Bank Open Data",
+      sourceUrl: usesOecd ? "https://data-explorer.oecd.org" : "https://data.worldbank.org",
+      indicatorCode: usesOecd ? "GPERD.PC_GDP" : "GB.XPD.RSDV.GD.ZS",
+    }));
   } else {
-    points += (staticScore / 20) * 6;
+    components.push(fallbackComponent("rd_expenditure", staticScore, "OECD and World Bank R&D expenditure values unavailable"));
   }
 
   // FDI net inflows % GDP (5 pts) — actual foreign capital attraction signal
   if (fdi !== null) {
     const clampedFdi = Math.min(fdi, 20);
-    if (clampedFdi > 10)      points += 5;
-    else if (clampedFdi > 4)  points += 4;
-    else if (clampedFdi > 1.5) points += 3;
-    else if (clampedFdi > 0)  points += 2;
-    else                      points += 0.5;
+    const points = clampedFdi > 10 ? 5 : clampedFdi > 4 ? 4 : clampedFdi > 1.5 ? 3 : clampedFdi > 0 ? 2 : 0.5;
+    components.push(component("fdi_inflows", { value: fdi, year: year(fdiValues), pointsEarned: points, status: "live" }));
   } else {
-    points += (staticScore / 20) * 5;
+    components.push(fallbackComponent("fdi_inflows", staticScore, "World Bank FDI value unavailable"));
   }
 
   // Static VC ecosystem proxy: 9pts when no IMF data; 3pts replaced by IMF govt expenditure signal
   if (imfGovtExpenditure !== null) {
-    if (imfGovtExpenditure >= 45)      points += 3;
-    else if (imfGovtExpenditure >= 35) points += 2;
-    else if (imfGovtExpenditure >= 25) points += 1;
-    else                               points += 0.5;
-    points += (staticScore / 20) * 6;
+    const points = imfGovtExpenditure >= 45 ? 3 : imfGovtExpenditure >= 35 ? 2 : imfGovtExpenditure >= 25 ? 1 : 0.5;
+    components.push(component("government_expenditure", { value: imfGovtExpenditure, year: year(imfGovtExpenditureValues), pointsEarned: points, status: "live" }));
   } else {
-    points += (staticScore / 20) * 9;
+    components.push(fallbackComponent("government_expenditure", staticScore, "IMF government-expenditure value unavailable"));
   }
+  components.push(fallbackComponent("capital_ecosystem", staticScore, "Designed capital-ecosystem residual"));
 
-  return clamp(Math.round(points), 0, 20);
+  const rawPoints = components.reduce((sum, item) => sum + item.pointsEarned, 0);
+  const score = hasAny ? clamp(Math.round(rawPoints), 0, 20) : staticScore;
+  return { score, rawPoints, components };
 }
 
 // ─── Economic Readiness (0-20) ──────────────────────────────────────────────
@@ -332,40 +398,37 @@ function scoreInvestment(
 //   Max:                        20 pts
 
 function scoreEconomicReadiness(
-  gdpPpp: number | null,
-  privateCredit: number | null,
-  tradeOpenness: number | null,
-  servicesShare: number | null,
+  gdpPppValues: IndicatorValues | undefined,
+  privateCreditValues: IndicatorValues | undefined,
+  tradeOpennessValues: IndicatorValues | undefined,
+  servicesShareValues: IndicatorValues | undefined,
   staticScore: number,
-  imfGovtDebt: number | null
-): number {
+  imfGovtDebtValues: IndicatorValues | undefined
+): PillarCalculation {
+  const gdpPpp = current(gdpPppValues);
+  const privateCredit = current(privateCreditValues);
+  const tradeOpenness = current(tradeOpennessValues);
+  const servicesShare = current(servicesShareValues);
+  const imfGovtDebt = current(imfGovtDebtValues);
   const hasAny =
     gdpPpp !== null || privateCredit !== null ||
     tradeOpenness !== null || servicesShare !== null;
-  if (!hasAny) return staticScore;
-
-  let points = 0;
+  const components: ScoreComponentProvenance[] = [];
 
   // GDP per capita PPP — constant 2017 international $ (6 pts)
   if (gdpPpp !== null) {
-    if (gdpPpp > 55_000) points += 6;     // Wealthy: US, Germany, Switzerland, Australia
-    else if (gdpPpp > 30_000) points += 4.5; // Upper-middle: Poland, Chile, Malaysia
-    else if (gdpPpp > 12_000) points += 3;   // Middle: China, Brazil, S. Africa
-    else if (gdpPpp > 4_000) points += 1.5;  // Lower-middle: India, Nigeria, Kenya
-    else points += 0.5;
+    const points = gdpPpp > 55_000 ? 6 : gdpPpp > 30_000 ? 4.5 : gdpPpp > 12_000 ? 3 : gdpPpp > 4_000 ? 1.5 : 0.5;
+    components.push(component("gdp_per_capita_ppp", { value: gdpPpp, year: year(gdpPppValues), pointsEarned: points, status: "live" }));
   } else {
-    points += (staticScore / 20) * 6;
+    components.push(fallbackComponent("gdp_per_capita_ppp", staticScore, "World Bank GDP per capita PPP value unavailable"));
   }
 
   // Private sector credit % GDP (3 pts) — financial depth signals ability to fund AI adoption
   if (privateCredit !== null) {
-    if (privateCredit > 150) points += 3;     // Deep finance: US, Japan, Singapore, Switzerland
-    else if (privateCredit > 80) points += 2.2; // Strong: EU average, China, Chile
-    else if (privateCredit > 40) points += 1.5; // Developing: Brazil, S. Africa, Turkey
-    else if (privateCredit > 15) points += 0.8;
-    else points += 0.3;
+    const points = privateCredit > 150 ? 3 : privateCredit > 80 ? 2.2 : privateCredit > 40 ? 1.5 : privateCredit > 15 ? 0.8 : 0.3;
+    components.push(component("private_credit", { value: privateCredit, year: year(privateCreditValues), pointsEarned: points, status: "live" }));
   } else {
-    points += (staticScore / 20) * 3;
+    components.push(fallbackComponent("private_credit", staticScore, "World Bank private-credit value unavailable"));
   }
 
   // Trade openness % GDP (3 pts) — access to global tech supply chains and talent
@@ -373,34 +436,33 @@ function scoreEconomicReadiness(
     // Small open economies (Singapore, Netherlands) naturally score very high.
     // Large economies (US, India) have structurally lower ratios — not a penalty.
     const capped = Math.min(tradeOpenness, 200); // cap extreme small-country outliers
-    if (capped > 120) points += 3;
-    else if (capped > 70) points += 2.2;
-    else if (capped > 40) points += 1.5;
-    else if (capped > 20) points += 0.8;
-    else points += 0.3;
+    const points = capped > 120 ? 3 : capped > 70 ? 2.2 : capped > 40 ? 1.5 : capped > 20 ? 0.8 : 0.3;
+    components.push(component("trade_openness", { value: tradeOpenness, year: year(tradeOpennessValues), pointsEarned: points, status: "live" }));
   } else {
-    points += (staticScore / 20) * 3;
+    components.push(fallbackComponent("trade_openness", staticScore, "World Bank trade-openness value unavailable"));
   }
 
   // Services value added % GDP (3 pts) — AI is a services-sector technology
   if (servicesShare !== null) {
-    if (servicesShare > 75) points += 3;      // Post-industrial: US, UK, Switzerland, Luxembourg
-    else if (servicesShare > 60) points += 2.2; // EU average, Australia, Canada
-    else if (servicesShare > 45) points += 1.5; // China, Russia, Indonesia
-    else if (servicesShare > 30) points += 0.8;
-    else points += 0.3;
+    const points = servicesShare > 75 ? 3 : servicesShare > 60 ? 2.2 : servicesShare > 45 ? 1.5 : servicesShare > 30 ? 0.8 : 0.3;
+    components.push(component("services_share", { value: servicesShare, year: year(servicesShareValues), pointsEarned: points, status: "live" }));
   } else {
-    points += (staticScore / 20) * 3;
+    components.push(fallbackComponent("services_share", staticScore, "World Bank services-share value unavailable"));
   }
 
   // Static market capacity proxy (5 pts); high govt debt (>100% GDP) reduces by 1pt
-  let staticPts = (staticScore / 20) * 5;
-  if (imfGovtDebt !== null && imfGovtDebt > 100) {
-    staticPts = Math.max(0, staticPts - 1);
-  }
-  points += staticPts;
+  const staticPts = (staticScore / 20) * 5;
+  components.push(component("market_capacity", { value: null, year: null, pointsEarned: staticPts, status: "fallback", substitution: "Designed market-capacity residual; no live replacement is defined." }));
+  const debtAdjustment = hasAny && imfGovtDebt !== null && imfGovtDebt > 100
+    ? Math.max(0, staticPts - 1) - staticPts
+    : 0;
+  components.push(imfGovtDebt !== null
+    ? component("government_debt", { value: imfGovtDebt, year: year(imfGovtDebtValues), pointsEarned: debtAdjustment, status: "live" })
+    : component("government_debt", { value: null, year: null, pointsEarned: 0, status: "fallback", substitution: "IMF government-debt value unavailable; no score adjustment was applied." }));
 
-  return clamp(Math.round(points), 0, 20);
+  const rawPoints = components.reduce((sum, item) => sum + item.pointsEarned, 0);
+  const score = hasAny ? clamp(Math.round(rawPoints), 0, 20) : staticScore;
+  return { score, rawPoints, components };
 }
 
 // ─── Trajectory (-10 to +10) ────────────────────────────────────────────────
@@ -589,47 +651,53 @@ export function calculateScores(
   const hightechPrevious = wb?.hightech_exports.previous ?? null;
   const broadbandPrev  = wb?.broadband.previous      ?? null;
 
-  const infraScore = scoreInfrastructure(
-    internet,
-    mobile,
-    electricity,
-    broadband,
+  const infraCalculation = scoreInfrastructure(
+    wb?.internet,
+    wb?.mobile,
+    wb?.electricity,
+    wb?.broadband,
     country.scores.infrastructure.score
   );
 
-  const talentScore = scoreTalent(
-    tertiary,
-    laborProd,
+  const talentCalculation = scoreTalent(
+    wb?.tertiary,
+    wb?.labor_productivity,
     country.scores.talent.score,
-    oecd?.researchers.current ?? null,
+    oecd?.researchers,
     ext?.wipo_gii ?? null
   );
 
-  const govScore = scoreGovernance(
-    govEff,
-    ruleOfLaw,
-    regQuality,
+  const governanceCalculation = scoreGovernance(
+    wb?.gov_effectiveness,
+    wb?.rule_of_law,
+    wb?.regulatory_quality,
     policy,
     country.scores.governance.score,
     ext?.oxford_insights ?? null
   );
 
-  const investScore = scoreInvestment(
-    rd,
-    fdi,
+  const investmentCalculation = scoreInvestment(
+    wb?.rd,
+    wb?.fdi,
     country.scores.investment.score,
-    imf?.govt_expenditure.current ?? null,
-    oecd?.rd_expenditure.current ?? null
+    imf?.govt_expenditure,
+    oecd?.rd_expenditure
   );
 
-  const econScore = scoreEconomicReadiness(
-    gdpPpp,
-    privateCredit,
-    tradeOpenness,
-    servicesShare,
+  const economicCalculation = scoreEconomicReadiness(
+    wb?.gdp_ppp,
+    wb?.private_credit,
+    wb?.trade_openness,
+    wb?.services_share,
     country.scores.economic_readiness.score,
-    imf?.govt_debt.current ?? null
+    imf?.govt_debt
   );
+
+  const infraScore = infraCalculation.score;
+  const talentScore = talentCalculation.score;
+  const govScore = governanceCalculation.score;
+  const investScore = investmentCalculation.score;
+  const econScore = economicCalculation.score;
 
   const totalScore = clamp(
     infraScore + talentScore + govScore + investScore + econScore,
@@ -691,7 +759,18 @@ export function calculateScores(
       }
     : null;
 
-  return {
+  const provenance: CountryProvenance = {
+    infrastructure: infraCalculation.components,
+    talent: talentCalculation.components,
+    governance: governanceCalculation.components,
+    investment: investmentCalculation.components,
+    economic_readiness: economicCalculation.components,
+  };
+
+  const scoredCountry: ScoredCountry & {
+    provenance: CountryProvenance;
+    coverage: ReturnType<typeof buildCoverage>;
+  } = {
     ...country,
     scores: {
       infrastructure: { ...country.scores.infrastructure, score: infraScore },
@@ -713,5 +792,9 @@ export function calculateScores(
     oecd_data: !!oecd,
     anthropic_data: anthropicScore !== null,
     raw_indicators: rawIndicators,
+    provenance,
+    coverage: buildCoverage(provenance),
   };
+
+  return scoredCountry;
 }
