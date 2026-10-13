@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useMemo, useEffect, useCallback, useRef } from "react";
+import { useState, useMemo, useEffect, useCallback, useReducer, useRef } from "react";
 import Link from "next/link";
 import CountryCard from "@/components/CountryCard";
-import SkeletonCard from "@/components/SkeletonCard";
 import RankingsTable from "@/components/RankingsTable";
 import FilterBar, { Region, SortKey, TierFilter, TrajectoryFilter } from "@/components/FilterBar";
 import ExportButton from "@/components/ExportButton";
@@ -15,6 +14,7 @@ import staticData from "@/data/countries.json";
 import type { ScoredCountry, ScoresResponse } from "@/lib/types";
 import { copyText } from "@/lib/copyText";
 import { asFallbackScoredCountry } from "@/lib/provenance";
+import { createHomeRefreshState, homeRefreshReducer } from "@/lib/homeRefresh";
 
 type ViewMode = "grid" | "table";
 
@@ -74,6 +74,7 @@ function HeroSparkline({ from, to }: { from: number; to: number }) {
 }
 
 const REGIONS_DISPLAY = ["Americas", "Europe", "Asia-Pacific", "Middle East & Africa"] as const;
+const BASELINE_COUNTRIES = staticData.countries.map(asFallbackScoredCountry);
 
 function regionalAvg(countries: ScoredCountry[], region: string) {
   const rc = countries.filter((c) => c.region === region);
@@ -93,12 +94,12 @@ export default function Home() {
   const [shareToast, setShareToast]       = useState(false);
   const [compareToast, setCompareToast]   = useState(false);
 
-  const [countries, setCountries] = useState<ScoredCountry[]>(() =>
-    staticData.countries.map(asFallbackScoredCountry)
+  const [refreshState, dispatchRefresh] = useReducer(
+    homeRefreshReducer,
+    BASELINE_COUNTRIES,
+    createHomeRefreshState,
   );
-  const [loading, setLoading]     = useState(true);
-  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
-  const [usingLive, setUsingLive] = useState(false);
+  const { countries, lastUpdated, usingLive } = refreshState;
 
   const urlInitRef = useRef(false);
   const gridRef    = useRef<HTMLDivElement>(null);
@@ -146,17 +147,27 @@ export default function Home() {
     });
   }, []);
 
-  useEffect(() => {
+  const refreshScores = useCallback(() => {
+    dispatchRefresh({ type: "refresh" });
     fetch("/api/scores")
-      .then((r) => r.json())
-      .then((data: ScoresResponse) => {
-        setCountries(data.countries);
-        setLastUpdated(data.last_updated);
-        setUsingLive(data.using_live_data);
+      .then((response) => {
+        if (!response.ok) throw new Error(`Score refresh failed with ${response.status}`);
+        return response.json();
       })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+      .then((data: ScoresResponse) => {
+        dispatchRefresh({
+          type: "success",
+          countries: data.countries,
+          lastUpdated: data.last_updated,
+          usingLive: data.using_live_data,
+        });
+      })
+      .catch(() => dispatchRefresh({ type: "error", message: "Live refresh unavailable" }));
   }, []);
+
+  useEffect(() => {
+    refreshScores();
+  }, [refreshScores]);
 
   const toggleCompare = useCallback((slug: string) => {
     setCompareList((prev) => {
@@ -312,7 +323,7 @@ export default function Home() {
               kicker: "Data Sources",
               value:  "17",
               sub:    "WB indicators",
-              note:   "Updated daily from live API feeds",
+              note:   "Live public sources with a complete static fallback",
             },
           ].map((k, i) => (
             <div key={i} style={{ paddingLeft: i ? 32 : 0, paddingRight: 32, borderLeft: i ? "1px solid var(--ed-border)" : "none" }}>
@@ -404,8 +415,12 @@ export default function Home() {
           </div>
           <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--dt-text-3)", letterSpacing: "0.06em", textAlign: "right" as const, lineHeight: 1.7 }}>
             {fmtDate && <div>LAST FETCH · {fmtDate.toUpperCase()}</div>}
-            <div style={{ color: usingLive ? "var(--positive)" : "var(--dt-text-3)" }}>
-              {usingLive ? "● LIVE SOURCES" : "○ BASELINE FALLBACK"} · 17 INDICATORS
+            <div className={`home-refresh-status status-${refreshState.status}`} role="status">
+              {refreshState.status === "refreshing" && "Refreshing with live sources"}
+              {refreshState.status === "live" && (usingLive ? "Live sources applied" : "Baseline sources applied")}
+              {refreshState.status === "baseline-error" && (
+                <>Baseline shown. <button onClick={refreshScores}>Retry live refresh</button></>
+              )}
             </div>
           </div>
         </div>
@@ -450,11 +465,7 @@ export default function Home() {
 
       {/* ── Country Grid ── */}
       <section data-grid style={{ background: "var(--dt-bg)", padding: "0 48px 40px" }}>
-        {loading ? (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
-            {Array.from({ length: 12 }).map((_, i) => <SkeletonCard key={i} />)}
-          </div>
-        ) : view === "table" ? (
+        {view === "table" ? (
           <RankingsTable countries={filtered} globalRanks={globalRanks} activeRegion={region} />
         ) : filtered.length === 0 ? (
           <div style={{ textAlign: "center", padding: "80px 0" }}>
@@ -515,8 +526,7 @@ export default function Home() {
       </section>
 
       {/* ── Regional Bands ── */}
-      {!loading && (
-        <section data-regional style={{ background: "var(--dt-bg)", padding: "32px 48px 48px", borderTop: "1px solid var(--dt-border)" }}>
+      <section data-regional style={{ background: "var(--dt-bg)", padding: "32px 48px 48px", borderTop: "1px solid var(--dt-border)" }}>
           <div style={{ display: "grid", gridTemplateColumns: "240px 1fr", gap: 48 }}>
             <div>
               <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--signal)", letterSpacing: "0.16em", fontWeight: 700, marginBottom: 6 }}>REGIONAL AVERAGE</div>
@@ -541,8 +551,7 @@ export default function Home() {
               })}
             </div>
           </div>
-        </section>
-      )}
+      </section>
 
       {/* ══════════════════════════════════════════════════════════════════════
           FOOTER — editorial, light

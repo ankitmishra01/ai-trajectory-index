@@ -612,3 +612,9 @@ button, [role="button"], select { min-height: 36px; }
   .country-brief-card > header { align-items: flex-start; flex-direction: column; }
   .country-embed-modal > div { flex-direction: column; }
 }
+
+.home-refresh-status { min-height: 28px; display: inline-flex; align-items: center; justify-content: flex-end; gap: 4px; color: var(--ed-text-3); font: 700 10px/1.3 var(--font-mono); letter-spacing: .04em; }
+.home-refresh-status.status-live { color: var(--positive); }
+.home-refresh-status.status-refreshing::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--signal); animation: live-dot-pulse 1.2s infinite; }
+.home-refresh-status.status-baseline-error { color: var(--warning); }
+.home-refresh-status button { min-height: 32px; padding: 0 6px; border: 0; background: transparent; color: inherit; font: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
