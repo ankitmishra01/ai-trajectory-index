@@ -439,8 +439,8 @@ export default function RegionDeepDive({ config }: Props) {
             {loading ? (
               <div className="h-56 skeleton rounded-xl" />
             ) : (
-              <div style={{ height: 280 }}>
-                <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+              <div className="h-[280px] w-full min-w-0">
+                <ResponsiveContainer width="100%" height={280} minWidth={1} minHeight={280}>
                   <BarChart
                     data={gapData}
                     layout="vertical"
