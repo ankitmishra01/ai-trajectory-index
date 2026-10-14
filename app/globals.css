@@ -58,6 +58,7 @@
   --shadow-sm: 0 1px 2px rgba(31, 28, 20, .05);
   --shadow-md: 0 14px 36px rgba(31, 28, 20, .08);
   --content-max: 1440px;
+  --content-wide: 1344px;
 
   /* ── Legacy compat vars (old components) ─────────── */
   --bg:            var(--dt-bg);
@@ -346,11 +347,16 @@ button, [role="button"], select { min-height: 36px; }
 
 /* Methodology research instrument */
 .methodology-page { background: var(--ed-bg); color: var(--ed-text-0); }
-.methodology-shell { width: min(var(--content-wide), calc(100% - 40px)); margin: 0 auto; padding: 56px 0 96px; }
+.methodology-shell { width: min(var(--content-wide), calc(100% - 96px)); margin: 0 auto; padding: 56px 0 96px; }
 .methodology-hero { max-width: 900px; padding: 24px 0 48px; }
 .methodology-hero h1 { margin: 12px 0 18px; font: 600 clamp(44px, 7vw, 82px)/.96 var(--font-display); letter-spacing: -.045em; }
 .methodology-deck { max-width: 760px; color: var(--ed-text-1); font-size: clamp(18px, 2.2vw, 24px); line-height: 1.5; }
 .methodology-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+.button-primary, .button-secondary { padding: 0 20px; font-family: var(--font-sans); font-size: 13px; font-weight: 600; border-radius: var(--radius-sm); }
+.button-primary { background: var(--signal); color: #fff; border: 1px solid var(--signal); }
+.button-secondary { background: transparent; color: var(--ed-text-0); border: 1px solid var(--ed-text-0); }
+.button-primary:hover { filter: brightness(.94); }
+.button-secondary:hover { background: var(--ed-surface); }
 .methodology-actions a { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
 .methodology-jump { position: sticky; top: 0; z-index: 20; display: flex; gap: 6px; overflow-x: auto; padding: 10px; margin-bottom: 16px; border: 1px solid var(--ed-border); border-radius: var(--radius-lg); background: color-mix(in srgb, var(--ed-bg) 92%, transparent); backdrop-filter: blur(14px); box-shadow: var(--shadow-sm); }
 .methodology-jump a { flex: 0 0 auto; min-height: 40px; display: inline-flex; align-items: center; padding: 0 13px; border-radius: var(--radius-md); color: var(--ed-text-1); font-size: 13px; font-weight: 650; text-decoration: none; }

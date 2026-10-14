@@ -34,7 +34,7 @@
         "investment": {
           "score": 20,
           "reasons": [
-            "World's largest AI venture ecosystem — over $50B+ invested in AI startups annually",
+            "World's largest AI venture ecosystem — over $50B invested in AI startups annually",
             "Hyperscaler capex commitments exceed $200B for 2024 AI infrastructure alone",
             "CHIPS Act ($52B) and Inflation Reduction Act accelerating domestic semiconductor manufacturing"
           ]
@@ -144,7 +144,7 @@
         "governance": {
           "score": 16,
           "reasons": [
-            "AI Safety Institute (Bletchley Park) is the world's first dedicated AI safety government body",
+            "AI Security Institute (founded 2023 as the AI Safety Institute after the Bletchley Park summit) was the first state-backed AI safety body",
             "Principles-based regulatory approach — AI-specific rules applied via existing sector regulators",
             "Hosted the Bletchley Park AI Safety Summit, establishing UK as global governance convener"
           ]
@@ -498,9 +498,9 @@
         "governance": {
           "score": 15,
           "reasons": [
-            "Artificial Intelligence and Data Act (AIDA) introduced — one of the world's first AI-specific laws",
+            "Artificial Intelligence and Data Act (AIDA), tabled in Bill C-27 in 2022, died on the order paper in January 2025; no federal AI-specific law is in force",
             "Voluntary Code of Conduct for Generative AI adopted by major Canadian AI companies",
-            "Pan-Canadian AI Strategy ($2B) coordinates government, academia, and industry AI development"
+            "Pan-Canadian AI Strategy (2017, renewed with $443M in Budget 2021) coordinates government, academia, and industry AI development"
           ]
         },
         "investment": {

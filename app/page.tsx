@@ -55,7 +55,7 @@ function HeroSparkline({ from, to }: { from: number; to: number }) {
   const width = 48, height = 20;
   const pts = Array.from({ length: 10 }, (_, i) => {
     const t = i / 9;
-    const noise = Math.sin(i * 1.7) * Math.abs(trend) * 0.12;
+    const noise = 0 /* straight line: today's score to the 2028 projection; no synthetic history */;
     return from + trend * t + noise;
   });
   const min = Math.min(...pts) - 1;
@@ -215,7 +215,12 @@ export default function Home() {
 
   const topCountry     = ranked[0];
   const topTrajCountry = [...countries].sort((a, b) => (b.projected_score_2028 - b.total_score) - (a.projected_score_2028 - a.total_score))[0];
-  const avgScore       = Math.round(countries.reduce((s, c) => s + c.total_score, 0) / (countries.length || 1));
+  const medianScore    = (() => {
+    const xs = countries.map((c) => c.total_score).sort((a, b) => a - b);
+    if (!xs.length) return 0;
+    const m = Math.floor(xs.length / 2);
+    return Math.round(xs.length % 2 ? xs[m] : (xs[m - 1] + xs[m]) / 2);
+  })();
   const compareCountries = useMemo(
     () => compareList.map((slug) => countries.find((c) => c.slug === slug)).filter(Boolean) as ScoredCountry[],
     [compareList, countries]
@@ -257,7 +262,7 @@ export default function Home() {
               most effectively?
             </h2>
             <p style={{ fontFamily: "var(--font-display)", fontSize: 20, fontStyle: "italic", fontWeight: 400, color: "var(--ed-text-1)", lineHeight: 1.45, marginTop: 28, maxWidth: 560 }}>
-              A live index scoring {countries.length} economies on AI readiness today and trajectory through 2028 — built on World Bank, OECD and World Governance Indicator data.
+              A live index scoring {countries.length} economies on AI readiness today and trajectory through 2028 — built on World Bank, IMF, OECD and Worldwide Governance Indicators data.
             </p>
             <div style={{ display: "flex", gap: 12, marginTop: 32 }}>
               <button
@@ -315,15 +320,15 @@ export default function Home() {
             },
             {
               kicker: "Median Score",
-              value:  String(avgScore),
+              value:  String(medianScore),
               sub:    "/ 100",
-              note:   `Global average across ${countries.length} economies`,
+              note:   `Median readiness across ${countries.length} economies`,
             },
             {
               kicker: "Data Sources",
               value:  "17",
-              sub:    "WB indicators",
-              note:   "Live public sources with a complete static fallback",
+              sub:    "World Bank indicators",
+              note:   "Plus WGI, IMF, OECD and policy inputs, with a static fallback",
             },
           ].map((k, i) => (
             <div key={i} style={{ paddingLeft: i ? 32 : 0, paddingRight: 32, borderLeft: i ? "1px solid var(--ed-border)" : "none" }}>
