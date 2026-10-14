@@ -28,44 +28,52 @@ export default function KeyInsights({ countries, onSortChange, onRegionChange, o
   const mover = byGain[0];
   const delta = Math.round(mover.projected_score_2028 - mover.total_score);
 
-  const regionMap: Record<string, { total: number; count: number }> = {};
-  for (const c of countries) {
-    if (!regionMap[c.region]) regionMap[c.region] = { total: 0, count: 0 };
-    regionMap[c.region].total += c.total_score;
-    regionMap[c.region].count += 1;
-  }
-  const globalAvg = countries.reduce((s, c) => s + c.total_score, 0) / countries.length;
+  const PILLARS = [
+    ["infrastructure", "Infrastructure"],
+    ["talent", "Talent"],
+    ["governance", "Governance"],
+    ["investment", "Investment"],
+    ["economic_readiness", "Economic Readiness"],
+  ] as const;
+  const avg = (xs: ScoredCountry[], f: (c: ScoredCountry) => number) =>
+    xs.length ? xs.reduce((s, c) => s + f(c), 0) / xs.length : 0;
+
+  // Governance: compare regional averages of the Governance pillar (0-20), not total readiness.
+  const regions = Array.from(new Set(countries.map((c) => c.region)));
+  const globalGovAvg = avg(countries, (c) => c.scores.governance.score);
   let topRegion = "";
-  let topRegionAvg = -1;
-  for (const [r, d] of Object.entries(regionMap)) {
-    const avg = d.total / d.count;
-    if (avg > topRegionAvg) { topRegionAvg = avg; topRegion = r; }
+  let topRegionGovAvg = -1;
+  for (const r of regions) {
+    const a = avg(countries.filter((c) => c.region === r), (c) => c.scores.governance.score);
+    if (a > topRegionGovAvg) { topRegionGovAvg = a; topRegion = r; }
   }
 
-  const africaCountries = countries.filter((c) => c.region === "Middle East & Africa");
-  const africaInvAvg = africaCountries.length > 0
-    ? africaCountries.reduce((s, c) => s + c.scores.investment.score, 0) / africaCountries.length
-    : 0;
+  // Middle East & Africa: report its actual weakest pillar rather than assuming one.
+  const meaCountries = countries.filter((c) => c.region === "Middle East & Africa");
+  const meaPillars = PILLARS.map(([key, label]) => ({ label, avg: avg(meaCountries, (c) => c.scores[key].score) }))
+    .sort((a, b) => a.avg - b.avg);
+  const meaWeakest = meaPillars[0];
+  const tenth = byScore[Math.min(9, byScore.length - 1)];
 
   const insights: Insight[] = [
     {
       kicker: "CONVERGENCE",
-      body: `Top-10 readiness scores cluster between 70–${leader.total_score} — frontier capacity is now table stakes among advanced economies.`,
+      body: `The top 10 readiness scores sit between ${tenth.total_score} and ${leader.total_score} out of 100, so frontier capacity is now table stakes among advanced economies.`,
       onClick: () => onNavigate("/country/" + leader.slug),
     },
     {
       kicker: "TRAJECTORY",
-      body: `${mover.flag} ${mover.name} is the fastest-rising economy at +${delta} pts — trajectory separates leaders from plateauing nations.`,
+      body: `${mover.flag} ${mover.name} has the largest projected gain, +${delta} pts by 2028, a directional scenario that separates rising economies from plateauing ones.`,
       onClick: () => onSortChange("trajectory_gain"),
     },
     {
       kicker: "GOVERNANCE",
-      body: `${topRegion} leads on governance avg at ${Math.round(topRegionAvg)}/100 — ${Math.round(topRegionAvg - globalAvg)} pts above the global average.`,
+      body: `${topRegion} leads on Governance at ${topRegionGovAvg.toFixed(1)}/20 on average, ${(topRegionGovAvg - globalGovAvg).toFixed(1)} pts above the global average of ${globalGovAvg.toFixed(1)}/20.`,
       onClick: () => onRegionChange(topRegion as Region),
     },
     {
-      kicker: "INVESTMENT GAP",
-      body: `Investment is Africa & Middle East's weakest pillar at ${africaInvAvg.toFixed(1)}/20 avg — capital access is the binding constraint.`,
+      kicker: "REGIONAL GAP",
+      body: `${meaWeakest.label} is the weakest pillar across Middle East & Africa at ${meaWeakest.avg.toFixed(1)}/20 on average.`,
       onClick: () => onNavigate("/africa"),
     },
   ];
