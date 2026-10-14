@@ -53,7 +53,7 @@ function MiniSparkline({ from, to, width = 56, height = 18 }: { from: number; to
   const color = trend > 0 ? "var(--positive)" : trend < 0 ? "var(--negative)" : "var(--dt-text-3)";
   const pts = Array.from({ length: 12 }, (_, i) => {
     const t = i / 11;
-    const noise = Math.sin(i * 1.7) * Math.abs(trend) * 0.15;
+    const noise = 0 /* straight line: today's score to the 2028 projection; no synthetic history */;
     return from + trend * t + noise;
   });
   const min = Math.min(...pts) - 1;
