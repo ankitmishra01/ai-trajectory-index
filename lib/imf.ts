@@ -48,7 +48,8 @@ async function fetchIMFIndicator(indicator: string): Promise<Record<string, Indi
   const url = `https://www.imf.org/external/datamapper/api/v1/${indicator}`;
   const res = await fetch(url, {
     next: { revalidate: 86400 },
-    headers: { "Accept": "application/json" },
+    // The IMF API blocks Node's default user agent (403); a descriptive agent is accepted.
+    headers: { "Accept": "application/json", "User-Agent": "Mozilla/5.0 (compatible; AI-Trajectory-Index/1.0; +https://ai-trajectory-index.vercel.app)" },
   });
 
   if (!res.ok) throw new Error(`IMF API error for ${indicator}: ${res.status}`);
