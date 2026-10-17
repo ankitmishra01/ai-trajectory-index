@@ -6,10 +6,20 @@ An interactive index scoring **186 economies** on current AI readiness and 3–5
 
 ---
 
-## Key Findings (2026 Edition)
+## Key Findings (live scores, 17 Oct 2026)
+
+These come from the live scoring pipeline (`/api/scores`), not the static baseline, and will move as sources update. In this run, 185 of 186 economies scored on live World Bank data (Taiwan is not covered by the World Bank) and 75.5% of expected live indicators were observed.
 
 | Finding | Detail |
 |---------|--------|
+| 🇩🇰 **Denmark leads overall** | 87/100, ahead of the Netherlands (86), the United States (85), Germany (84) and Singapore (84) |
+| 🇸🇳 **Senegal has the strongest trajectory** | Trajectory +7: current 40 → projected 51 by 2028 |
+| 🇵🇱 **Poland is the fastest-rising advanced economy** | 72 → 81 projected by 2028 (trajectory +6), the largest gain in the top 40 |
+| 🇧🇾 **Belarus has the largest governance gap** | Non-governance pillars average 11.5/20 against governance at 4/20, a 7.5-point gap |
+| 🌍 **Middle East & Africa face an infrastructure constraint** | Median infrastructure 7/20 against a global median of 13 |
+| 🇪🇺 **Europe leads on governance** | Average governance 13.2/20 against 10.3/20 investment: policy ahead of capital |
+
+---------|--------|
 | 🇺🇸 **US leads overall** | 91/100: highest score across all 186 economies |
 | 🇮🇳 **India has the strongest trajectory** | Current score 65 → projected 73 by 2028 (trajectory +8) |
 | 🇦🇪 **UAE fastest-rising advanced economy** | 73 → 79 projected by 2028 (trajectory +6) |
@@ -189,7 +199,7 @@ The static baseline ensures coverage for all 186 economies. Live and external da
 | IMF government expenditure, % of GDP | `>=45: 3`; `>=35: 2`; `>=25: 1`; otherwise `0.5` |
 | IMF government debt, % of GDP | Above 100 subtracts 1 point from the 5-point market-capacity allocation |
 
-The API calculates every source independently with `Promise.allSettled`. A failed IMF, OECD, or Anthropic request does not prevent World Bank scoring or the static fallback. In `/api/scores`, `using_live_data` reports whether the World Bank fetch succeeded; `sources` reports each supplemental source separately; and each country includes `data_source`, `wb_data_year`, source-availability flags, and the raw World Bank values used in scoring.
+The API calculates every source independently with `Promise.allSettled`. A failed IMF, OECD, or Anthropic request does not prevent World Bank scoring or the static fallback. In `/api/scores`, `using_live_data` reports whether any World Bank indicator loaded; `sources.*` is true only when that source contributed data to at least one country; `coverage` reports the share of expected live indicators observed and any failed World Bank indicators; and each country includes `data_source`, `wb_data_year`, source-availability flags, and the raw World Bank values used in scoring.
 
 ### Score provenance and coverage
 
@@ -212,20 +222,20 @@ The homepage renders all 186 static baseline rankings immediately. It then refre
 
 ### World Bank indicator registry
 
-The API requests the two most recent observations for 17 indicators. The latest value supports Readiness and the prior value supports trend calculations where applicable.
+The API requests the two most recent non-empty observations (`mrnev=2`) for 17 indicators, reading every page of the response. The latest value supports Readiness and the prior value supports trend calculations where applicable.
 
 | Code | Indicator | Use |
 |---|---|---|
 | `IT.NET.USER.ZS` | Individuals using the internet | Infrastructure |
 | `IT.CEL.SETS.P2` | Mobile subscriptions per 100 people | Infrastructure |
-| `IT.NET.BBN.P2` | Fixed broadband subscriptions per 100 people | Infrastructure and trajectory |
+| `IT.NET.BBND.P2` | Fixed broadband subscriptions per 100 people | Infrastructure and trajectory |
 | `EG.ELC.ACCS.ZS` | Access to electricity | Infrastructure |
 | `SE.TER.ENRR` | Gross tertiary enrolment | Talent |
 | `SL.GDP.PCAP.EM.KD` | GDP per person employed, constant 2017 PPP | Talent and trajectory |
 | `GB.XPD.RSDV.GD.ZS` | R&D expenditure as a share of GDP | Investment and trajectory |
-| `GE.EST` | Government Effectiveness estimate | Governance |
-| `RL.EST` | Rule of Law estimate | Governance |
-| `RQ.EST` | Regulatory Quality estimate | Governance |
+| `GOV_WGI_GE.EST` | Government Effectiveness estimate | Governance |
+| `GOV_WGI_RL.EST` | Rule of Law estimate | Governance |
+| `GOV_WGI_RQ.EST` | Regulatory Quality estimate | Governance |
 | `BX.KLT.DINV.WD.GD.ZS` | FDI net inflows as a share of GDP | Investment |
 | `NY.GDP.PCAP.PP.KD` | GDP per capita at constant 2017 PPP | Economic Readiness |
 | `NY.GDP.PCAP.CD` | GDP per capita in current US dollars | Trajectory growth only |
@@ -323,7 +333,7 @@ Adoption gap   = Adoption total - Readiness total
 | [IMF DataMapper](https://www.imf.org/external/datamapper/) | Government expenditure and gross debt | Fetched with a 24-hour cache |
 | [OECD Data Explorer](https://data-explorer.oecd.org/) | R&D expenditure and researchers per 1,000 employed | Fetched from the OECD SDMX API with a 24-hour cache |
 | [OECD.AI Policy Observatory](https://oecd.ai/en/) | National AI strategy dates, regulation flags, and OECD membership in the maintained policy dataset | Updated in `data/ai-policies.json` |
-| [Anthropic Economic Index dataset](https://huggingface.co/datasets/Anthropic/EconomicIndex) | Country usage-intensity modifier for trajectory | Latest matching public CSV, cached for 24 hours |
+| [Anthropic Economic Index dataset](https://huggingface.co/datasets/Anthropic/EconomicIndex) | Country usage-intensity modifier for trajectory | Precomputed by `scripts/build-anthropic-usage.mjs` into `data/anthropic-usage.json` (Claude.ai conversations per million working-age people, percentile rank); rebuild when a new release lands |
 | [Oxford Insights Government AI Readiness Index](https://oxfordinsights.com/ai-readiness/government-ai-readiness-index-2025/) | Governance institutional enrichment | Maintained in `data/external-indices.json` |
 | [WIPO Global Innovation Index](https://www.wipo.int/en/web/global-innovation-index) | Talent-quality enrichment | Maintained in `data/external-indices.json` |
 

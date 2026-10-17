@@ -8,6 +8,7 @@ interface SiteHeaderProps {
   activePage?: "index" | "map" | "explore" | "compare" | "adoption" | "methodology";
   usingLive?: boolean;
   lastFetched?: string | null;
+  liveShare?: number | null; // % of expected live indicators actually observed (from /api/scores coverage)
   citation?: string;
 }
 
@@ -22,13 +23,16 @@ const NAV = [
 
 const SITE_CITATION = "Mishra, A. (2026). AI Trajectory Index: Scoring 186 Economies on AI Readiness and 3–5 Year Trajectory. https://ai-trajectory-index.vercel.app";
 
-function formatStatus(usingLive?: boolean, lastFetched?: string | null) {
+// Report measured coverage, never a blanket "live" claim.
+export function formatStatus(usingLive?: boolean, lastFetched?: string | null, liveShare?: number | null) {
   const date = lastFetched ? new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(new Date(lastFetched)) : null;
   if (!date) return "2026 EDITION · 17 INDICATORS";
-  return `${usingLive ? "LIVE SOURCES" : "BASELINE FALLBACK"} · UPDATED ${date.toUpperCase()}`;
+  if (!usingLive) return `BASELINE FALLBACK · UPDATED ${date.toUpperCase()}`;
+  if (liveShare !== null && liveShare !== undefined) return `LIVE DATA ${Math.round(liveShare)}% OF INDICATORS · UPDATED ${date.toUpperCase()}`;
+  return `SOURCES REFRESHED · UPDATED ${date.toUpperCase()}`;
 }
 
-export default function SiteHeader({ activePage, usingLive, lastFetched, citation = SITE_CITATION }: SiteHeaderProps) {
+export default function SiteHeader({ activePage, usingLive, lastFetched, liveShare = null, citation = SITE_CITATION }: SiteHeaderProps) {
   const [copied, setCopied] = useState(false);
   const dateStr = new Date().toLocaleDateString("en-US", { weekday: "long", day: "2-digit", month: "short", year: "numeric" }).toUpperCase();
 
@@ -45,8 +49,8 @@ export default function SiteHeader({ activePage, usingLive, lastFetched, citatio
         <div style={{ display: "flex", alignItems: "center", gap: 12, fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--ed-text-2)", letterSpacing: ".06em", minWidth: 0 }}>
           <span>{dateStr}</span><span aria-hidden="true">·</span>
           <span className="score-nowrap" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-            <span aria-hidden="true" style={{ width: 6, height: 6, borderRadius: 99, background: usingLive ? "var(--positive)" : "var(--ed-muted)" }} />
-            {formatStatus(usingLive, lastFetched)}
+            <span aria-hidden="true" style={{ width: 6, height: 6, borderRadius: 99, background: usingLive && (liveShare === null || liveShare >= 50) ? "var(--positive)" : "var(--ed-muted)" }} />
+            {formatStatus(usingLive, lastFetched, liveShare)}
           </span>
         </div>
         <button onClick={copyCitation} className="cite-button" style={{ border: 0, background: "transparent", color: "var(--ed-text-1)", font: "600 12px var(--font-sans)", cursor: "pointer", padding: "4px 0" }}>

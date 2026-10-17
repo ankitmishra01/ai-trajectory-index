@@ -100,6 +100,7 @@ export default function Home() {
     createHomeRefreshState,
   );
   const { countries, lastUpdated, usingLive } = refreshState;
+  const [liveShare, setLiveShare] = useState<number | null>(null);
 
   const urlInitRef = useRef(false);
   const gridRef    = useRef<HTMLDivElement>(null);
@@ -161,6 +162,7 @@ export default function Home() {
           lastUpdated: data.last_updated,
           usingLive: data.using_live_data,
         });
+        setLiveShare(data.coverage?.live_indicator_share ?? null);
       })
       .catch(() => dispatchRefresh({ type: "error", message: "Live refresh unavailable" }));
   }, []);
@@ -243,7 +245,7 @@ export default function Home() {
   return (
     <main style={{ minHeight: "100vh" }}>
 
-      <SiteHeader activePage="index" usingLive={usingLive} lastFetched={lastUpdated} />
+      <SiteHeader activePage="index" usingLive={usingLive} lastFetched={lastUpdated} liveShare={liveShare} />
 
       {/* ══════════════════════════════════════════════════════════════════════
           HERO — editorial 2-col: headline + leaderboard preview
@@ -422,7 +424,7 @@ export default function Home() {
             {fmtDate && <div>LAST FETCH · {fmtDate.toUpperCase()}</div>}
             <div className={`home-refresh-status status-${refreshState.status}`} role="status">
               {refreshState.status === "refreshing" && "Refreshing with live sources"}
-              {refreshState.status === "live" && (usingLive ? "Live sources applied" : "Baseline sources applied")}
+              {refreshState.status === "live" && (usingLive ? (liveShare !== null ? `Live sources applied · ${Math.round(liveShare)}% of indicators observed` : "Live sources applied") : "Baseline sources applied")}
               {refreshState.status === "baseline-error" && (
                 <>Baseline shown. <button onClick={refreshScores}>Retry live refresh</button></>
               )}
