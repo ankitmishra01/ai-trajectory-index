@@ -19,6 +19,7 @@ import SiteHeader from "@/components/SiteHeader";
 import TrajectoryArrow from "@/components/TrajectoryArrow";
 import WhatIfSimulator from "@/components/WhatIfSimulator";
 import adoptionData from "@/data/adoption.json";
+import { SLUG_TO_ISO3 } from "@/lib/slugToIso3";
 import staticData from "@/data/countries.json";
 import { DIM_COLORS as ADOPT_DIM_COLORS, DIM_LABELS as ADOPT_DIM_LABELS } from "@/lib/adoption";
 import type { AdoptionEntry } from "@/lib/adoption";
@@ -50,7 +51,13 @@ interface Props {
   initialCountry: ScoredCountry;
 }
 
+// Economies the Global Economic Intelligence dashboard profiles (its World Bank registry has no Taiwan entry).
+const GEI_BASE = "https://g20-gamma.vercel.app";
+const GEI_EXCLUDED = new Set(["TWN"]);
+
 export default function CountryPageClient({ slug, initialCountry }: Props) {
+  const geiIso3 = SLUG_TO_ISO3[slug] ?? "";
+  const geiUrl = /^[A-Z]{3}$/.test(geiIso3) && !GEI_EXCLUDED.has(geiIso3) ? `${GEI_BASE}/#country/${geiIso3}` : null;
   const [activeTab, setActiveTab] = useState<PageTab>("combined");
   const [country, setCountry] = useState(initialCountry);
   const [allCountries, setAllCountries] = useState<ScoredCountry[]>(() => staticData.countries.map(asFallbackScoredCountry));
@@ -148,13 +155,14 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
       )}
 
       <div className="flex-1 min-w-0">
-        <SiteHeader usingLive={usingLive} lastFetched={lastUpdated} citation={`Mishra, A. (2026). ${country.name}: AI readiness country profile. AI Trajectory Index. https://ai-trajectory-index.vercel.app/country/${slug}`} />
+        <SiteHeader usingLive={usingLive} lastFetched={lastUpdated} citation={`Mishra, A. (2026). ${country.name}: AI readiness country profile. AI Trajectory Index. https://ai-trajectory-index.vercel.app/country/${slug}${geiUrl ? `. Economic context: Global Economic Intelligence, ${geiUrl}` : ""}`} />
         <div className="country-profile-bar no-print">
           <div className="country-content-width">
             <button onClick={() => setSidebarOpen(true)} className="lg:hidden country-bar-action" aria-label="Browse countries">☰ <span>Countries</span></button>
             <span className="country-profile-label">Country profile</span>
             <div className="ml-auto flex items-center gap-2">
               <Link href={`/compare/${slug}/usa`} className="country-bar-action">Compare</Link>
+              {geiUrl && <a href={geiUrl} target="_blank" rel="noopener noreferrer" className="country-bar-action" title={`${country.name} on Global Economic Intelligence: growth, inflation, debt, policy rate and FX`}>See the economy ↗</a>}
               <button onClick={handleCopyLink} className="country-bar-action" aria-live="polite">{copied ? "Link copied" : "Share"}</button>
             </div>
           </div>

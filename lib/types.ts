@@ -105,6 +105,7 @@ export interface ScoresResponse {
     oecd: boolean;
     anthropic: boolean;
   };
+  source_status?: { oecd: { mode: "live" | "cache" | "unavailable"; as_of: string | null; error?: string } };
   coverage?: ScoresCoverage;
 }
 

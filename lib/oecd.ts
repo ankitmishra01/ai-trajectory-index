@@ -106,7 +106,7 @@ async function fetchOECDIndicator(
   return parsed;
 }
 
-export async function fetchOECDData(): Promise<OECDData> {
+export async function fetchOECDLive(): Promise<OECDData> {
   // Fetch R&D (% GDP) and Researchers (/1000 employed) in parallel
   // Filter: Annual, all countries (..), all entity types (..), variable, all HC types (..), measure
   const [rdRaw, researchersRaw] = await Promise.all([
@@ -126,4 +126,10 @@ export async function fetchOECDData(): Promise<OECDData> {
   }
 
   return merged;
+}
+
+
+// Kept for callers that want the live pull only; scoring uses fetchOECDDataWithStatus (lib/oecd-cache.ts).
+export async function fetchOECDData(): Promise<OECDData> {
+  return fetchOECDLive();
 }
