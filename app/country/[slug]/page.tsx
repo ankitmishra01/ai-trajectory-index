@@ -4,6 +4,7 @@ import staticData from "@/data/countries.json";
 import CountryPageClient from "@/components/CountryPageClient";
 import type { ScoredCountry } from "@/lib/types";
 import { asFallbackScoredCountry } from "@/lib/provenance";
+import { computeScoresResponse } from "@/lib/liveScores";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ai-trajectory-index.vercel.app";
 
@@ -17,17 +18,27 @@ function scoreBandLabel(score: number): string {
 export async function generateMetadata(
   { params }: { params: { slug: string } }
 ): Promise<Metadata> {
-  const country = staticData.countries.find((c) => c.slug === params.slug);
-  if (!country) {
+  const staticCountry = staticData.countries.find((c) => c.slug === params.slug);
+  if (!staticCountry) {
     return { title: "Country Not Found — AI Trajectory Index" };
+  }
+
+  // Use the same live scores the page body shows; fall back to the static baseline if sources fail.
+  let pool: { slug: string; total_score: number }[] = staticData.countries;
+  let country: { name: string; total_score: number; projected_score_2028: number; trajectory_label: string } = staticCountry;
+  try {
+    const live = await computeScoresResponse();
+    const match = live.countries.find((c) => c.slug === params.slug);
+    if (match) { country = match; pool = live.countries; }
+  } catch {
+    /* keep static baseline */
   }
 
   const tier    = scoreBandLabel(country.total_score);
   const delta   = country.projected_score_2028 - country.total_score;
   const deltaStr = delta > 0 ? `+${delta}` : String(delta);
 
-  // Rank within all countries (approx from static data)
-  const ranked  = [...staticData.countries].sort((a, b) => b.total_score - a.total_score);
+  const ranked  = [...pool].sort((a, b) => b.total_score - a.total_score);
   const rank    = ranked.findIndex((c) => c.slug === params.slug) + 1;
 
   const title       = `${country.name} — AI Trajectory Index | ${country.total_score}/100 (#${rank} Global)`;
@@ -64,13 +75,23 @@ export async function generateMetadata(
   };
 }
 
-export default function CountryPage({ params }: { params: { slug: string } }) {
+export default async function CountryPage({ params }: { params: { slug: string } }) {
   const staticCountry = staticData.countries.find((c) => c.slug === params.slug);
   if (!staticCountry) notFound();
 
   const initialCountry: ScoredCountry = asFallbackScoredCountry(staticCountry);
 
-  const ranked = [...staticData.countries].sort((a, b) => b.total_score - a.total_score);
+  // Live score and rank for structured data (same numbers as the title); static baseline on failure.
+  let pool: { slug: string; total_score: number }[] = staticData.countries;
+  let liveScore = staticCountry.total_score;
+  try {
+    const live = await computeScoresResponse();
+    const match = live.countries.find((c) => c.slug === params.slug);
+    if (match) { liveScore = match.total_score; pool = live.countries; }
+  } catch {
+    /* keep static baseline */
+  }
+  const ranked = [...pool].sort((a, b) => b.total_score - a.total_score);
   const rank   = ranked.findIndex((c) => c.slug === params.slug) + 1;
   const url    = `${SITE_URL}/country/${params.slug}`;
 
@@ -78,7 +99,7 @@ export default function CountryPage({ params }: { params: { slug: string } }) {
     "@context": "https://schema.org",
     "@type": "Dataset",
     name: `${staticCountry.name} — AI Readiness Score`,
-    description: `AI Readiness Score: ${staticCountry.total_score}/100. Ranked #${rank} globally across 186 economies.`,
+    description: `AI Readiness Score: ${liveScore}/100. Ranked #${rank} globally across 186 economies.`,
     url,
     creator: { "@type": "Person", name: "Ankit Mishra", url: "https://ankitmishra.ca" },
     keywords: ["artificial intelligence", "AI readiness", staticCountry.name, staticCountry.region],

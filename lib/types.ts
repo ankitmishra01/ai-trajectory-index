@@ -105,4 +105,14 @@ export interface ScoresResponse {
     oecd: boolean;
     anthropic: boolean;
   };
+  coverage?: ScoresCoverage;
+}
+
+export interface ScoresCoverage {
+  live_indicator_share: number; // % of expected live indicators observed across all economies
+  countries_live: number;
+  countries_total: number;
+  world_bank_indicators_ok: number;
+  world_bank_indicators_total: number;
+  world_bank_failures: { indicator: string; error: string }[];
 }

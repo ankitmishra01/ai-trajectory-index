@@ -2,9 +2,10 @@
 // Endpoint: https://sdmx.oecd.org/public/rest/data/
 // Rate limit: 60 queries/hour — this module makes 2 requests total.
 // Country codes: ISO 3166-1 alpha-3
-// Indicators:
-//   GPERD  — Gross domestic expenditure on R&D (% of GDP)
-//   HC_R   — Researchers (head count per 1000 employed)
+// Indicators (dataflow OECD.STI.STP,DSD_MSTI@DF_MSTI,1.0; key = REF_AREA.FREQ.MEASURE.UNIT.PRICE_BASE.TRANSFORMATION):
+//   .A.G.PT_B1GQ._Z._Z      — Gross domestic expenditure on R&D (GERD), % of GDP
+//   .A.T_RS.10P3EMP._Z._Z   — Researchers (FTE) per 1 000 employment
+// The previous keys ("A...GPERD..PC_GDP") did not match the dataflow's dimensions and returned 404.
 
 import type { IndicatorValues } from "./worldbank";
 
@@ -31,13 +32,14 @@ interface SDMXStructure {
 interface SDMXResponse {
   data: {
     dataSets:  SDMXDataSet[];
-    structure: SDMXStructure;
+    structure?: SDMXStructure;    // SDMX-JSON 1.0
+    structures?: SDMXStructure[]; // SDMX-JSON 2.0 (current OECD default)
   };
 }
 
-function parseSDMX(json: SDMXResponse): Record<string, IndicatorValues> {
+export function parseSDMX(json: SDMXResponse): Record<string, IndicatorValues> {
   const dataSet   = json?.data?.dataSets?.[0];
-  const structure = json?.data?.structure;
+  const structure = json?.data?.structure ?? json?.data?.structures?.[0];
   if (!dataSet || !structure) return {};
 
   // Identify which series dimension index is REF_AREA (country)
@@ -86,25 +88,30 @@ async function fetchOECDIndicator(
   // OECD Data Explorer SDMX-JSON endpoint
   const base = "https://sdmx.oecd.org/public/rest/data";
   const flow = "OECD.STI.STP,DSD_MSTI@DF_MSTI,1.0";
-  const url  = `${base}/${flow}/${filter}?format=jsondata&startPeriod=2018&endPeriod=2025&dimensionAtObservation=TIME_PERIOD`;
+  const url  = `${base}/${flow}/${filter}?startPeriod=2018&dimensionAtObservation=TIME_PERIOD`;
 
   const res = await fetch(url, {
     next: { revalidate: 86400 },
-    headers: { "Accept": "application/vnd.sdmx.data+json;version=2" },
+    headers: {
+      "Accept": "application/vnd.sdmx.data+json;version=2",
+      "User-Agent": "ai-trajectory-index/1.0 (+https://ai-trajectory-index.vercel.app)",
+    },
   });
 
   if (!res.ok) throw new Error(`OECD API error for ${label}: ${res.status}`);
 
   const json: SDMXResponse = await res.json();
-  return parseSDMX(json);
+  const parsed = parseSDMX(json);
+  if (!Object.keys(parsed).length) throw new Error(`OECD API returned no series for ${label}`);
+  return parsed;
 }
 
 export async function fetchOECDData(): Promise<OECDData> {
   // Fetch R&D (% GDP) and Researchers (/1000 employed) in parallel
   // Filter: Annual, all countries (..), all entity types (..), variable, all HC types (..), measure
   const [rdRaw, researchersRaw] = await Promise.all([
-    fetchOECDIndicator("A...GPERD..PC_GDP",    "R&D expenditure % GDP"),
-    fetchOECDIndicator("A...GPERD..PC_1000EMP","Researchers per 1000 employed"),
+    fetchOECDIndicator(".A.G.PT_B1GQ._Z._Z",    "R&D expenditure % GDP"),
+    fetchOECDIndicator(".A.T_RS.10P3EMP._Z._Z", "Researchers per 1000 employed"),
   ]);
 
   const allIso3s = Array.from(new Set([...Object.keys(rdRaw), ...Object.keys(researchersRaw)]));

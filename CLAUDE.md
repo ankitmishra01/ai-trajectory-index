@@ -17,16 +17,16 @@ npm run lint       # ESLint only
 - `/data/ai-policies.json`: policy metadata keyed by slug: `has_national_ai_strategy`, `strategy_year`, `has_ai_regulation`, `oecd_member`
 
 **Live scoring pipeline (Phase 2):**
-- `lib/worldbank.ts`: fetches 17 World Bank indicators in parallel (`mrv=2` for growth rates), 24h Next.js cache
-- `lib/imf.ts`: fetches government expenditure and gross debt from IMF DataMapper
-- `lib/oecd.ts`: fetches R&D expenditure and researcher density from OECD SDMX
-- `lib/anthropic-index.ts`: fetches the latest public Anthropic Economic Index CSV and calculates country usage intensity
+- `lib/worldbank.ts`: fetches 17 World Bank indicators in parallel (`mrnev=2`, every page read, 200-with-error treated as failure), 24h Next.js cache; `fetchWorldBank()` also returns per-indicator status
+- `lib/imf.ts`: fetches government expenditure (`G_X_G01_GDP_PT`, Fiscal Monitor) and gross debt (`GGXWDG_NGDP`, WEO) from IMF DataMapper, actual years only (projections ignored)
+- `lib/oecd.ts`: fetches R&D (`.A.G.PT_B1GQ._Z._Z`) and researchers per 1 000 employment (`.A.T_RS.10P3EMP._Z._Z`) from OECD MSTI SDMX (JSON 2.0 `structures`)
+- `lib/anthropic-index.ts`: reads `data/anthropic-usage.json`, built offline by `scripts/build-anthropic-usage.mjs` (Claude.ai conversations per million working-age people, percentile rank). The raw file is ~100 MB, too large for a serverless request
 - `lib/slugToIso.ts`: maps all 186 slugs to ISO2 codes for World Bank API
 - `lib/slugToIso3.ts`: maps all 186 slugs to ISO3 codes for IMF, OECD, and Anthropic data
 - `lib/scoring.ts`: `calculateScores()` combines live, maintained, and static inputs; missing values fall back proportionally to the static baseline
 - `lib/methodology.ts`: shared descriptive registry for component labels, official source links, point budgets, threshold copy, and the methodology CSV; it does not calculate scores
 - `lib/provenance.ts`: builds complete static provenance and calculates source-availability coverage
-- `app/api/scores/route.ts`: combines World Bank, IMF, OECD, Anthropic, policy, and external-index inputs; each network source fails independently through `Promise.allSettled`; `revalidate: 86400`
+- `lib/liveScores.ts` (`computeScoresResponse()`, also used by country page metadata) and `app/api/scores/route.ts`: combines World Bank, IMF, OECD, Anthropic, policy, and external-index inputs; each network source fails independently through `Promise.allSettled`; `revalidate: 86400`
 
 **Score formula summary (v3: post-audit):**
 - Infrastructure: fixed broadband (6) + internet users (3) + mobile (3) + electricity (3) + static quality (5)
@@ -43,14 +43,14 @@ npm run lint       # ESLint only
 - projected_score_2028 = clamp(total + trajectory × 1.5, 0, 100)
 
 **WB indicators fetched (17 total, all parallel, 24h cache):**
-`IT.NET.USER.ZS`, `IT.CEL.SETS.P2`, `IT.NET.BBN.P2`, `SE.TER.ENRR`, `SL.GDP.PCAP.EM.KD`, `GB.XPD.RSDV.GD.ZS`, `EG.ELC.ACCS.ZS`, `GE.EST`, `RL.EST`, `RQ.EST`, `BX.KLT.DINV.WD.GD.ZS`, `NY.GDP.PCAP.PP.KD`, `NY.GDP.PCAP.CD`, `FS.AST.PRVT.GD.ZS`, `NE.TRD.GNFS.ZS`, `NV.SRV.TOTL.ZS`, `TX.VAL.TECH.MF.ZS`
+`IT.NET.USER.ZS`, `IT.CEL.SETS.P2`, `IT.NET.BBND.P2`, `SE.TER.ENRR`, `SL.GDP.PCAP.EM.KD`, `GB.XPD.RSDV.GD.ZS`, `EG.ELC.ACCS.ZS`, `GOV_WGI_GE.EST`, `GOV_WGI_RL.EST`, `GOV_WGI_RQ.EST`, `BX.KLT.DINV.WD.GD.ZS`, `NY.GDP.PCAP.PP.KD`, `NY.GDP.PCAP.CD`, `FS.AST.PRVT.GD.ZS`, `NE.TRD.GNFS.ZS`, `NV.SRV.TOTL.ZS`, `TX.VAL.TECH.MF.ZS`
 
 **Routing:**
 - `/`: filterable grid, renders all static baseline rankings immediately, then refreshes `/api/scores` without clearing interaction state
 - `/adoption`: separate curated adoption lens; it does not change the Readiness score
 - `/compare/[a]/[b]`: shareable comparison route, expandable to four countries in the client
 - `/country/[slug]`: detail page, same pattern (static → live upgrade)
-- `/api/scores`: GET, returns `{ countries, last_updated, using_live_data, sources }`
+- `/api/scores`: GET, returns `{ countries, last_updated, using_live_data, sources, coverage }`; `sources.*` is true only if that source contributed data to some country, and `coverage.live_indicator_share` drives the header status
 - `/api/methodology.csv`: GET, deterministic UTF-8 methodology dictionary generated from `lib/methodology.ts`
 - `/api/narrative/[country]`: GET, returns `{ sections: {heading, body}[], source: "ai" | "template", generatedAt }` (see Narrative below)
 

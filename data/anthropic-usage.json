@@ -1,0 +1,588 @@
+{
+ "source": "Anthropic Economic Index (Hugging Face: Anthropic/EconomicIndex)",
+ "file": "release_2026_03_24/data/aei_raw_claude_ai_2026-02-05_to_2026-02-12.csv",
+ "period": {
+  "start": "2026-02-05",
+  "end": "2026-02-12"
+ },
+ "generated_at": "2026-10-17T10:46:57.933Z",
+ "method": "Claude.ai conversations per million working-age people (World Bank SP.POP.1564.TO), percentile rank 0-100 among economies with at least 200 conversations in the sample week.",
+ "economies": 115,
+ "values": {
+  "MOZ": {
+   "usage_count": 225,
+   "usage_per_million_working_age": 11.89,
+   "index": 0
+  },
+  "TZA": {
+   "usage_count": 492,
+   "usage_per_million_working_age": 12.77,
+   "index": 1
+  },
+  "UGA": {
+   "usage_count": 480,
+   "usage_per_million_working_age": 17.09,
+   "index": 2
+  },
+  "AGO": {
+   "usage_count": 375,
+   "usage_per_million_working_age": 18.12,
+   "index": 3
+  },
+  "BGD": {
+   "usage_count": 2447,
+   "usage_per_million_working_age": 21.2,
+   "index": 4
+  },
+  "ZMB": {
+   "usage_count": 320,
+   "usage_per_million_working_age": 25.61,
+   "index": 4
+  },
+  "MDG": {
+   "usage_count": 515,
+   "usage_per_million_working_age": 27.31,
+   "index": 5
+  },
+  "HTI": {
+   "usage_count": 237,
+   "usage_per_million_working_age": 30.9,
+   "index": 6
+  },
+  "BFA": {
+   "usage_count": 435,
+   "usage_per_million_working_age": 32.18,
+   "index": 7
+  },
+  "UZB": {
+   "usage_count": 861,
+   "usage_per_million_working_age": 37.1,
+   "index": 8
+  },
+  "ZWE": {
+   "usage_count": 362,
+   "usage_per_million_working_age": 38.03,
+   "index": 9
+  },
+  "KHM": {
+   "usage_count": 467,
+   "usage_per_million_working_age": 40.8,
+   "index": 10
+  },
+  "HND": {
+   "usage_count": 367,
+   "usage_per_million_working_age": 51.15,
+   "index": 11
+  },
+  "CIV": {
+   "usage_count": 1044,
+   "usage_per_million_working_age": 56.1,
+   "index": 11
+  },
+  "PAK": {
+   "usage_count": 8699,
+   "usage_per_million_working_age": 57.39,
+   "index": 12
+  },
+  "NGA": {
+   "usage_count": 7704,
+   "usage_per_million_working_age": 57.5,
+   "index": 13
+  },
+  "RWA": {
+   "usage_count": 504,
+   "usage_per_million_working_age": 58.68,
+   "index": 14
+  },
+  "EGY": {
+   "usage_count": 4584,
+   "usage_per_million_working_age": 61.3,
+   "index": 15
+  },
+  "GTM": {
+   "usage_count": 734,
+   "usage_per_million_working_age": 61.36,
+   "index": 16
+  },
+  "TGO": {
+   "usage_count": 296,
+   "usage_per_million_working_age": 61.41,
+   "index": 17
+  },
+  "IND": {
+   "usage_count": 61627,
+   "usage_per_million_working_age": 61.52,
+   "index": 18
+  },
+  "IDN": {
+   "usage_count": 12692,
+   "usage_per_million_working_age": 65.12,
+   "index": 18
+  },
+  "CMR": {
+   "usage_count": 1118,
+   "usage_per_million_working_age": 66.74,
+   "index": 19
+  },
+  "BEN": {
+   "usage_count": 556,
+   "usage_per_million_working_age": 67.52,
+   "index": 20
+  },
+  "DZA": {
+   "usage_count": 2107,
+   "usage_per_million_working_age": 70.21,
+   "index": 21
+  },
+  "GHA": {
+   "usage_count": 1639,
+   "usage_per_million_working_age": 76.9,
+   "index": 22
+  },
+  "SEN": {
+   "usage_count": 892,
+   "usage_per_million_working_age": 80.39,
+   "index": 23
+  },
+  "PSE": {
+   "usage_count": 259,
+   "usage_per_million_working_age": 81.7,
+   "index": 24
+  },
+  "NPL": {
+   "usage_count": 1584,
+   "usage_per_million_working_age": 81.87,
+   "index": 25
+  },
+  "BOL": {
+   "usage_count": 728,
+   "usage_per_million_working_age": 89.26,
+   "index": 25
+  },
+  "OMN": {
+   "usage_count": 359,
+   "usage_per_million_working_age": 89.51,
+   "index": 26
+  },
+  "IRQ": {
+   "usage_count": 2580,
+   "usage_per_million_working_age": 90.66,
+   "index": 27
+  },
+  "JOR": {
+   "usage_count": 682,
+   "usage_per_million_working_age": 91,
+   "index": 28
+  },
+  "VNM": {
+   "usage_count": 6306,
+   "usage_per_million_working_age": 91.75,
+   "index": 29
+  },
+  "AZE": {
+   "usage_count": 657,
+   "usage_per_million_working_age": 92.08,
+   "index": 30
+  },
+  "ZAF": {
+   "usage_count": 4107,
+   "usage_per_million_working_age": 94.12,
+   "index": 31
+  },
+  "KEN": {
+   "usage_count": 3338,
+   "usage_per_million_working_age": 95.55,
+   "index": 32
+  },
+  "ECU": {
+   "usage_count": 1187,
+   "usage_per_million_working_age": 96.14,
+   "index": 32
+  },
+  "KGZ": {
+   "usage_count": 450,
+   "usage_per_million_working_age": 98.64,
+   "index": 33
+  },
+  "MNG": {
+   "usage_count": 243,
+   "usage_per_million_working_age": 108.06,
+   "index": 34
+  },
+  "MEX": {
+   "usage_count": 9757,
+   "usage_per_million_working_age": 109.73,
+   "index": 35
+  },
+  "SLV": {
+   "usage_count": 475,
+   "usage_per_million_working_age": 110.87,
+   "index": 36
+  },
+  "PRY": {
+   "usage_count": 515,
+   "usage_per_million_working_age": 113.13,
+   "index": 37
+  },
+  "PHL": {
+   "usage_count": 9281,
+   "usage_per_million_working_age": 118.37,
+   "index": 38
+  },
+  "KWT": {
+   "usage_count": 455,
+   "usage_per_million_working_age": 118.6,
+   "index": 39
+  },
+  "THA": {
+   "usage_count": 6217,
+   "usage_per_million_working_age": 124.78,
+   "index": 39
+  },
+  "SAU": {
+   "usage_count": 3698,
+   "usage_per_million_working_age": 136.41,
+   "index": 40
+  },
+  "PER": {
+   "usage_count": 3354,
+   "usage_per_million_working_age": 144.95,
+   "index": 41
+  },
+  "MYS": {
+   "usage_count": 3921,
+   "usage_per_million_working_age": 154.24,
+   "index": 42
+  },
+  "TUR": {
+   "usage_count": 9170,
+   "usage_per_million_working_age": 156.1,
+   "index": 43
+  },
+  "KAZ": {
+   "usage_count": 2026,
+   "usage_per_million_working_age": 157.13,
+   "index": 44
+  },
+  "ARG": {
+   "usage_count": 4985,
+   "usage_per_million_working_age": 163.86,
+   "index": 45
+  },
+  "DOM": {
+   "usage_count": 1244,
+   "usage_per_million_working_age": 164.57,
+   "index": 46
+  },
+  "MAR": {
+   "usage_count": 4325,
+   "usage_per_million_working_age": 169.62,
+   "index": 46
+  },
+  "LKA": {
+   "usage_count": 2451,
+   "usage_per_million_working_age": 171.15,
+   "index": 47
+  },
+  "BRA": {
+   "usage_count": 25548,
+   "usage_per_million_working_age": 173.65,
+   "index": 48
+  },
+  "JAM": {
+   "usage_count": 368,
+   "usage_per_million_working_age": 177.36,
+   "index": 49
+  },
+  "COL": {
+   "usage_count": 6908,
+   "usage_per_million_working_age": 185.23,
+   "index": 50
+  },
+  "PAN": {
+   "usage_count": 559,
+   "usage_per_million_working_age": 185.8,
+   "index": 51
+  },
+  "LBN": {
+   "usage_count": 714,
+   "usage_per_million_working_age": 190.82,
+   "index": 52
+  },
+  "BIH": {
+   "usage_count": 394,
+   "usage_per_million_working_age": 195.16,
+   "index": 53
+  },
+  "CHL": {
+   "usage_count": 2720,
+   "usage_per_million_working_age": 198.89,
+   "index": 54
+  },
+  "BHR": {
+   "usage_count": 258,
+   "usage_per_million_working_age": 207.85,
+   "index": 54
+  },
+  "UKR": {
+   "usage_count": 5501,
+   "usage_per_million_working_age": 209.59,
+   "index": 55
+  },
+  "CRI": {
+   "usage_count": 772,
+   "usage_per_million_working_age": 217.32,
+   "index": 56
+  },
+  "TUN": {
+   "usage_count": 1851,
+   "usage_per_million_working_age": 225.4,
+   "index": 57
+  },
+  "ALB": {
+   "usage_count": 381,
+   "usage_per_million_working_age": 246.54,
+   "index": 58
+  },
+  "QAT": {
+   "usage_count": 634,
+   "usage_per_million_working_age": 256.08,
+   "index": 59
+  },
+  "URY": {
+   "usage_count": 593,
+   "usage_per_million_working_age": 266.18,
+   "index": 60
+  },
+  "HUN": {
+   "usage_count": 1647,
+   "usage_per_million_working_age": 268.43,
+   "index": 61
+  },
+  "PRI": {
+   "usage_count": 587,
+   "usage_per_million_working_age": 290.31,
+   "index": 61
+  },
+  "ARM": {
+   "usage_count": 605,
+   "usage_per_million_working_age": 294.43,
+   "index": 62
+  },
+  "SVK": {
+   "usage_count": 1089,
+   "usage_per_million_working_age": 307.6,
+   "index": 63
+  },
+  "ROU": {
+   "usage_count": 3833,
+   "usage_per_million_working_age": 313.38,
+   "index": 64
+  },
+  "GRC": {
+   "usage_count": 2108,
+   "usage_per_million_working_age": 322.59,
+   "index": 65
+  },
+  "MKD": {
+   "usage_count": 408,
+   "usage_per_million_working_age": 345,
+   "index": 66
+  },
+  "MUS": {
+   "usage_count": 319,
+   "usage_per_million_working_age": 359.48,
+   "index": 67
+  },
+  "BGR": {
+   "usage_count": 1569,
+   "usage_per_million_working_age": 384.89,
+   "index": 68
+  },
+  "POL": {
+   "usage_count": 9310,
+   "usage_per_million_working_age": 394.4,
+   "index": 68
+  },
+  "SRB": {
+   "usage_count": 1643,
+   "usage_per_million_working_age": 400.17,
+   "index": 69
+  },
+  "JPN": {
+   "usage_count": 29128,
+   "usage_per_million_working_age": 401.77,
+   "index": 70
+  },
+  "MDA": {
+   "usage_count": 631,
+   "usage_per_million_working_age": 420.25,
+   "index": 71
+  },
+  "CZE": {
+   "usage_count": 3027,
+   "usage_per_million_working_age": 436.25,
+   "index": 72
+  },
+  "HRV": {
+   "usage_count": 1084,
+   "usage_per_million_working_age": 446.11,
+   "index": 73
+  },
+  "ITA": {
+   "usage_count": 17373,
+   "usage_per_million_working_age": 466.25,
+   "index": 74
+  },
+  "ESP": {
+   "usage_count": 15640,
+   "usage_per_million_working_age": 482.04,
+   "index": 75
+  },
+  "ARE": {
+   "usage_count": 4704,
+   "usage_per_million_working_age": 496.87,
+   "index": 75
+  },
+  "GEO": {
+   "usage_count": 1324,
+   "usage_per_million_working_age": 529.6,
+   "index": 76
+  },
+  "SVN": {
+   "usage_count": 764,
+   "usage_per_million_working_age": 566.32,
+   "index": 77
+  },
+  "AUT": {
+   "usage_count": 3456,
+   "usage_per_million_working_age": 579.57,
+   "index": 78
+  },
+  "DEU": {
+   "usage_count": 30270,
+   "usage_per_million_working_age": 580.91,
+   "index": 79
+  },
+  "FIN": {
+   "usage_count": 2050,
+   "usage_per_million_working_age": 590.65,
+   "index": 80
+  },
+  "LTU": {
+   "usage_count": 1147,
+   "usage_per_million_working_age": 612.99,
+   "index": 81
+  },
+  "LVA": {
+   "usage_count": 713,
+   "usage_per_million_working_age": 616.23,
+   "index": 82
+  },
+  "BEL": {
+   "usage_count": 4812,
+   "usage_per_million_working_age": 636.23,
+   "index": 82
+  },
+  "PRT": {
+   "usage_count": 4406,
+   "usage_per_million_working_age": 654.09,
+   "index": 83
+  },
+  "DNK": {
+   "usage_count": 2537,
+   "usage_per_million_working_age": 666.76,
+   "index": 84
+  },
+  "IRL": {
+   "usage_count": 2577,
+   "usage_per_million_working_age": 715.24,
+   "index": 85
+  },
+  "NOR": {
+   "usage_count": 2619,
+   "usage_per_million_working_age": 718.16,
+   "index": 86
+  },
+  "CYP": {
+   "usage_count": 681,
+   "usage_per_million_working_age": 720.15,
+   "index": 87
+  },
+  "SWE": {
+   "usage_count": 4885,
+   "usage_per_million_working_age": 739,
+   "index": 88
+  },
+  "FRA": {
+   "usage_count": 32332,
+   "usage_per_million_working_age": 768.35,
+   "index": 89
+  },
+  "NZL": {
+   "usage_count": 2739,
+   "usage_per_million_working_age": 797.35,
+   "index": 89
+  },
+  "KOR": {
+   "usage_count": 29075,
+   "usage_per_million_working_age": 809.83,
+   "index": 90
+  },
+  "GBR": {
+   "usage_count": 35869,
+   "usage_per_million_working_age": 815.06,
+   "index": 91
+  },
+  "EST": {
+   "usage_count": 741,
+   "usage_per_million_working_age": 861.51,
+   "index": 92
+  },
+  "MLT": {
+   "usage_count": 340,
+   "usage_per_million_working_age": 881.17,
+   "index": 93
+  },
+  "NLD": {
+   "usage_count": 10296,
+   "usage_per_million_working_age": 886.69,
+   "index": 94
+  },
+  "AUS": {
+   "usage_count": 15906,
+   "usage_per_million_working_age": 896.82,
+   "index": 95
+  },
+  "CAN": {
+   "usage_count": 25902,
+   "usage_per_million_working_age": 960.28,
+   "index": 96
+  },
+  "USA": {
+   "usage_count": 222372,
+   "usage_per_million_working_age": 1008.5,
+   "index": 96
+  },
+  "CHE": {
+   "usage_count": 6287,
+   "usage_per_million_working_age": 1068.96,
+   "index": 97
+  },
+  "LUX": {
+   "usage_count": 520,
+   "usage_per_million_working_age": 1105.97,
+   "index": 98
+  },
+  "ISR": {
+   "usage_count": 6872,
+   "usage_per_million_working_age": 1128.72,
+   "index": 99
+  },
+  "SGP": {
+   "usage_count": 5499,
+   "usage_per_million_working_age": 1214.34,
+   "index": 100
+  }
+ }
+}

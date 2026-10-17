@@ -56,6 +56,7 @@ export default function MapPage() {
   const [mobilePanelOpen, setMobilePanelOpen] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
   const [usingLive, setUsingLive] = useState(false);
+  const [liveShare, setLiveShare] = useState<number | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   // Adoption score lookup
@@ -129,6 +130,7 @@ export default function MapPage() {
         setCountries(data.countries);
         setLastUpdated(data.last_updated);
         setUsingLive(data.using_live_data);
+        setLiveShare(data.coverage?.live_indicator_share ?? null);
       })
       .catch(() => {});
   }, []);
@@ -202,7 +204,7 @@ export default function MapPage() {
 
   return (
     <main style={{ minHeight: "100vh", background: "var(--dt-bg)", display: "flex", flexDirection: "column" }}>
-      <SiteHeader activePage="map" usingLive={usingLive} lastFetched={lastUpdated} />
+      <SiteHeader activePage="map" usingLive={usingLive} lastFetched={lastUpdated} liveShare={liveShare} />
       <div style={{ padding: "28px 48px 22px", borderBottom: "1px solid var(--ed-border)" }}>
         <div className="eyebrow">GEOGRAPHIC VIEW</div>
         <h1 style={{ font: "450 clamp(34px,5vw,58px)/1 var(--font-display)", letterSpacing: "-.03em", margin: "8px 0 10px" }}>AI readiness, mapped.</h1>

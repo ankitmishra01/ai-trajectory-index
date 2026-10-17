@@ -1,6 +1,8 @@
 // World Bank API client
 // Endpoint: https://api.worldbank.org/v2/
-// mrv=2 fetches the two most recent values per country (used for growth rate calculation)
+// mrnev=2 fetches the two most recent NON-EMPTY values per country (used for growth rates).
+// (mrv=2 returned only the last two calendar years, which are mostly empty for lagging series.)
+// Every page is read: the API paginates, and stopping at page 1 silently dropped countries.
 
 const WB_BASE = "https://api.worldbank.org/v2";
 
@@ -8,7 +10,7 @@ const INDICATORS = {
   // ── Digital access ──────────────────────────────────────────────────────────
   internet:      "IT.NET.USER.ZS",      // Internet users (% of population)
   mobile:        "IT.CEL.SETS.P2",      // Mobile subscriptions per 100 people
-  broadband:     "IT.NET.BBN.P2",       // Fixed broadband subscriptions per 100 people
+  broadband:     "IT.NET.BBND.P2",      // Fixed broadband subscriptions per 100 people (IT.NET.BBN.P2 was retired)
 
   // ── Education & labour ──────────────────────────────────────────────────────
   tertiary:           "SE.TER.ENRR",        // Tertiary school enrollment (%)
@@ -21,10 +23,11 @@ const INDICATORS = {
   electricity: "EG.ELC.ACCS.ZS",       // Access to electricity (% of population)
 
   // ── Governance (World Governance Indicators, WGI) ───────────────────────────
-  // WGI estimates are z-scores: range ≈ −2.5 to +2.5 (higher = better)
-  gov_effectiveness:  "GE.EST",         // Government Effectiveness
-  rule_of_law:        "RL.EST",         // Rule of Law
-  regulatory_quality: "RQ.EST",         // Regulatory Quality
+  // WGI estimates are z-scores: range ≈ −2.5 to +2.5 (higher = better).
+  // The legacy GE.EST / RL.EST / RQ.EST codes were archived; GOV_WGI_* are the current series.
+  gov_effectiveness:  "GOV_WGI_GE.EST", // Government Effectiveness
+  rule_of_law:        "GOV_WGI_RL.EST", // Rule of Law
+  regulatory_quality: "GOV_WGI_RQ.EST", // Regulatory Quality
 
   // ── Investment & capital flows ───────────────────────────────────────────────
   fdi: "BX.KLT.DINV.WD.GD.ZS",        // FDI net inflows (% of GDP)
@@ -77,33 +80,43 @@ interface WBDataPoint {
   date: string;
 }
 
-async function fetchIndicator(
-  indicator: string
-): Promise<Record<string, IndicatorValues>> {
-  const url = `${WB_BASE}/country/all/indicator/${indicator}?format=json&mrv=2&per_page=500`;
+interface WBPageMeta { page?: number; pages?: number; total?: number }
 
-  const res = await fetch(url, {
-    next: { revalidate: 86400 }, // 24-hour cache via Next.js data cache
-  });
+// Per-indicator fetch status, so callers can report honestly what actually loaded.
+export interface IndicatorFetchStatus {
+  indicator: string;
+  ok: boolean;
+  countries: number;
+  error?: string;
+}
 
-  if (!res.ok) {
-    throw new Error(`World Bank API error for ${indicator}: ${res.status}`);
+const PER_PAGE = 1000;
+const MAX_PAGES = 10;
+
+// The World Bank returns HTTP 200 with `[{ message: [...] }]` for unknown/archived indicators
+// or invalid parameters. Treat that as a failure instead of "no data".
+export function worldBankError(json: unknown): string | null {
+  if (!Array.isArray(json)) return "unexpected response shape";
+  const first = json[0] as { message?: { key?: string; value?: string }[] } | undefined;
+  if (first && Array.isArray(first.message) && first.message.length) {
+    return first.message.map((m) => [m.key, m.value].filter(Boolean).join(": ")).join("; ");
   }
+  if (!Array.isArray(json[1])) return "no data array in response";
+  return null;
+}
 
-  const json = await res.json();
-  // WB response: [metadata, dataArray]
-  const dataArray: WBDataPoint[] = Array.isArray(json[1]) ? json[1] : [];
-
-  // Group by country ISO code; WB returns newest first when mrv=2
+// Group raw points (newest first per country) into current/previous values. Exported for tests.
+export function groupPoints(points: WBDataPoint[]): Record<string, IndicatorValues> {
   const byCountry: Record<string, { value: number | null; date: string }[]> = {};
-  for (const point of dataArray) {
-    const iso = point.country.id;
-    if (!byCountry[iso]) byCountry[iso] = [];
-    byCountry[iso].push({ value: point.value, date: point.date });
+  for (const point of points) {
+    const iso = point.country?.id;
+    if (!iso) continue; // territories without an ISO code (e.g. some WGI rows)
+    if (point.value === null || point.value === undefined) continue;
+    (byCountry[iso] ??= []).push({ value: point.value, date: point.date });
   }
-
   const result: Record<string, IndicatorValues> = {};
   for (const [iso, pts] of Object.entries(byCountry)) {
+    pts.sort((a, b) => b.date.localeCompare(a.date));
     result[iso] = {
       current:  pts[0]?.value ?? null,
       previous: pts[1]?.value ?? null,
@@ -113,7 +126,41 @@ async function fetchIndicator(
   return result;
 }
 
-export async function fetchWorldBankIndicators(): Promise<WorldBankData> {
+export async function fetchIndicatorPoints(indicator: string): Promise<WBDataPoint[]> {
+  const points: WBDataPoint[] = [];
+  for (let page = 1, pages = 1; page <= pages && page <= MAX_PAGES; page++) {
+    const url = `${WB_BASE}/country/all/indicator/${indicator}?format=json&mrnev=2&per_page=${PER_PAGE}&page=${page}`;
+    const res = await fetch(url, { next: { revalidate: 86400 } }); // 24-hour cache via Next.js data cache
+    if (!res.ok) throw new Error(`World Bank API error for ${indicator}: HTTP ${res.status}`);
+    const json = await res.json();
+    const err = worldBankError(json);
+    if (err) throw new Error(`World Bank API error for ${indicator}: ${err}`);
+    const meta = (json[0] ?? {}) as WBPageMeta;
+    pages = Number(meta.pages) || 1;
+    points.push(...(json[1] as WBDataPoint[]));
+  }
+  return points;
+}
+
+async function fetchIndicator(
+  indicator: string,
+  status: IndicatorFetchStatus[]
+): Promise<Record<string, IndicatorValues>> {
+  try {
+    const grouped = groupPoints(await fetchIndicatorPoints(indicator));
+    status.push({ indicator, ok: true, countries: Object.keys(grouped).length });
+    return grouped;
+  } catch (e) {
+    const error = e instanceof Error ? e.message : String(e);
+    console.error(`[worldbank] ${error}`);
+    status.push({ indicator, ok: false, countries: 0, error });
+    return {};
+  }
+}
+
+// Fetch every indicator and report per-indicator status alongside the merged data.
+export async function fetchWorldBank(): Promise<{ data: WorldBankData; status: IndicatorFetchStatus[] }> {
+  const status: IndicatorFetchStatus[] = [];
   const [
     internet, mobile, broadband,
     tertiary, labor_productivity, rd, electricity,
@@ -122,23 +169,23 @@ export async function fetchWorldBankIndicators(): Promise<WorldBankData> {
     gdp_ppp, gdp, private_credit, trade_openness, services_share,
     hightech_exports,
   ] = await Promise.all([
-    fetchIndicator(INDICATORS.internet),
-    fetchIndicator(INDICATORS.mobile),
-    fetchIndicator(INDICATORS.broadband),
-    fetchIndicator(INDICATORS.tertiary),
-    fetchIndicator(INDICATORS.labor_productivity),
-    fetchIndicator(INDICATORS.rd),
-    fetchIndicator(INDICATORS.electricity),
-    fetchIndicator(INDICATORS.gov_effectiveness),
-    fetchIndicator(INDICATORS.rule_of_law),
-    fetchIndicator(INDICATORS.regulatory_quality),
-    fetchIndicator(INDICATORS.fdi),
-    fetchIndicator(INDICATORS.gdp_ppp),
-    fetchIndicator(INDICATORS.gdp),
-    fetchIndicator(INDICATORS.private_credit),
-    fetchIndicator(INDICATORS.trade_openness),
-    fetchIndicator(INDICATORS.services_share),
-    fetchIndicator(INDICATORS.hightech_exports),
+    fetchIndicator(INDICATORS.internet, status),
+    fetchIndicator(INDICATORS.mobile, status),
+    fetchIndicator(INDICATORS.broadband, status),
+    fetchIndicator(INDICATORS.tertiary, status),
+    fetchIndicator(INDICATORS.labor_productivity, status),
+    fetchIndicator(INDICATORS.rd, status),
+    fetchIndicator(INDICATORS.electricity, status),
+    fetchIndicator(INDICATORS.gov_effectiveness, status),
+    fetchIndicator(INDICATORS.rule_of_law, status),
+    fetchIndicator(INDICATORS.regulatory_quality, status),
+    fetchIndicator(INDICATORS.fdi, status),
+    fetchIndicator(INDICATORS.gdp_ppp, status),
+    fetchIndicator(INDICATORS.gdp, status),
+    fetchIndicator(INDICATORS.private_credit, status),
+    fetchIndicator(INDICATORS.trade_openness, status),
+    fetchIndicator(INDICATORS.services_share, status),
+    fetchIndicator(INDICATORS.hightech_exports, status),
   ]);
 
   // Merge all indicators keyed by ISO2
@@ -189,5 +236,10 @@ export async function fetchWorldBankIndicators(): Promise<WorldBankData> {
     };
   }
 
-  return merged;
+  if (status.every((st) => !st.ok)) throw new Error("World Bank: every indicator request failed");
+  return { data: merged, status };
+}
+
+export async function fetchWorldBankIndicators(): Promise<WorldBankData> {
+  return (await fetchWorldBank()).data;
 }

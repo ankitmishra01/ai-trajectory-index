@@ -352,7 +352,7 @@ function scoreInvestment(
       status: "live",
       source: usesOecd ? "OECD Data Explorer" : "World Bank Open Data",
       sourceUrl: usesOecd ? "https://data-explorer.oecd.org" : "https://data.worldbank.org",
-      indicatorCode: usesOecd ? "GPERD.PC_GDP" : "GB.XPD.RSDV.GD.ZS",
+      indicatorCode: usesOecd ? "MSTI G.PT_B1GQ" : "GB.XPD.RSDV.GD.ZS",
     }));
   } else {
     components.push(fallbackComponent("rd_expenditure", staticScore, "OECD and World Bank R&D expenditure values unavailable"));
