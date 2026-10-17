@@ -39,7 +39,7 @@ describe("OECD client", () => {
         dataSets: [{ series: { "0:0": { observations: { "0": [3.2], "1": [3.4] } } } }],
         structures: [{ dimensions: { series: [{ id: "REF_AREA", values: [{ id: "USA" }] }, { id: "FREQ", values: [{ id: "A" }] }], observation: [{ id: "TIME_PERIOD", values: [{ id: "2022" }, { id: "2023" }] }] } }],
       },
-    };
+    } as unknown as Parameters<typeof parseSDMX>[0];
     expect(parseSDMX(json)).toEqual({ USA: { current: 3.4, previous: 3.2, year: 2023 } });
   });
 });
