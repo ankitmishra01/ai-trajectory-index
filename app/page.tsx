@@ -567,7 +567,7 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════════════════════════
           FOOTER — editorial, light
       ══════════════════════════════════════════════════════════════════════ */}
-      <footer style={{ background: "var(--ed-bg)", padding: "64px 48px 32px", borderTop: "8px solid var(--signal)" }}>
+      <footer data-site-footer style={{ background: "var(--ed-bg)", padding: "64px 48px 32px", borderTop: "8px solid var(--signal)" }}>
         <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: 48, marginBottom: 48 }}>
           <div>
             <h5 style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 400, color: "var(--ed-text-0)", margin: "0 0 8px", letterSpacing: "-0.015em" }}>

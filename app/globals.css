@@ -4,18 +4,32 @@
 
 :root {
   /* ── Editorial surface (light) ────────────────────── */
-  --ed-bg:           #FBF9F4;
-  --ed-raised:       #F5F1E8;
-  --ed-border:       #EBE5D5;
-  --ed-border-strong:#D8CFB8;
-  --ed-muted:        #A89E84;
-  --ed-text-2:       #6B6354;
-  --ed-text-1:       #3D3829;
-  --ed-text-0:       #1F1C14;
+  /* Contrast refresh: a warm-white base, pure-white cards, a distinct stone
+     band and darker borders/muted text, so sections separate instead of every
+     surface reading as the same cream. */
+  --ed-bg:           #F8F7F3;
+  --ed-raised:       #F1ECE1;
+  --ed-surface:      #FFFFFF;
+  --ed-surface-2:    #F6F2EA;
+  --ed-border:       #E0D8C6;
+  --ed-border-strong:#BDB194;
+  --ed-muted:        #6E6653;
+  --ed-text-3:       #6B6353;
+  --ed-text-2:       #575043;
+  --ed-text-1:       #332E24;
+  --ed-text-0:       #18160F;
+
+  /* ── Ink band: deep navy for the utility bar, "At a glance" and footer ── */
+  --ink:             #13203A;
+  --ink-2:           #1C2C4A;
+  --on-ink:          #F3F0E8;
+  --on-ink-muted:    #B7C0D2;
+  --ink-accent:      #F2876A;
+  --ink-rule:        rgba(243, 240, 232, .2);
 
   /* ── Analytical aliases: one editorial system across every route ── */
   --dt-bg:           var(--ed-bg);
-  --dt-surface:      #FFFEFA;
+  --dt-surface:      var(--ed-surface);
   --dt-raised:       var(--ed-raised);
   --dt-border:       var(--ed-border);
   --dt-border-strong:var(--ed-border-strong);
@@ -25,17 +39,18 @@
   --dt-text-0:       var(--ed-text-0);
 
   /* ── Signal + semantic ───────────────────────────── */
-  --signal:          #D64528;
-  --signal-hover:    #B53619;
+  --signal:          #C73E22;
+  --signal-hover:    #A9321A;
   --signal-tint:     #FCF1EE;
   --positive:        #3F7A4D;
   --negative:        #A8513D;
+  --warning:         #A5650F;
 
   /* ── Pillar colours (data only) ──────────────────── */
   --pillar-infra:    #3B5BA5;
   --pillar-talent:   #7A4F8C;
   --pillar-gov:      #3F7A4D;
-  --pillar-invest:   #B58A2E;
+  --pillar-invest:   #9C7522;
   --pillar-econ:     #8B4A3F;
 
   /* ── Type stacks (overridden by next/font vars) ───── */
@@ -55,8 +70,8 @@
   --radius-sm: 2px;
   --radius-md: 6px;
   --radius-lg: 12px;
-  --shadow-sm: 0 1px 2px rgba(31, 28, 20, .05);
-  --shadow-md: 0 14px 36px rgba(31, 28, 20, .08);
+  --shadow-sm: 0 1px 2px rgba(19, 32, 58, .07), 0 0 0 1px rgba(19, 32, 58, .02);
+  --shadow-md: 0 14px 36px rgba(19, 32, 58, .10);
   --content-max: 1440px;
   --content-wide: 1344px;
 
@@ -68,15 +83,39 @@
   --border-mid:    var(--dt-border-strong);
   --border-strong: var(--dt-border-strong);
   --accent:        var(--signal);
-  --accent-rgb:    214, 69, 40;
+  --accent-rgb:    199, 62, 34;
   --text-1:        var(--dt-text-0);
   --text-2:        var(--dt-text-1);
   --text-3:        var(--dt-text-2);
   --green:         var(--positive);
   --green-rgb:     63, 122, 77;
   --red:           var(--negative);
-  --amber:         #B58A2E;
+  --amber:         #9C7522;
 }
+
+/* ── Ink bands ────────────────────────────────────────
+   Components style themselves with inline var(--ed-*) values, so a band only
+   needs to re-point those variables; no component markup changes. */
+.site-utility,
+section[data-insights],
+footer[data-site-footer] {
+  --ed-text-0: var(--on-ink);
+  --ed-text-1: var(--on-ink);
+  --ed-text-2: var(--on-ink-muted);
+  --ed-text-3: var(--on-ink-muted);
+  --ed-muted: var(--on-ink-muted);
+  --ed-border: var(--ink-rule);
+  --ed-border-strong: var(--ink-rule);
+  --signal: var(--ink-accent);
+  --dt-text-3: var(--on-ink-muted);
+  --text-3: var(--on-ink-muted);
+  color: var(--on-ink);
+  background: var(--ink) !important;
+}
+.site-utility { border-bottom-color: transparent !important; }
+section[data-insights] { border-top: 0 !important; }
+footer[data-site-footer] a { color: var(--on-ink); }
+footer[data-site-footer] a:hover { color: var(--ink-accent); }
 
 /* ── Base ─────────────────────────────────────────── */
 body {
@@ -100,13 +139,13 @@ button, [role="button"], select { min-height: 36px; }
 ::selection { background: var(--signal); color: #fff; }
 .score-nowrap { white-space: nowrap; font-variant-numeric: tabular-nums; }
 .page-shell { width: min(100%, var(--content-max)); margin-inline: auto; padding: 40px 48px 64px; }
-.surface-panel { background: #fffefa; border: 1px solid var(--ed-border); box-shadow: var(--shadow-sm); }
+.surface-panel { background: var(--ed-surface); border: 1px solid var(--ed-border); box-shadow: var(--shadow-sm); }
 .eyebrow { font: 700 10px/1.2 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--signal); }
 .status-toast { position: fixed; right: 24px; bottom: 24px; z-index: 100; padding: 11px 14px; background: var(--ed-text-0); color: var(--ed-bg); box-shadow: var(--shadow-md); }
 .mobile-nav { display: none; position: relative; }
 .mobile-nav summary { cursor: pointer; list-style: none; border: 1px solid var(--ed-border-strong); padding: 8px 11px; font: 700 11px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; }
 .mobile-nav summary::-webkit-details-marker { display: none; }
-.mobile-nav nav { position: absolute; right: 0; top: calc(100% + 8px); min-width: 190px; padding: 8px; display: grid; background: #fffefa; border: 1px solid var(--ed-border-strong); box-shadow: var(--shadow-md); }
+.mobile-nav nav { position: absolute; right: 0; top: calc(100% + 8px); min-width: 190px; padding: 8px; display: grid; background: var(--ed-surface); border: 1px solid var(--ed-border-strong); box-shadow: var(--shadow-md); }
 .mobile-nav a { padding: 10px 12px; color: var(--ed-text-0); text-decoration: none; font-weight: 600; }
 
 /* ── Rankings table ───────────────────────────────── */
@@ -470,7 +509,7 @@ button, [role="button"], select { min-height: 36px; }
 
 /* Country research profile */
 .country-layout { background: var(--ed-bg); color: var(--ed-text-0); }
-.country-sidebar-shell, .country-drawer-panel { border-right: 1px solid var(--ed-border); background: var(--ed-surface); }
+.country-sidebar-shell, .country-drawer-panel { border-right: 1px solid var(--ed-border); background: var(--ed-raised); }
 .country-drawer-backdrop, .country-modal-backdrop { background: rgba(28, 25, 20, .58); backdrop-filter: blur(4px); }
 .country-icon-button { width: 44px; height: 44px; display: grid; place-items: center; border-radius: var(--radius-md); color: var(--ed-text-1); }
 .country-profile-bar { border-bottom: 1px solid var(--ed-border); background: var(--ed-surface); }
