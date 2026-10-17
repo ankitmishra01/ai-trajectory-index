@@ -1,7 +1,7 @@
 // Shared live scoring: used by /api/scores and by page metadata so titles and bodies agree.
 import { fetchWorldBank } from "@/lib/worldbank";
 import { fetchIMFData } from "@/lib/imf";
-import { fetchOECDData } from "@/lib/oecd";
+import { fetchOECDDataWithStatus } from "@/lib/oecd-cache";
 import { fetchAnthropicIndex } from "@/lib/anthropic-index";
 import { calculateScores } from "@/lib/scoring";
 import { SLUG_TO_ISO2 } from "@/lib/slugToIso";
@@ -22,14 +22,15 @@ export async function computeScoresResponse(): Promise<ScoresResponse> {
   const [wbResult, imfResult, oecdResult, anthropicResult] = await Promise.allSettled([
     fetchWorldBank(),
     fetchIMFData(),
-    fetchOECDData(),
+    fetchOECDDataWithStatus(),
     fetchAnthropicIndex(),
   ]);
 
   const wbData       = wbResult.status       === "fulfilled" ? wbResult.value.data  : {};
   const wbStatus     = wbResult.status       === "fulfilled" ? wbResult.value.status : [];
   const imfData      = imfResult.status      === "fulfilled" ? imfResult.value       : {} as IMFData;
-  const oecdData     = oecdResult.status     === "fulfilled" ? oecdResult.value      : {} as OECDData;
+  const oecdData     = oecdResult.status     === "fulfilled" ? oecdResult.value.data : {} as OECDData;
+  const oecdStatus   = oecdResult.status     === "fulfilled" ? oecdResult.value.status : { mode: "unavailable" as const, as_of: null };
   const anthropicData = anthropicResult.status === "fulfilled" ? anthropicResult.value : {};
 
   const usingLiveData = wbResult.status === "fulfilled" && wbStatus.some((st) => st.ok);
@@ -75,6 +76,8 @@ export async function computeScoresResponse(): Promise<ScoresResponse> {
     last_updated: new Date().toISOString(),
     using_live_data: usingLiveData,
     sources,
+    // Whether each enrichment source was fetched live or served from a dated cache.
+    source_status: { oecd: oecdStatus },
     coverage,
   } satisfies ScoresResponse;
 
