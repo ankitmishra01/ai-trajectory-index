@@ -28,6 +28,11 @@ npm run lint       # ESLint only
 - `lib/provenance.ts`: builds complete static provenance and calculates source-availability coverage
 - `lib/liveScores.ts` (`computeScoresResponse()`, also used by country page metadata) and `app/api/scores/route.ts`: combines World Bank, IMF, OECD, Anthropic, policy, and external-index inputs; each network source fails independently through `Promise.allSettled`; `revalidate: 86400`
 
+**Nightly snapshots and history:**
+- `scripts/build-scores.ts` (run by `.github/workflows/nightly-scores.yml`, 03:07 UTC + manual dispatch, `npx tsx scripts/build-scores.ts`) recomputes every score and writes `data/scores-live.json` (full `/api/scores` payload + `generated_at`, `index_version`, `snapshot_date`, `by_iso3`; only replaced when live World Bank data arrived), `data/history/YYYY-MM-DD.json` (compact ISO3-keyed snapshot incl. source failures; immutable, citable), and `data/history/series.json` (aligned history). Builders live in `lib/snapshot.ts`; history and movers in `lib/history.ts`.
+- `lib/scoresSource.ts` `getScoresResponse()` serves `data/scores-live.json` while it is < 36h old (header `x-scores-source: snapshot`), otherwise computes live; used by `/api/scores` and country page metadata.
+- `/api/history/[iso3]` (points, history start, snapshot permalink) feeds `components/ScoreHistory.tsx` on country pages; `/api/movers?days=30` feeds `components/RecentMovers.tsx` on the homepage. Both show an honest note while history is short. Citations include index version, snapshot date and the snapshot permalink.
+
 **Score formula summary (v3: post-audit):**
 - Infrastructure: fixed broadband (6) + internet users (3) + mobile (3) + electricity (3) + static quality (5)
 - Talent: tertiary enrollment (6) + labor productivity GDP/worker PPP (6) + static talent proxy (8); OECD researchers can replace 2 static points and WIPO GII can replace 1

@@ -15,6 +15,7 @@ import PillarProvenance from "@/components/PillarProvenance";
 import PolicyGapAnalyser from "@/components/PolicyGapAnalyser";
 import ScoreGauge from "@/components/ScoreGauge";
 import ScoreSparkline from "@/components/ScoreSparkline";
+import ScoreHistory, { type HistoryPayload } from "@/components/ScoreHistory";
 import SiteHeader from "@/components/SiteHeader";
 import TrajectoryArrow from "@/components/TrajectoryArrow";
 import WhatIfSimulator from "@/components/WhatIfSimulator";
@@ -68,6 +69,7 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
   const [usingLive, setUsingLive] = useState(false);
+  const [history, setHistory] = useState<HistoryPayload | null>(null);
   const urlInitRef = useRef(false);
 
   const adoption = (adoptionData.countries as AdoptionEntry[]).find((item) => item.slug === slug) ?? null;
@@ -87,6 +89,11 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
     const query = params.toString();
     window.history.replaceState({}, "", query ? `?${query}` : window.location.pathname);
   }, [activeTab]);
+
+  useEffect(() => {
+    if (!/^[A-Z]{3}$/.test(geiIso3)) return;
+    fetch(`/api/history/${geiIso3}`).then((r) => (r.ok ? r.json() : null)).then(setHistory).catch(() => setHistory(null));
+  }, [geiIso3]);
 
   useEffect(() => {
     fetch("/api/scores")
@@ -155,7 +162,7 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
       )}
 
       <div className="flex-1 min-w-0">
-        <SiteHeader usingLive={usingLive} lastFetched={lastUpdated} citation={`Mishra, A. (2026). ${country.name}: AI readiness country profile. AI Trajectory Index. https://ai-trajectory-index.vercel.app/country/${slug}${geiUrl ? `. Economic context: Global Economic Intelligence, ${geiUrl}` : ""}`} />
+        <SiteHeader usingLive={usingLive} lastFetched={lastUpdated} citation={`Mishra, A. (2026). ${country.name}: AI readiness country profile. AI Trajectory Index (Version ${history?.index_version ?? "3"}${history?.latest_snapshot ? `, snapshot ${history.latest_snapshot}` : ""}). https://ai-trajectory-index.vercel.app/country/${slug}${history?.snapshot_url ? `. Data snapshot: ${history.snapshot_url}` : ""}${geiUrl ? `. Economic context: Global Economic Intelligence, ${geiUrl}` : ""}`} />
         <div className="country-profile-bar no-print">
           <div className="country-content-width">
             <button onClick={() => setSidebarOpen(true)} className="lg:hidden country-bar-action" aria-label="Browse countries">☰ <span>Countries</span></button>
@@ -182,6 +189,7 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
               <div className="country-hero-score"><ScoreGauge score={country.total_score} size={180} /><p>AI Readiness Score</p></div>
               <CoverageBadge coverage={country.coverage} />
             </div>
+            <ScoreHistory history={history} countryName={country.name} />
             {liveScoreDelta !== 0 && <div className="country-live-change" role="status">Live sources changed the baseline score from {initialCountry.total_score} to {country.total_score} ({liveScoreDelta > 0 ? "+" : ""}{liveScoreDelta} points).</div>}
           </CountrySection>
 

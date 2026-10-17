@@ -4,7 +4,7 @@ import staticData from "@/data/countries.json";
 import CountryPageClient from "@/components/CountryPageClient";
 import type { ScoredCountry } from "@/lib/types";
 import { asFallbackScoredCountry } from "@/lib/provenance";
-import { computeScoresResponse } from "@/lib/liveScores";
+import { getScoresResponse } from "@/lib/scoresSource";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ai-trajectory-index.vercel.app";
 
@@ -27,7 +27,7 @@ export async function generateMetadata(
   let pool: { slug: string; total_score: number }[] = staticData.countries;
   let country: { name: string; total_score: number; projected_score_2028: number; trajectory_label: string } = staticCountry;
   try {
-    const live = await computeScoresResponse();
+    const { data: live } = await getScoresResponse();
     const match = live.countries.find((c) => c.slug === params.slug);
     if (match) { country = match; pool = live.countries; }
   } catch {
@@ -85,7 +85,7 @@ export default async function CountryPage({ params }: { params: { slug: string }
   let pool: { slug: string; total_score: number }[] = staticData.countries;
   let liveScore = staticCountry.total_score;
   try {
-    const live = await computeScoresResponse();
+    const { data: live } = await getScoresResponse();
     const match = live.countries.find((c) => c.slug === params.slug);
     if (match) { liveScore = match.total_score; pool = live.countries; }
   } catch {
