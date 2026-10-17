@@ -9,6 +9,7 @@ import ExportButton from "@/components/ExportButton";
 import ComparisonPanel from "@/components/ComparisonPanel";
 import KeyInsights from "@/components/KeyInsights";
 import FastestMovers from "@/components/FastestMovers";
+import RecentMovers from "@/components/RecentMovers";
 import SiteHeader from "@/components/SiteHeader";
 import staticData from "@/data/countries.json";
 import type { ScoredCountry, ScoresResponse } from "@/lib/types";
@@ -438,6 +439,9 @@ export default function Home() {
         countries={countries}
         onSortClick={() => { setSort("trajectory_gain"); scrollToGrid(); }}
       />
+
+      {/* ── Measured movers from nightly snapshots ── */}
+      <RecentMovers countries={countries} />
 
       {/* ── Filter bar ── */}
       <section data-filterbar style={{ background: "var(--dt-bg)", padding: "0 48px 24px" }} ref={gridRef}>
