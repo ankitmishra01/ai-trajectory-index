@@ -16,6 +16,7 @@ import type { ScoredCountry, ScoresResponse } from "@/lib/types";
 import { copyText } from "@/lib/copyText";
 import { asFallbackScoredCountry } from "@/lib/provenance";
 import { createHomeRefreshState, homeRefreshReducer } from "@/lib/homeRefresh";
+import { competitionRanks } from "@/lib/rank";
 
 type ViewMode = "grid" | "table";
 
@@ -184,10 +185,9 @@ export default function Home() {
     () => [...countries].sort((a, b) => b.total_score - a.total_score),
     [countries]
   );
-  const globalRanks = useMemo(
-    () => Object.fromEntries(ranked.map((c, i) => [c.slug, i + 1])),
-    [ranked]
-  );
+  // Standard competition ranking: economies with the same total share a rank. Reading the
+  // rank off the sorted array index instead made ties resolve by position in countries.json.
+  const globalRanks = useMemo(() => competitionRanks(ranked), [ranked]);
 
   const filtered = useMemo(() =>
     countries

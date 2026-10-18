@@ -12,20 +12,12 @@ These come from the live scoring pipeline (`/api/scores`), not the static baseli
 
 | Finding | Detail |
 |---------|--------|
-| 🇩🇰 **Denmark leads overall** | 87/100, ahead of the Netherlands (86), the United States (85), Germany (84) and Singapore (84) |
+| 🇩🇰 **Denmark leads overall** | 87/100, ahead of the Netherlands (86) and the United States (85). Six economies then tie on 84: Finland, Germany, Singapore, South Korea, Sweden and Switzerland |
 | 🇸🇳 **Senegal has the strongest trajectory** | Trajectory +7: current 40 → projected 51 by 2028 |
 | 🇵🇱 **Poland is the fastest-rising advanced economy** | 72 → 81 projected by 2028 (trajectory +6), the largest gain in the top 40 |
 | 🇧🇾 **Belarus has the largest governance gap** | Non-governance pillars average 11.5/20 against governance at 4/20, a 7.5-point gap |
 | 🌍 **Middle East & Africa face an infrastructure constraint** | Median infrastructure 7/20 against a global median of 13 |
 | 🇪🇺 **Europe leads on governance** | Average governance 13.2/20 against 10.3/20 investment: policy ahead of capital |
-
----------|--------|
-| 🇺🇸 **US leads overall** | 91/100: highest score across all 186 economies |
-| 🇮🇳 **India has the strongest trajectory** | Current score 65 → projected 73 by 2028 (trajectory +8) |
-| 🇦🇪 **UAE fastest-rising advanced economy** | 73 → 79 projected by 2028 (trajectory +6) |
-| 🇷🇺 **Russia has the largest governance gap** | Non-governance pillars average 14.0, compared with governance at 8/20, a 6.0-point gap |
-| 🌍 **Africa has an infrastructure constraint** | Median infrastructure score 5.5/20 vs global median 7.0 |
-| 🇪🇺 **Europe leads on governance** | EU avg 10.2/20 governance vs 9.2/20 investment: policy ahead of capital |
 
 ---
 

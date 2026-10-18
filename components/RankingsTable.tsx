@@ -71,6 +71,16 @@ export default function RankingsTable({ countries, globalRanks, activeRegion }: 
     }
   }
 
+  // globalRanks is the full 186-economy map, so a rank that appears more than once is shared.
+  // Shared ranks render as "=4" rather than implying a separation the scores do not support.
+  const sharedRanks = useMemo(() => {
+    const counts: Record<number, number> = {};
+    for (const r of Object.values(globalRanks)) counts[r] = (counts[r] ?? 0) + 1;
+    const shared: Record<number, true> = {};
+    for (const r of Object.values(globalRanks)) if (counts[r] > 1) shared[r] = true;
+    return shared;
+  }, [globalRanks]);
+
   const sorted = useMemo(() => {
     return [...countries].sort((a, b) => {
       let av: number, bv: number;
@@ -140,7 +150,8 @@ export default function RankingsTable({ countries, globalRanks, activeRegion }: 
           </thead>
           <tbody>
             {sorted.map((c) => {
-              const rank = globalRanks[c.slug] ?? "—";
+              const rankValue = globalRanks[c.slug];
+              const rank = rankValue === undefined ? "—" : sharedRanks[rankValue] ? `=${rankValue}` : String(rankValue);
               const { color, glow } = totalScoreColor(c.total_score);
               const isRegionActive = activeRegion && activeRegion !== "All" && c.region === activeRegion;
 

@@ -5,6 +5,7 @@ import CountryPageClient from "@/components/CountryPageClient";
 import type { ScoredCountry } from "@/lib/types";
 import { asFallbackScoredCountry } from "@/lib/provenance";
 import { getScoresResponse } from "@/lib/scoresSource";
+import { competitionRankEntries, formatRank } from "@/lib/rank";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ai-trajectory-index.vercel.app";
 
@@ -38,8 +39,9 @@ export async function generateMetadata(
   const delta   = country.projected_score_2028 - country.total_score;
   const deltaStr = delta > 0 ? `+${delta}` : String(delta);
 
-  const ranked  = [...pool].sort((a, b) => b.total_score - a.total_score);
-  const rank    = ranked.findIndex((c) => c.slug === params.slug) + 1;
+  // Competition ranking: equal totals share a rank, and a shared rank is shown as "=4".
+  const rankEntry = competitionRankEntries(pool)[params.slug];
+  const rank      = formatRank(rankEntry);
 
   const title       = `${country.name} — AI Trajectory Index | ${country.total_score}/100 (#${rank} Global)`;
   const description = `${tier} · ${country.trajectory_label} trajectory · Projected ${country.projected_score_2028}/100 by 2028 (${deltaStr} pts). See how 186 economies rank on AI readiness across Infrastructure, Talent, Governance, Investment and Economic Readiness.`;
@@ -91,9 +93,8 @@ export default async function CountryPage({ params }: { params: { slug: string }
   } catch {
     /* keep static baseline */
   }
-  const ranked = [...pool].sort((a, b) => b.total_score - a.total_score);
-  const rank   = ranked.findIndex((c) => c.slug === params.slug) + 1;
-  const url    = `${SITE_URL}/country/${params.slug}`;
+  const rank = formatRank(competitionRankEntries(pool)[params.slug]);
+  const url  = `${SITE_URL}/country/${params.slug}`;
 
   const jsonLd = {
     "@context": "https://schema.org",
