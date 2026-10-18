@@ -15,6 +15,7 @@ import type { ScoredCountry, ScoresResponse } from "@/lib/types";
 import type { RegionConfig } from "@/lib/regionConfigs";
 import SiteHeader from "@/components/SiteHeader";
 import { asFallbackScoredCountry } from "@/lib/provenance";
+import { competitionRankEntriesBy, formatRank } from "@/lib/rank";
 
 const PILLARS = [
   { key: "infrastructure",    label: "Infrastructure",   short: "Infra",  color: "#3B5BA5" },
@@ -68,6 +69,14 @@ export default function RegionDeepDive({ config }: Props) {
     [countries, config]
   );
 
+  // Every ordered list on this page ranks with the shared competition helper, so economies
+  // that share a score share a rank instead of being separated by their position in the
+  // source array. Three pools, three measures: readiness, adoption and projected gain.
+  const regionalRanks = useMemo(
+    () => competitionRankEntriesBy(regional, (c) => c.slug, (c) => c.total_score),
+    [regional]
+  );
+
   const globalAvgByPillar = useMemo(() =>
     Object.fromEntries(PILLARS.map((p) => [p.key, avg(countries.map((c) => c.scores[p.key].score))])),
     [countries]
@@ -105,6 +114,10 @@ export default function RegionDeepDive({ config }: Props) {
     [...regional]
       .sort((a, b) => (b.projected_score_2028 - b.total_score) - (a.projected_score_2028 - a.total_score))
       .slice(0, 10),
+    [regional]
+  );
+  const gainRanks = useMemo(
+    () => competitionRankEntriesBy(regional, (c) => c.slug, (c) => c.projected_score_2028 - c.total_score),
     [regional]
   );
 
@@ -148,6 +161,10 @@ export default function RegionDeepDive({ config }: Props) {
     () => [...regionalAdoption].sort((a, b) => b.adoption_total - a.adoption_total),
     [regionalAdoption]
   );
+  const adoptionRanks = useMemo(
+    () => competitionRankEntriesBy(regionalAdoption, (a) => a.slug, (a) => a.adoption_total),
+    [regionalAdoption]
+  );
   const regionAdoptionAvg = avg(regionalAdoption.map((a) => a.adoption_total));
   const globalAdoptionAvg = avg(allEnriched.map((a) => a.adoption_total));
   const topLeapfrog  = [...regionalAdoption].sort((a, b) => b.adoption_gap - a.adoption_gap)[0];
@@ -173,8 +190,8 @@ export default function RegionDeepDive({ config }: Props) {
             onClick={() => {
               const headers = ["Rank","Country","Flag","Sub-region","Score","Infrastructure","Talent","Governance","Investment","Economic_Readiness","Trajectory","Projected_2028"];
               const ranked = [...regional].sort((a, b) => b.total_score - a.total_score);
-              const rows = ranked.map((c, i) => [
-                i + 1, `"${c.name}"`, c.flag, `"${config.subregions[c.slug] ?? ""}"`,
+              const rows = ranked.map((c) => [
+                regionalRanks[c.slug]?.rank ?? "", `"${c.name}"`, c.flag, `"${config.subregions[c.slug] ?? ""}"`,
                 c.total_score, c.scores.infrastructure.score, c.scores.talent.score,
                 c.scores.governance.score, c.scores.investment.score, c.scores.economic_readiness.score,
                 `"${c.trajectory_label}"`, c.projected_score_2028,
@@ -283,7 +300,7 @@ export default function RegionDeepDive({ config }: Props) {
                       onMouseEnter={(e) => (e.currentTarget.style.background = "var(--raised)")}
                       onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                     >
-                      <span className="text-xs w-5 text-center font-bold tabular-nums" style={{ color: "var(--text-3)" }}>{i + 1}</span>
+                      <span className="text-xs w-7 text-center font-bold tabular-nums" style={{ color: "var(--text-3)" }}>{formatRank(adoptionRanks[a.slug])}</span>
                       <span className="text-xl flex-shrink-0">{a.flag}</span>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold" style={{ color: "var(--text-1)" }}>{a.name}</p>
@@ -401,7 +418,7 @@ export default function RegionDeepDive({ config }: Props) {
                     onMouseEnter={(e) => (e.currentTarget.style.background = "var(--raised)")}
                     onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                   >
-                    <span className="text-xs w-5 text-center font-bold tabular-nums" style={{ color: "var(--text-3)" }}>{i + 1}</span>
+                    <span className="text-xs w-7 text-center font-bold tabular-nums" style={{ color: "var(--text-3)" }}>{formatRank(gainRanks[c.slug])}</span>
                     <span className="text-xl flex-shrink-0">{c.flag}</span>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
@@ -613,7 +630,7 @@ export default function RegionDeepDive({ config }: Props) {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {[...regional]
               .sort((a, b) => b.total_score - a.total_score)
-              .map((c, i) => {
+              .map((c) => {
                 const band  = scoreBand(c.total_score);
                 const delta = c.projected_score_2028 - c.total_score;
                 const sr    = config.subregions[c.slug] ?? "";
@@ -631,8 +648,8 @@ export default function RegionDeepDive({ config }: Props) {
                       (e.currentTarget as HTMLElement).style.background = "var(--surface)";
                     }}
                   >
-                    <span className="text-xs w-5 text-center font-bold tabular-nums flex-shrink-0"
-                      style={{ color: "var(--text-3)" }}>{i + 1}</span>
+                    <span className="text-xs w-7 text-center font-bold tabular-nums flex-shrink-0"
+                      style={{ color: "var(--text-3)" }}>{formatRank(regionalRanks[c.slug])}</span>
                     <span className="text-2xl flex-shrink-0">{c.flag}</span>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold truncate" style={{ color: "var(--text-1)" }}>{c.name}</p>

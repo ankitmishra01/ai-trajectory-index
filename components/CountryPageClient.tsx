@@ -27,6 +27,7 @@ import type { AdoptionEntry } from "@/lib/adoption";
 import { copyText } from "@/lib/copyText";
 import { PILLAR_KEYS } from "@/lib/methodology";
 import { asFallbackScoredCountry } from "@/lib/provenance";
+import { competitionRankEntries, formatRankLabel, type RankEntry } from "@/lib/rank";
 import type { NarrativeSection, ScoresResponse, ScoredCountry } from "@/lib/types";
 
 const DIM_LABELS = {
@@ -50,18 +51,26 @@ interface NarrativeState {
 interface Props {
   slug: string;
   initialCountry: ScoredCountry;
+  // Competition ranks computed on the server from the same pool the page <title> uses, so the
+  // first paint agrees with the tab. Recomputed here once /api/scores returns the live list.
+  initialGlobalRank?: RankEntry | null;
+  initialRegionRank?: RankEntry | null;
 }
 
 // Economies the Global Economic Intelligence dashboard profiles (its World Bank registry has no Taiwan entry).
 const GEI_BASE = "https://g20-gamma.vercel.app";
 const GEI_EXCLUDED = new Set(["TWN"]);
 
-export default function CountryPageClient({ slug, initialCountry }: Props) {
+export default function CountryPageClient({ slug, initialCountry, initialGlobalRank, initialRegionRank }: Props) {
   const geiIso3 = SLUG_TO_ISO3[slug] ?? "";
   const geiUrl = /^[A-Z]{3}$/.test(geiIso3) && !GEI_EXCLUDED.has(geiIso3) ? `${GEI_BASE}/#country/${geiIso3}` : null;
   const [activeTab, setActiveTab] = useState<PageTab>("combined");
   const [country, setCountry] = useState(initialCountry);
   const [allCountries, setAllCountries] = useState<ScoredCountry[]>(() => staticData.countries.map(asFallbackScoredCountry));
+  // False until /api/scores answers, while allCountries is still the static seed. The server
+  // already ranked this country against the live pool, so we show its answer until we have
+  // the same list it used rather than ranking against a different one.
+  const [liveListLoaded, setLiveListLoaded] = useState(false);
   const [narrative, setNarrative] = useState<NarrativeState>({ status: "idle", sections: [] });
   const [copied, setCopied] = useState(false);
   const [embedOpen, setEmbedOpen] = useState(false);
@@ -100,6 +109,7 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
       .then((response) => response.json())
       .then((data: ScoresResponse) => {
         setAllCountries(data.countries);
+        setLiveListLoaded(data.countries.length > 0);
         setLastUpdated(data.last_updated);
         setUsingLive(data.using_live_data);
         const liveCountry = data.countries.find((item) => item.slug === slug);
@@ -137,9 +147,13 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
   }, [allCountries, country, slug]);
 
   const ranked = [...allCountries].sort((a, b) => b.total_score - a.total_score);
-  const globalRank = ranked.findIndex((item) => item.slug === slug) + 1;
+  // Same helper, same pool as the page <title> and the JSON-LD Dataset description. Reading
+  // the rank off this sorted array index instead is what made the hero say "#17" on a page
+  // whose own tab said "=4": the index ordered the six economies tied on 84 by their row
+  // position in data/countries.json.
   const regionPeers = ranked.filter((item) => item.region === country.region);
-  const regionRank = regionPeers.findIndex((item) => item.slug === slug) + 1;
+  const globalRank = liveListLoaded ? competitionRankEntries(allCountries)[slug] : initialGlobalRank ?? undefined;
+  const regionRank = liveListLoaded ? competitionRankEntries(regionPeers)[slug] : initialRegionRank ?? undefined;
   const delta = country.projected_score_2028 - country.total_score;
   const liveScoreDelta = country.data_source === "live" ? country.total_score - initialCountry.total_score : 0;
 
@@ -181,9 +195,9 @@ export default function CountryPageClient({ slug, initialCountry }: Props) {
               <div className="country-hero-identity">
                 <span className="country-flag" aria-hidden="true">{country.flag}</span>
                 <div>
-                  <p className="eyebrow">{country.region} · #{regionRank} in region</p>
+                  <p className="eyebrow">{country.region} · {formatRankLabel(regionRank)} in region</p>
                   <h1>{country.name}</h1>
-                  <div className="country-hero-meta"><span>#{globalRank} globally</span><TrajectoryArrow label={country.trajectory_label} score={country.trajectory_score} size="md" /><span>{country.projected_score_2028}/100 by 2028</span></div>
+                  <div className="country-hero-meta"><span>{formatRankLabel(globalRank)} globally</span><TrajectoryArrow label={country.trajectory_label} score={country.trajectory_score} size="md" /><span>{country.projected_score_2028}/100 by 2028</span></div>
                 </div>
               </div>
               <div className="country-hero-score"><ScoreGauge score={country.total_score} size={180} /><p>AI Readiness Score</p></div>

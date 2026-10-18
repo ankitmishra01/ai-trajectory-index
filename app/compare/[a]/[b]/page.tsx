@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -8,6 +8,8 @@ import {
 } from "recharts";
 import staticData from "@/data/countries.json";
 import SiteHeader from "@/components/SiteHeader";
+import { competitionRankEntries, formatRankLabel } from "@/lib/rank";
+import type { Country, ScoresResponse } from "@/lib/types";
 
 const PILLARS = [
   { key: "infrastructure",     label: "Infrastructure" },
@@ -79,15 +81,23 @@ export default function ComparePage({ params }: { params: { a: string; b: string
   const [slugA, setSlugA] = useState(params.a);
   const [slugB, setSlugB] = useState(params.b);
 
-  const ca = staticData.countries.find((c) => c.slug === slugA);
-  const cb = staticData.countries.find((c) => c.slug === slugB);
+  // Rank against the live pool the rest of the site ranks against. On the static baseline
+  // alone this page put Germany at #14 and Finland at #17, two economies that in fact tie on
+  // 84 and that the country page and the home table both publish as #4 (tied).
+  const [countries, setCountries] = useState<Country[]>(staticData.countries);
+  useEffect(() => {
+    fetch("/api/scores")
+      .then((response) => response.json())
+      .then((data: ScoresResponse) => { if (data.countries?.length) setCountries(data.countries); })
+      .catch(() => {});
+  }, []);
 
-  const ranked = useMemo(
-    () => [...staticData.countries].sort((x, y) => y.total_score - x.total_score),
-    []
-  );
-  const rankA = ranked.findIndex((c) => c.slug === slugA) + 1;
-  const rankB = ranked.findIndex((c) => c.slug === slugB) + 1;
+  const ca = countries.find((c) => c.slug === slugA);
+  const cb = countries.find((c) => c.slug === slugB);
+
+  const rankEntries = useMemo(() => competitionRankEntries(countries), [countries]);
+  const rankA = formatRankLabel(rankEntries[slugA]);
+  const rankB = formatRankLabel(rankEntries[slugB]);
 
   const radarData = PILLARS.map(({ key, label }) => ({
     subject: label,
@@ -125,7 +135,7 @@ export default function ComparePage({ params }: { params: { a: string; b: string
                       <span style={{ fontSize: 36 }}>{c.flag}</span>
                       <div>
                         <p style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 500, color: "var(--dt-text-0)" }}>{c.name}</p>
-                        <p style={{ fontFamily: "var(--font-sans)", fontSize: 11, color: "var(--dt-text-3)", marginTop: 2 }}>#{i === 0 ? rankA : rankB} globally · {c.region}</p>
+                        <p style={{ fontFamily: "var(--font-sans)", fontSize: 11, color: "var(--dt-text-3)", marginTop: 2 }}>{i === 0 ? rankA : rankB} globally · {c.region}</p>
                       </div>
                       <div style={{ marginLeft: "auto", fontFamily: "var(--font-mono)", fontSize: 32, fontWeight: 500 }}>
                         <ScoreNum value={c.total_score} color={scoreColor(c.total_score)} />
@@ -221,7 +231,7 @@ export default function ComparePage({ params }: { params: { a: string; b: string
                     </p>
                     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                       {[
-                        { label: "Global rank", value: `#${rank}` },
+                        { label: "Global rank", value: rank },
                         { label: "Trajectory",  value: c.trajectory_label },
                         { label: "2028 projection", value: `${c.projected_score_2028}/100 (${delta > 0 ? "+" : ""}${delta})`, accent: color },
                       ].map(({ label, value, accent }) => (

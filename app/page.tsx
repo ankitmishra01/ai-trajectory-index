@@ -16,7 +16,7 @@ import type { ScoredCountry, ScoresResponse } from "@/lib/types";
 import { copyText } from "@/lib/copyText";
 import { asFallbackScoredCountry } from "@/lib/provenance";
 import { createHomeRefreshState, homeRefreshReducer } from "@/lib/homeRefresh";
-import { competitionRanks } from "@/lib/rank";
+import { competitionRankEntries, formatRank } from "@/lib/rank";
 
 type ViewMode = "grid" | "table";
 
@@ -187,7 +187,12 @@ export default function Home() {
   );
   // Standard competition ranking: economies with the same total share a rank. Reading the
   // rank off the sorted array index instead made ties resolve by position in countries.json.
-  const globalRanks = useMemo(() => competitionRanks(ranked), [ranked]);
+  const globalRankEntries = useMemo(() => competitionRankEntries(ranked), [ranked]);
+  // Plain rank numbers for the cards and the CSV/JSON export, which have no tie column.
+  const globalRanks = useMemo(
+    () => Object.fromEntries(Object.entries(globalRankEntries).map(([slug, entry]) => [slug, entry.rank])),
+    [globalRankEntries]
+  );
 
   const filtered = useMemo(() =>
     countries
@@ -283,11 +288,14 @@ export default function Home() {
           {/* Right: leaderboard preview (top 5) */}
           <div style={{ borderLeft: "1px solid var(--ed-border-strong)", paddingLeft: 32 }}>
             <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--ed-text-2)", letterSpacing: "0.16em", fontWeight: 700, marginBottom: 16 }}>TOP FIVE · OVERALL READINESS</div>
-            {ranked.slice(0, 5).map((c, i) => (
+            {ranked.slice(0, 5).map((c) => (
               <Link key={c.slug} href={`/country/${c.slug}`}
                 style={{ display: "grid", gridTemplateColumns: "32px 1fr auto auto", alignItems: "center", gap: 12, padding: "12px 0", borderBottom: "1px solid var(--ed-border)", textDecoration: "none" }}>
                 <span style={{ fontFamily: "var(--font-display)", fontSize: 26, fontStyle: "italic", color: "var(--ed-muted)", lineHeight: 1 }}>
-                  {String(i + 1).padStart(2, "0")}
+                  {/* The competition rank, not the list position: the fourth and fifth rows
+                      are two of the six economies tied on 84, and numbering them 04 and 05
+                      asserted an order that only existed in data/countries.json. */}
+                  {(() => { const token = formatRank(globalRankEntries[c.slug]); return token.startsWith("=") ? token : token.padStart(2, "0"); })()}
                 </span>
                 <div>
                   <div style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 500, color: "var(--ed-text-0)", lineHeight: 1.1 }}>{c.flag} {c.name}</div>
@@ -477,7 +485,7 @@ export default function Home() {
       {/* ── Country Grid ── */}
       <section data-grid style={{ background: "var(--dt-bg)", padding: "0 48px 40px" }}>
         {view === "table" ? (
-          <RankingsTable countries={filtered} globalRanks={globalRanks} activeRegion={region} />
+          <RankingsTable countries={filtered} rankEntries={globalRankEntries} activeRegion={region} />
         ) : filtered.length === 0 ? (
           <div style={{ textAlign: "center", padding: "80px 0" }}>
             <div style={{ fontFamily: "var(--font-display)", fontSize: 48, color: "var(--dt-text-3)", marginBottom: 16 }}>—</div>

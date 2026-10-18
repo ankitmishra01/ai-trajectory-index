@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import type { ScoredCountry } from "@/lib/types";
+import { competitionRankEntries, formatRankLabel } from "@/lib/rank";
 
 const PILLARS = [
   { key: "infrastructure", label: "Infrastructure", color: "#3B5BA5", max: 20 },
@@ -43,17 +44,19 @@ export default function WhatIfSimulator({ country, allCountries }: Props) {
     scores.infrastructure + scores.talent + scores.governance + scores.investment + scores.economic_readiness
   ));
 
-  const ranked = useMemo(
-    () => [...allCountries].sort((a, b) => b.total_score - a.total_score),
-    [allCountries]
-  );
-  const currentRank  = ranked.findIndex((c) => c.slug === country.slug) + 1;
-  const hypotheticalRank = useMemo(() => {
-    const inserted = ranked
-      .filter((c) => c.slug !== country.slug)
-      .filter((c) => c.total_score > hypotheticalTotal).length + 1;
-    return inserted;
-  }, [ranked, country.slug, hypotheticalTotal]);
+  // Both ranks are competition ranks, so the delta compares like with like. currentRank used
+  // to come off the sorted array index while hypotheticalRank already counted the economies
+  // scoring strictly higher, which made the two sides of "rankDelta" different measures.
+  const currentRankEntry = useMemo(() => competitionRankEntries(allCountries)[country.slug], [allCountries, country.slug]);
+  const currentRank  = currentRankEntry?.rank ?? 0;
+  const hypotheticalEntry = useMemo(() => {
+    const others = allCountries.filter((c) => c.slug !== country.slug);
+    return {
+      rank: others.filter((c) => c.total_score > hypotheticalTotal).length + 1,
+      tied: others.some((c) => c.total_score === hypotheticalTotal),
+    };
+  }, [allCountries, country.slug, hypotheticalTotal]);
+  const hypotheticalRank = hypotheticalEntry.rank;
 
   const scoreDelta = hypotheticalTotal - country.total_score;
   const rankDelta  = currentRank - hypotheticalRank;
@@ -110,7 +113,7 @@ export default function WhatIfSimulator({ country, allCountries }: Props) {
             <div className="text-right">
               <p className="text-[10px] uppercase tracking-widest mb-1" style={{ color: "var(--text-3)" }}>Global Rank</p>
               <div className="flex items-baseline gap-2 justify-end">
-                <span className="text-2xl font-black" style={{ color: "var(--text-1)" }}>#{hypotheticalRank}</span>
+                <span className="text-2xl font-black" style={{ color: "var(--text-1)" }}>{formatRankLabel(hypotheticalEntry)}</span>
                 {isDirty && rankDelta !== 0 && (
                   <span className="text-sm font-bold" style={{ color: rankDelta > 0 ? "#4ade80" : "#f87171" }}>
                     ({rankDelta > 0 ? "↑" : "↓"}{Math.abs(rankDelta)} places)

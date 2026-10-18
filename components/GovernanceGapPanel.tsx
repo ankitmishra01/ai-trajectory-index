@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import type { ScoredCountry } from "@/lib/types";
+import { competitionRankEntriesBy, formatRank } from "@/lib/rank";
 
 interface Props {
   countries: ScoredCountry[];
@@ -16,7 +17,7 @@ function scoreColor(s: number) {
 }
 
 export default function GovernanceGapPanel({ countries }: Props) {
-  const top = useMemo(() =>
+  const withGap = useMemo(() =>
     [...countries]
       .map((c) => ({
         ...c,
@@ -24,10 +25,19 @@ export default function GovernanceGapPanel({ countries }: Props) {
         govScore: c.scores.governance.score,
         gap: Math.round((c.total_score / 5 - c.scores.governance.score) * 10) / 10,
       }))
-      .filter((c) => c.gap > 0)
-      .sort((a, b) => b.gap - a.gap)
-      .slice(0, 10),
+      .filter((c) => c.gap > 0),
     [countries]
+  );
+
+  // Competition rank on the gap itself: gaps are rounded to one decimal, so economies share a
+  // gap often, and numbering the rows 1..10 made that order come from the input array.
+  const gapRanks = useMemo(
+    () => competitionRankEntriesBy(withGap, (c) => c.slug, (c) => c.gap),
+    [withGap]
+  );
+  const top = useMemo(
+    () => [...withGap].sort((a, b) => b.gap - a.gap).slice(0, 10),
+    [withGap]
   );
 
   if (!top.length) return null;
@@ -48,15 +58,15 @@ export default function GovernanceGapPanel({ countries }: Props) {
       </p>
 
       <div className="space-y-3">
-        {top.map((c, i) => {
+        {top.map((c) => {
           const expectedPct = (c.avgPillar / 20) * 100;
           const actualPct   = (c.govScore   / 20) * 100;
           return (
             <Link key={c.slug} href={`/country/${c.slug}`}
               className="block group transition-opacity hover:opacity-90">
               <div className="flex items-center gap-3 mb-1">
-                <span className="text-[10px] w-4 text-right flex-shrink-0 tabular-nums"
-                  style={{ color: "var(--text-3)" }}>#{i + 1}</span>
+                <span className="text-[10px] w-7 text-right flex-shrink-0 tabular-nums"
+                  style={{ color: "var(--text-3)" }}>{formatRank(gapRanks[c.slug])}</span>
                 <span className="text-base">{c.flag}</span>
                 <span className="text-sm font-semibold flex-1 truncate group-hover:text-blue-300 transition-colors"
                   style={{ color: "var(--text-1)" }}>{c.name}</span>

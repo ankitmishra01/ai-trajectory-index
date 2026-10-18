@@ -275,6 +275,19 @@ The forward estimate is a directional scenario, not a forecast:
 Projected 2028 score = clamp(Readiness + Trajectory × 1.5, 0, 100)
 ```
 
+### Ranking convention
+
+Scores are integers on a 0–100 scale, so ties are the norm: in the 2026-10-18 snapshot, 172 of 186 economies share a total with at least one other and six share 84. Every ordered list on the site therefore uses **standard competition ranking** ([`lib/rank.ts`](lib/rank.ts)): equal scores receive equal ranks, and the ranks the tie consumes are skipped (1, 2, 3, 4, 4, 4, 4, 4, 4, 10, …). Reading a rank off a sorted array index instead resolved ties by row order in `data/countries.json`, which is not a measurement.
+
+One convention, two display forms, and the `#` belongs to exactly one of them:
+
+| Form | Unique rank | Shared rank | Used by |
+|---|---|---|---|
+| `formatRankLabel` | `#4` | `#4 (tied)` | page titles, `og:title`, JSON-LD, country hero, compare page, what-if simulator |
+| `formatRank` | `4` | `=4` | numeric columns already headed `#` — rankings table, regional tables, adoption, governance gaps, trajectory movers |
+
+The same helper ranks every list, each against its own pool and measure: readiness total, regional readiness total, adoption total, governance gap and projected gain. The CSV and JSON exports ([`components/ExportButton.tsx`](components/ExportButton.tsx), the regional and adoption CSVs) carry the competition rank as a plain integer with no tie marker, so a shared rank appears there as a repeated number.
+
 ### Readiness tiers
 
 | Score | Tier | Interpretation |

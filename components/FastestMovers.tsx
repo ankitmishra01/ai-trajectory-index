@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ScoredCountry } from "@/lib/types";
+import { competitionRankEntriesBy, formatRank } from "@/lib/rank";
 
 interface FastestMoversProps {
   countries: ScoredCountry[];
@@ -34,6 +35,9 @@ function MiniSparkline({ from, to, width = 120, height = 28 }: { from: number; t
 }
 
 export default function FastestMovers({ countries, onSortClick }: FastestMoversProps) {
+  // Competition rank on the projected gain. Several economies share the same gain, so
+  // numbering the five cards 1..5 asserted an order that came from the input array.
+  const gainRanks = competitionRankEntriesBy(countries, (c) => c.slug, (c) => c.projected_score_2028 - c.total_score);
   const top5 = countries.length > 0
     ? [...countries]
         .sort((a, b) => (b.projected_score_2028 - b.total_score) - (a.projected_score_2028 - a.total_score))
@@ -62,7 +66,7 @@ export default function FastestMovers({ countries, onSortClick }: FastestMoversP
           ? Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className="skeleton" style={{ height: 160, background: "var(--dt-surface)" }} />
             ))
-          : top5.map((c, i) => {
+          : top5.map((c) => {
               const gain = Math.round(c.projected_score_2028 - c.total_score);
               return (
                 <Link
@@ -73,7 +77,7 @@ export default function FastestMovers({ countries, onSortClick }: FastestMoversP
                   onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "var(--dt-surface)"; }}
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 12 }}>
-                    <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--dt-text-3)", fontWeight: 600 }}>#{i + 1}</span>
+                    <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--dt-text-3)", fontWeight: 600 }}>{formatRank(gainRanks[c.slug])}</span>
                     <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--positive)", fontWeight: 600 }}>+{gain} pts</span>
                   </div>
                   <div style={{ fontSize: 28, marginBottom: 4 }}>{c.flag}</div>

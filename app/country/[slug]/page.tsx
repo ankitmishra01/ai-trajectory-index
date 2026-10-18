@@ -5,9 +5,13 @@ import CountryPageClient from "@/components/CountryPageClient";
 import type { ScoredCountry } from "@/lib/types";
 import { asFallbackScoredCountry } from "@/lib/provenance";
 import { getScoresResponse } from "@/lib/scoresSource";
-import { competitionRankEntries, formatRank } from "@/lib/rank";
+import { competitionRankEntries, formatRankLabel, type RankEntry } from "@/lib/rank";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ai-trajectory-index.vercel.app";
+
+// The pool the ranks are computed over: the live countries when the snapshot or a live
+// compute is available, the static baseline otherwise. Both shapes carry these three fields.
+type RankPoolEntry = { slug: string; total_score: number; region: string };
 
 function scoreBandLabel(score: number): string {
   if (score >= 80) return "Leading";
@@ -25,7 +29,7 @@ export async function generateMetadata(
   }
 
   // Use the same live scores the page body shows; fall back to the static baseline if sources fail.
-  let pool: { slug: string; total_score: number }[] = staticData.countries;
+  let pool: RankPoolEntry[] = staticData.countries;
   let country: { name: string; total_score: number; projected_score_2028: number; trajectory_label: string } = staticCountry;
   try {
     const { data: live } = await getScoresResponse();
@@ -39,11 +43,11 @@ export async function generateMetadata(
   const delta   = country.projected_score_2028 - country.total_score;
   const deltaStr = delta > 0 ? `+${delta}` : String(delta);
 
-  // Competition ranking: equal totals share a rank, and a shared rank is shown as "=4".
-  const rankEntry = competitionRankEntries(pool)[params.slug];
-  const rank      = formatRank(rankEntry);
+  // Competition ranking: equal totals share a rank, and a shared rank reads "#4 (tied)".
+  // formatRankLabel supplies the "#" — prepending another one is what produced "#=4".
+  const rank = formatRankLabel(competitionRankEntries(pool)[params.slug]);
 
-  const title       = `${country.name} — AI Trajectory Index | ${country.total_score}/100 (#${rank} Global)`;
+  const title       = `${country.name} — AI Trajectory Index | ${country.total_score}/100 · Global ${rank}`;
   const description = `${tier} · ${country.trajectory_label} trajectory · Projected ${country.projected_score_2028}/100 by 2028 (${deltaStr} pts). See how 186 economies rank on AI readiness across Infrastructure, Talent, Governance, Investment and Economic Readiness.`;
   const url         = `${SITE_URL}/country/${params.slug}`;
 
@@ -84,7 +88,7 @@ export default async function CountryPage({ params }: { params: { slug: string }
   const initialCountry: ScoredCountry = asFallbackScoredCountry(staticCountry);
 
   // Live score and rank for structured data (same numbers as the title); static baseline on failure.
-  let pool: { slug: string; total_score: number }[] = staticData.countries;
+  let pool: RankPoolEntry[] = staticData.countries;
   let liveScore = staticCountry.total_score;
   try {
     const { data: live } = await getScoresResponse();
@@ -93,14 +97,22 @@ export default async function CountryPage({ params }: { params: { slug: string }
   } catch {
     /* keep static baseline */
   }
-  const rank = formatRank(competitionRankEntries(pool)[params.slug]);
+
+  // The visible hero reads these same two entries, so the body cannot contradict the title.
+  // Before this, the title ranked against the live pool while the hero read an array index
+  // out of the static baseline, and Finland rendered "=4" in the tab and "#17" on the page.
+  const globalRankEntry: RankEntry | null = competitionRankEntries(pool)[params.slug] ?? null;
+  const regionPool = pool.filter((c) => c.region === staticCountry.region);
+  const regionRankEntry: RankEntry | null = competitionRankEntries(regionPool)[params.slug] ?? null;
+
+  const rank = formatRankLabel(globalRankEntry ?? undefined);
   const url  = `${SITE_URL}/country/${params.slug}`;
 
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Dataset",
     name: `${staticCountry.name} — AI Readiness Score`,
-    description: `AI Readiness Score: ${liveScore}/100. Ranked #${rank} globally across 186 economies.`,
+    description: `AI Readiness Score: ${liveScore}/100. Ranked ${rank} globally across ${pool.length} economies.`,
     url,
     creator: { "@type": "Person", name: "Ankit Mishra", url: "https://ankitmishra.ca" },
     keywords: ["artificial intelligence", "AI readiness", staticCountry.name, staticCountry.region],
@@ -117,7 +129,13 @@ export default async function CountryPage({ params }: { params: { slug: string }
           Countries") so every piece of client state — narrative, active tab,
           expanded pillar — resets for the new country instead of carrying
           over stale state from the previous one. */}
-      <CountryPageClient key={params.slug} slug={params.slug} initialCountry={initialCountry} />
+      <CountryPageClient
+        key={params.slug}
+        slug={params.slug}
+        initialCountry={initialCountry}
+        initialGlobalRank={globalRankEntry}
+        initialRegionRank={regionRankEntry}
+      />
     </>
   );
 }

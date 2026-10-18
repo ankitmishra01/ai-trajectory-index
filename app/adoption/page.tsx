@@ -15,6 +15,7 @@ import { enrichAdoption } from "@/lib/adoption";
 import type { EnrichedAdoption } from "@/lib/adoption";
 import type { ScoredCountry } from "@/lib/types";
 import { asFallbackScoredCountry } from "@/lib/provenance";
+import { competitionRankEntriesBy } from "@/lib/rank";
 
 type SortKey = "adoption_total" | "adoption_gap" | "gap_negative" | "government" | "consumer";
 type Region = "All" | "Americas" | "Europe" | "Asia-Pacific" | "Middle East & Africa";
@@ -135,8 +136,14 @@ export default function AdoptionPage() {
   const topOverperform  = [...enriched].sort((a, b) => b.adoption_gap - a.adoption_gap)[0];
   const topUnderperform = [...enriched].sort((a, b) => a.adoption_gap - b.adoption_gap)[0];
 
+  // Competition ranking on the adoption score, the same convention the readiness table uses.
+  // Reading the rank off the sorted array index ordered economies with identical adoption
+  // totals by their position in data/adoption.json. Feeds the table, the cards and the CSV.
   const globalRanks = useMemo(
-    () => Object.fromEntries(sorted.map((c, i) => [c.slug, i + 1])),
+    () => Object.fromEntries(
+      Object.entries(competitionRankEntriesBy(sorted, (c) => c.slug, (c) => c.adoption_total))
+        .map(([slug, entry]) => [slug, entry.rank])
+    ),
     [sorted]
   );
 

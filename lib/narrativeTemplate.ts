@@ -9,6 +9,7 @@
 // its per-country brief from data rather than a live LLM call.
 
 import type { ScoredCountry, NarrativeSection } from "./types";
+import { competitionRankEntries } from "./rank";
 
 export interface PolicyFacts {
   has_national_ai_strategy?: boolean;
@@ -52,8 +53,10 @@ export function buildFactPack(
   allCountries: ScoredCountry[],
   policy: PolicyFacts
 ) {
-  const ranked = [...allCountries].sort((a, b) => b.total_score - a.total_score);
-  const rank = ranked.findIndex((c) => c.slug === country.slug) + 1;
+  // Competition rank, the same number the page title, the hero and the table publish. The
+  // fact pack feeds both the deterministic brief and the AI prompt, so an index-derived rank
+  // here would have put a different number into the prose than the one on the same page.
+  const rank = competitionRankEntries(allCountries)[country.slug]?.rank ?? 0;
   const regionPeers = allCountries.filter((c) => c.region === country.region);
 
   const pillarKeys = ["infrastructure", "talent", "governance", "investment", "economic_readiness"] as const;

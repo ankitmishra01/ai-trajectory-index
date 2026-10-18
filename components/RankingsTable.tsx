@@ -4,10 +4,13 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import TrajectoryArrow from "./TrajectoryArrow";
 import type { ScoredCountry } from "@/lib/types";
+import { formatRank, type RankEntry } from "@/lib/rank";
 
 interface Props {
   countries: ScoredCountry[];
-  globalRanks: Record<string, number>;
+  // Competition ranks for all 186 economies, so a rank shared by several of them renders as
+  // "=4" in a column already headed "#" rather than implying an order the scores do not have.
+  rankEntries: Record<string, RankEntry>;
   activeRegion?: string;
 }
 
@@ -58,7 +61,7 @@ function SortIcon({ active, dir }: { active: boolean; dir: "asc" | "desc" }) {
   );
 }
 
-export default function RankingsTable({ countries, globalRanks, activeRegion }: Props) {
+export default function RankingsTable({ countries, rankEntries, activeRegion }: Props) {
   const [sortCol, setSortCol]   = useState<SortCol>("rank");
   const [sortDir, setSortDir]   = useState<"asc" | "desc">("asc");
 
@@ -71,22 +74,12 @@ export default function RankingsTable({ countries, globalRanks, activeRegion }: 
     }
   }
 
-  // globalRanks is the full 186-economy map, so a rank that appears more than once is shared.
-  // Shared ranks render as "=4" rather than implying a separation the scores do not support.
-  const sharedRanks = useMemo(() => {
-    const counts: Record<number, number> = {};
-    for (const r of Object.values(globalRanks)) counts[r] = (counts[r] ?? 0) + 1;
-    const shared: Record<number, true> = {};
-    for (const r of Object.values(globalRanks)) if (counts[r] > 1) shared[r] = true;
-    return shared;
-  }, [globalRanks]);
-
   const sorted = useMemo(() => {
     return [...countries].sort((a, b) => {
       let av: number, bv: number;
       if (sortCol === "rank") {
-        av = globalRanks[a.slug] ?? 999;
-        bv = globalRanks[b.slug] ?? 999;
+        av = rankEntries[a.slug]?.rank ?? 999;
+        bv = rankEntries[b.slug]?.rank ?? 999;
       } else if (["infrastructure","talent","governance","investment","economic_readiness"].includes(sortCol)) {
         av = a.scores[sortCol as keyof typeof a.scores].score;
         bv = b.scores[sortCol as keyof typeof b.scores].score;
@@ -96,7 +89,7 @@ export default function RankingsTable({ countries, globalRanks, activeRegion }: 
       }
       return sortDir === "asc" ? av - bv : bv - av;
     });
-  }, [countries, globalRanks, sortCol, sortDir]);
+  }, [countries, rankEntries, sortCol, sortDir]);
 
   if (sorted.length === 0) {
     return (
@@ -150,8 +143,7 @@ export default function RankingsTable({ countries, globalRanks, activeRegion }: 
           </thead>
           <tbody>
             {sorted.map((c) => {
-              const rankValue = globalRanks[c.slug];
-              const rank = rankValue === undefined ? "—" : sharedRanks[rankValue] ? `=${rankValue}` : String(rankValue);
+              const rank = formatRank(rankEntries[c.slug]);
               const { color, glow } = totalScoreColor(c.total_score);
               const isRegionActive = activeRegion && activeRegion !== "All" && c.region === activeRegion;
 
